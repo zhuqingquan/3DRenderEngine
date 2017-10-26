@@ -1,0 +1,170 @@
+#ifndef MIRROR_PRODUCTVERSION 
+#define MIRROR_PRODUCTVERSION 
+#define Version_STR(M,C,P,R) M##.##C##.##P##.##R 
+#define Version(M,C,P,R) M##,##C##,##P##,##R 
+/* 
+ * 产品版本 
+ */ 
+#define ProductVersion Version(1,1,3,3898) 
+#define ProductVersion_STR Version_STR(1,1,3,3898) 
+/* 
+ * 服务器模块文件版本 
+ */ 
+#define FileVersion_BigScreenFactory(Rev) Version(1,0,3,Rev) 
+#define FileVersion_BigScreenFactoryProxy(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MediaStream(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorServer(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorDestop(Rev) Version(1,0,3,Rev) 
+#define FileVersion_DxRender(Rev) Version(1,0,3,Rev) 
+#define FileVersion_FFMpegDecoder(Rev) Version(1,0,3,Rev) 
+#define FileVersion_GetSolutionFromStream(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MemoryPool(Rev) Version(1,0,3,Rev) 
+#define FileVersion_StreamSplit(Rev) Version(1,0,3,Rev) 
+#define FileVersion_BigScreenFactory_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_BigScreenFactoryProxy_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MediaStream_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MirrorServer_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MirrorDestop_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_DxRender_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_FFMpegDecoder_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_GetSolutionFromStream_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MemoryPool_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_StreamSplit_STR(Rev) Version_STR(1,0,3,Rev) 
+/* 
+ * 配置端文件版本 
+ */ 
+#define FileVersion_MirrorConfig(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorConfigLocal(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorConfigSDK(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorMonitor(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorConfig_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MirrorConfigLocal_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MirrorConfigSDK_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MirrorMonitor_STR(Rev) Version_STR(1,0,3,Rev) 
+/* 
+ * 公共模块（底层）文件版本 
+ */ 
+#define FileVersion_MirrorRPC(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorRPC_STR(Rev) Version_STR(1,0,3,Rev) 
+/* 
+ * 服务器SDK文件版本 
+ */ 
+#define FileVersion_MirrorRRPCClient64(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorRRPCClientSDK(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorClient(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorRRPCClient64_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MirrorRRPCClientSDK_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MirrorClient_STR(Rev) Version_STR(1,0,3,Rev) 
+/* 
+ * 显示SDK文件版本 
+ */ 
+#define FileVersion_DxMirrorRender_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MrrorQos_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_MirrorRender_STR(Rev) Version_STR(1,0,3,Rev) 
+#define FileVersion_DxMirrorRender(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MrrorQos(Rev) Version(1,0,3,Rev) 
+#define FileVersion_MirrorRender(Rev) Version(1,0,3,Rev) 
+#define _ProductVersion_STR(V) #V 
+#define ProductVersion_STRING(V) _ProductVersion_STR(V) 
+#endif 
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(中华人民共和国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,3896
+ PRODUCTVERSION 1,0,0,3896
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x7L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404b0"
+        BEGIN
+            VALUE "FileDescription", "MirrorRP 库"
+            VALUE "FileVersion", "1.0.0.3896"
+            VALUE "InternalName", "MirrorRP"
+            VALUE "LegalCopyright", "Copyright (C) 2012"
+            VALUE "OriginalFilename", "MirrorRP.lib"
+            VALUE "ProductName", "MirrorRP 库"
+            VALUE "ProductVersion", "1.0.0.3896"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+#endif    // 中文(中华人民共和国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
