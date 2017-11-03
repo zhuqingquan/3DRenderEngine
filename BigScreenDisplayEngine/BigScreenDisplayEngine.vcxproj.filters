@@ -57,6 +57,9 @@
     <ClCompile Include="WindowModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RawFileSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BigScreenBackground.h">
@@ -108,6 +111,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WindowModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RawFileSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

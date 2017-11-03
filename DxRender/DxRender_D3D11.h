@@ -129,6 +129,10 @@ namespace zRender
 		IRawFrameTexture* createTexture(PIXFormat pixFmt, int width, int height, 
 							unsigned char* initData = NULL, int initDataLen = 0, bool isShared = false);
 
+		IRawFrameTexture* createTexture(PIXFormat pixfmt, int width, int height, TEXTURE_USAGE usage, bool bShared, unsigned char* initData, int dataLen, int pitch);
+
+		IRawFrameTexture* openSharedTexture(IRawFrameTexture* sharedTexture);
+
 		/**
 		 *	@name		releaseTexture
 		 *	@brief		 Õ∑≈Texture∂‘œÛ

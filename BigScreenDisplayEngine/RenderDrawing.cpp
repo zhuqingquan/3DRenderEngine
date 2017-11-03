@@ -217,12 +217,12 @@ int RenderDrawing::doRenderWork()
 		}
 		render->present(0);
 		//将RenderTarget中的内容保存到文件中
-		if(0==m_render->getSnapshot(pdstData, dstDataLen, dstWidth, dstHeight, dstPixfmt, dstPitch))
-		{
-			int len = dstPitch * dstHeight;
-			dstOuput.write((char*)pdstData, len);
-		}
-		Sleep(1000);
+		//if(0==m_render->getSnapshot(pdstData, dstDataLen, dstWidth, dstHeight, dstPixfmt, dstPitch))
+		//{
+		//	int len = dstPitch * dstHeight;
+		//	dstOuput.write((char*)pdstData, len);
+		//}
+		Sleep(10);
 	}
 	free(pdstData);
 /*

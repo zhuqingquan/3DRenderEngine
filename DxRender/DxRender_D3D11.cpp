@@ -576,6 +576,104 @@ IRawFrameTexture* DxRender_D3D11::createTexture(PIXFormat pixFmt, int width, int
 	return tex;
 }
 
+IRawFrameTexture * DxRender_D3D11::createTexture(PIXFormat pixfmt, int width, int height, TEXTURE_USAGE usage, bool bShared, unsigned char * initData, int dataLen, int pitch)
+{
+	if (m_device == NULL)
+	{
+#ifdef _DEBUG
+		printf("DxRender_D3D11 Object have not be inited yet.\n");
+		assert(false);
+#endif
+		return NULL;
+	}
+	IRawFrameTexture* tex = NULL;
+	switch (pixfmt)
+	{
+	case PIXFMT_A8R8G8B8:
+	case PIXFMT_R8G8B8:
+	case PIXFMT_R8G8B8A8:
+	case PIXFMT_B8G8R8A8:
+	case PIXFMT_B8G8R8X8:
+	case PIXFMT_X8R8G8B8:
+		tex = new ARGBTexture_8(pixfmt);
+		break;
+	case PIXFMT_YUY2:
+		tex = new YUVTexture_Packed(pixfmt);
+		break;
+	case PIXFMT_YUV420P:
+	case PIXFMT_YV12:
+		tex = new YUVTexture_Planar(pixfmt);
+		break;
+	case PIXFMT_NV12:
+		tex = new YUVTexture_NV12(pixfmt);
+		break;
+	default:
+	{
+		TCHAR errmsg[1024] = { 0 };
+		swprintf_s(errmsg, 1024, L"DxRender_D3D11 failed to create Texture.unsurport Pixfmt.[Fmt=%d]", pixfmt);
+		log_e(LOG_TAG, errmsg);
+	}
+	break;
+	}
+	if (NULL == tex || 0 != tex->create(m_device, width, height, usage, bShared, (char*)initData, dataLen, pitch))
+	{
+		delete tex;
+		TCHAR errmsg[1024] = { 0 };
+		swprintf_s(errmsg, 1024, L"tex->create failed");
+		log_e(LOG_TAG, errmsg);
+		return NULL;
+	}
+
+	return tex;
+}
+
+IRawFrameTexture * zRender::DxRender_D3D11::openSharedTexture(IRawFrameTexture * sharedTexture)
+{
+	if (sharedTexture == NULL)
+		return NULL;
+	PIXFormat pixfmt = sharedTexture->getPixelFormat();
+	int width = sharedTexture->getWidth();
+	int height = sharedTexture->getHeight();
+	IRawFrameTexture* tex = NULL;
+	switch (pixfmt)
+	{
+	case PIXFMT_A8R8G8B8:
+	case PIXFMT_R8G8B8:
+	case PIXFMT_R8G8B8A8:
+	case PIXFMT_B8G8R8A8:
+	case PIXFMT_B8G8R8X8:
+	case PIXFMT_X8R8G8B8:
+		tex = new ARGBTexture_8(pixfmt);
+		break;
+	case PIXFMT_YUY2:
+		tex = new YUVTexture_Packed(pixfmt);
+		break;
+	case PIXFMT_YUV420P:
+	case PIXFMT_YV12:
+		tex = new YUVTexture_Planar(pixfmt);
+		break;
+	case PIXFMT_NV12:
+		tex = new YUVTexture_NV12(pixfmt);
+		break;
+	default:
+	{
+		TCHAR errmsg[1024] = { 0 };
+		swprintf_s(errmsg, 1024, L"DxRender_D3D11 failed to create Texture.unsurport Pixfmt.[Fmt=%d]", pixfmt);
+		log_e(LOG_TAG, errmsg);
+	}
+	break;
+	}
+	if (NULL == tex || 0 != tex->openSharedTexture(m_device, sharedTexture))
+	{
+		delete tex;
+		TCHAR errmsg[1024] = { 0 };
+		swprintf_s(errmsg, 1024, L"tex->openSharedTexture failed");
+		log_e(LOG_TAG, errmsg);
+		return NULL;
+	}
+	return tex;
+}
+
 int DxRender_D3D11::releaseTexture(IRawFrameTexture** texture)
 {
 	if(NULL==texture)
@@ -861,6 +959,7 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
 	//IRawFrameTexture* texture = displayElem->getTexture();
 	if(texture)
 	{
+		texture->acquireSync(0, INFINITE);
 		/*std::ifstream yuy2FileStream( "D:\\代码黑洞\\datasource\\Frame-720X576.yuy2", std::ios::in | std::ios::binary);
 		if(!yuy2FileStream)
 			return false;
@@ -927,6 +1026,10 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
 	VertexVector* vv = displayElem->getVertex();
 	size_t indexCount = vv ? vv->getIndexCount() : 0;
 	m_context->DrawIndexed(indexCount, 0, 0);
+	if (texture)
+	{
+		texture->releaseSync(0);
+	}
 	return 0;
 }
 
@@ -1035,6 +1138,7 @@ int zRender::DxRender_D3D11::getHeight()
 #include <D3DX11tex.h>
 int zRender::DxRender_D3D11::getSnapshot( unsigned char* pData, UINT& datalen, int& w, int& h, int& pixfmt, int& pitch )
 {
+	return 0;
 	//这个方法的实现性能并不是很高，所以当DxRender_D3D11对象渲染的目标分辨率>=1208*720时，以25fps的帧率调用此接口可能导致CPU上升2~4%（I5）
 	if(m_device==NULL || m_depthView==NULL || NULL==m_context)
 	{

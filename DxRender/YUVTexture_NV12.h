@@ -10,11 +10,11 @@
 #define _ZRENDER_YUVTEXTURE_NV12_H_
 
 #include "IDisplayContentProvider.h"
-#include "IRawFrameTexture.h"
+#include "inc/RawFrameTextureBase.h"
 
 namespace zRender
 {
-	class YUVTexture_NV12 : public IRawFrameTexture
+	class YUVTexture_NV12 : public RawFrameTextureBase
 	{
 	public:
 		/**
@@ -37,6 +37,8 @@ namespace zRender
 		 **/
 		int create(ID3D11Device* device, int width, int height,
 					const char* initData, int dataLen);
+
+		virtual int create(ID3D11Device* device, int width, int height, TEXTURE_USAGE usage, bool bShared, const char* initData, int dataLen, int pitch);
 
 		/**
 		 *	@name		destroy

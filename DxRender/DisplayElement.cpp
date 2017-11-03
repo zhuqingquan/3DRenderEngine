@@ -301,10 +301,11 @@ int DisplayElement::updateTexture(int& identify)
 		return -1004;
 
  	RECT effectReg;
- 	zRender::SharedTexture* shTex = m_TexDataSrc->getSharedTexture(effectReg, identify);
- 	if(NULL==shTex)
+ 	//zRender::SharedTexture* shTex = m_TexDataSrc->getSharedTexture(effectReg, identify);
+	zRender::IRawFrameTexture* tex = m_TexDataSrc->getTexture();
+ 	if(NULL!=tex)
  	{
-/*	int dataLen, width, height, yPitch, uPitch, vPitch;
+	int dataLen, width, height, yPitch, uPitch, vPitch;
 	PIXFormat pixfmt;
 	unsigned char* pData = m_TexDataSrc->getData(dataLen, yPitch, uPitch, vPitch, width, height, pixfmt, effectReg, identify);
 	int effectRegWidth = effectReg.right-effectReg.left;
@@ -319,14 +320,15 @@ int DisplayElement::updateTexture(int& identify)
 	copyedReg.right = (LONG)(effectReg.left + (effectRegWidth * m_TexEffectiveReg.right + 0.5));
 	copyedReg.top = (LONG)(effectReg.top + (effectRegHeight * m_TexEffectiveReg.top + 0.5));
 	copyedReg.bottom = (LONG)(effectReg.top + (effectRegHeight * m_TexEffectiveReg.bottom + 0.5));
+	return m_TexDataSrc->copyDataToTexture(RECT_f(0, 1, 0, 1), pData, yPitch, height, identify);
 	return m_texture->update(pData, dataLen, yPitch, uPitch, vPitch, width, height, copyedReg, m_contex);
-*/ 	
-		return -1005;
+	return -1005;
 	}
- 	else
- 	{
- 		return m_texture->update(shTex, effectReg, m_contex);
- 	}
+ 	//else
+ 	//{
+ 	//	return m_texture->update(shTex, effectReg, m_contex);
+ 	//}
+	////////////////////////////////////////////////////////////////////////////////
 // 	D3D11_MAPPED_SUBRESOURCE mappedRes;
 // 	ZeroMemory(&mappedRes, sizeof(mappedRes));
 // 	D3D11_TEXTURE2D_DESC texDesc;
@@ -359,4 +361,19 @@ float zRender::DisplayElement::getAlpha() const
 void zRender::DisplayElement::enableTransparent( bool enable )
 {
 	m_isEnableTransparent = enable;
+}
+
+int zRender::DisplayElement::openSharedTexture(IRawFrameTexture * sharedTexture)
+{
+	if (sharedTexture == NULL)
+		return -1;
+	if (m_texture)
+	{
+		//releaseTexTureResource();
+		return 0;
+	}
+	m_texture = m_dxRender->openSharedTexture(sharedTexture);
+	if (NULL == m_texture)
+		return -2;
+	return 0;
 }

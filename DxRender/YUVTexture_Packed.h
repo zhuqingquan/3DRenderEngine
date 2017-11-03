@@ -11,18 +11,20 @@
 
 #include "DxZRenderDLLDefine.h"
 #include "IDisplayContentProvider.h"
-#include "IRawFrameTexture.h"
+#include "inc/RawFrameTextureBase.h"
 
 #pragma warning(push)
 #pragma warning(disable:4251)
 
 namespace zRender
 {
+	class TextureResource;
+
 	/**
 	 *	@name	YUVTexture_Packed
 	 *	@brief	紧凑型内存布局的YUV像素类型的图片在显卡中显示所需的Texture资源类，先只支持PIXFMT_YUY2类型
 	 **/
-	class DX_ZRENDER_EXPORT_IMPORT YUVTexture_Packed : public IRawFrameTexture
+	class DX_ZRENDER_EXPORT_IMPORT YUVTexture_Packed : public RawFrameTextureBase
 	{
 	public:
 		/**
@@ -45,6 +47,8 @@ namespace zRender
 		 **/
 		int create(ID3D11Device* device, int width, int height,
 					const char* initData, int dataLen);
+
+		virtual int create(ID3D11Device* device, int width, int height, TEXTURE_USAGE usage, bool bShared, const char* initData, int dataLen, int pitch);
 
 		/**
 		 *	@name		destroy
@@ -117,6 +121,8 @@ namespace zRender
 			bool valid() const;
 		};
 		FrameTexture m_VideoFrame;
+		TextureResource* m_yuvTexRes;
+		TextureResource* m_parityTexRes;
 
 		FrameTexture create_txframe(ID3D11Device* device, int width, int height,
 			const char* initData, int dataLen);

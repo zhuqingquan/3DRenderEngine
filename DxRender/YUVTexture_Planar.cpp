@@ -16,7 +16,7 @@ const float factorToFrameBufLen_yuvPlanar = 1.5;
 #define LOG_TAG L"D3D11_YUVTexture_Plannar"
 
 YUVTexture_Planar::YUVTexture_Planar(PIXFormat yuvFmt)
-	: IRawFrameTexture(yuvFmt)
+	: RawFrameTextureBase(yuvFmt)
 {
 	if(m_pixfmt!=PIXFMT_YUV420P && m_pixfmt!=PIXFMT_YV12)
 		m_pixfmt = PIXFMT_UNKNOW;
@@ -49,6 +49,11 @@ int YUVTexture_Planar::create(ID3D11Device* device, int width, int height, const
 	m_width = width;
 	m_height = height;
 	return 0;
+}
+
+int YUVTexture_Planar::create(ID3D11Device * device, int width, int height, TEXTURE_USAGE usage, bool bShared, const char * initData, int dataLen, int pitch)
+{
+	return -1;
 }
 
 int YUVTexture_Planar::destroy()

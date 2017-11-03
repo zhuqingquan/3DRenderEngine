@@ -26,6 +26,7 @@ namespace zRender
 	class BackgroundComponent;
 	class IDisplayContentProvider;
 	class SharedTexture;
+	class IRawFrameTexture;
 
 	/**
 	 *	@name		DxRender
@@ -110,6 +111,12 @@ namespace zRender
 		 *	@return		int 0--³É¹¦   <0--Ê§°Ü
 		 */
 		int releaseDisplayElement(DisplayElement** displayElement);
+
+		IRawFrameTexture * createTexture(PIXFormat pixfmt, int width, int height, TEXTURE_USAGE usage, bool bShared, unsigned char * initData, int dataLen, int pitch);
+
+		IRawFrameTexture* openSharedTexture(IRawFrameTexture* sharedTexture);
+
+		void releaseTexture(IRawFrameTexture** rawFrameTexture);
 
 		int createSharedTexture(SharedTexture** ppSharedTex, PIXFormat pixfmt);
 

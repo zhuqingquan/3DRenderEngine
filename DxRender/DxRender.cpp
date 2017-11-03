@@ -57,6 +57,21 @@ int DxRender::releaseDisplayElement(DisplayElement** displayElement)
 	return m_renderImp->releaseDisplayElement(displayElement);
 }
 
+IRawFrameTexture * DxRender::createTexture(PIXFormat pixfmt, int width, int height, TEXTURE_USAGE usage, bool bShared, unsigned char * initData, int dataLen, int pitch)
+{
+	return m_renderImp->createTexture(pixfmt, width, height, usage, bShared, initData, dataLen, pitch);
+}
+
+IRawFrameTexture * zRender::DxRender::openSharedTexture(IRawFrameTexture * sharedTexture)
+{
+	return m_renderImp->openSharedTexture(sharedTexture);
+}
+
+void DxRender::releaseTexture(IRawFrameTexture ** rawFrameTexture)
+{
+	m_renderImp->releaseTexture(rawFrameTexture);
+}
+
 int DxRender::draw(DisplayElement* displayElem)
 {
 	return m_renderImp->draw(displayElem);

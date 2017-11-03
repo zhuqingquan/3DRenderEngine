@@ -9,7 +9,7 @@
 #ifndef _ZRENDER_ARGB_TEXTURE_H_
 #define _ZRENDER_ARGB_TEXTURE_H_
 
-#include "IRawFrameTexture.h"
+#include "inc/RawFrameTextureBase.h"
 
 namespace zRender
 {
@@ -17,7 +17,7 @@ namespace zRender
 	 *	@name		ARGBTexture_8
 	 *	@brief		ARGB像素类型的图片在显卡中显示所需的Texture资源类，先只支持PIXFMT_A8R8G8B8类型，PIXFMT_R8G8B8不支持
 	 */
-	class ARGBTexture_8 : public IRawFrameTexture
+	class ARGBTexture_8 : public RawFrameTextureBase
 	{
 	public:
 		/**
@@ -40,6 +40,8 @@ namespace zRender
 		 **/
 		int create(ID3D11Device* device, int width, int height,
 					const char* initData, int dataLen);
+
+		virtual int create(ID3D11Device* device, int width, int height, TEXTURE_USAGE usage, bool bShared, const char* initData, int dataLen, int pitch);
 
 		/**
 		 *	@name		destroy

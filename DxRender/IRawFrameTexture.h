@@ -17,6 +17,7 @@
 namespace zRender
 {
 	class SharedTexture;
+	class TextureResource;
 
 	/**
 	 * @name		IRawFrameTexture
@@ -53,6 +54,10 @@ namespace zRender
 		virtual int create(ID3D11Device* device, int width, int height,
 							const char* initData, int dataLen) = 0;
 
+		virtual int create(ID3D11Device* device, int width, int height, TEXTURE_USAGE usage, bool bShared, const char* initData, int dataLen, int pitch) = 0;
+
+		virtual int openSharedTexture(ID3D11Device* device, IRawFrameTexture* sharedTexture) = 0;
+
 		/**
 		 *	@name		destroy
 		 *	@brief		销毁create方法中所创建的资源
@@ -68,6 +73,8 @@ namespace zRender
 		 *	@return		int 0--成功	<0--失败 ， 当create失败或者destroy已经调用时，调用该接口也会是失败
 		 **/
 		virtual int getTexture(ID3D11Texture2D** outTexs, int& texsCount) const = 0;
+
+		virtual int getTextureResources(TextureResource** outTexs, int& texsCount) const = 0;
 
 		/**
 		 *	@name		getTexture
@@ -98,6 +105,8 @@ namespace zRender
 
 		virtual int update(SharedTexture* pSharedTexture, const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex) = 0;
 
+		virtual int copyTexture(const IRawFrameTexture* srcTexture) = 0;
+
 		/**
 		 *	@name		getWidth
 		 *	@brief		获取图片的宽，像素值
@@ -126,6 +135,8 @@ namespace zRender
 		 **/
 		PIXFormat getPixelFormat() const { return m_pixfmt; }
 
+		virtual int acquireSync(int key, unsigned int timeout) = 0;
+		virtual int releaseSync(int key) = 0;
 	protected:
 		PIXFormat m_pixfmt;
 		int m_width;

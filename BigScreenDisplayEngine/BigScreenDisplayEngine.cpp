@@ -19,6 +19,7 @@
 #include "ScreenRender.h"
 #include "BigViewport.h"
 #include "CommandShell.h"
+#include "RawFileSource.h"
 
 using namespace SOA::Mirror::Render;
 using namespace std;
@@ -447,8 +448,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	//rd4->start(timerHandle);
 	rd4->start(timerHandleVec[3]);*/
 //	system("pause");
-
-	BigView* view = new BigView(zRender::RECT_f(0.0, 1, 0.0, 1));
+	ScreenRender* sr = screen->getScreenRender(0, 0);
+	RenderDrawing* rd = sr->getRenderDrawing();
+	zRender::DxRender* dxrender = rd->getDxRender();
+	zRender::RawFileSource* fileSrc = new zRender::RawFileSource(dxrender);
+	fileSrc->open(_T("D:\\InsideMoveVtc.yuv"), zRender::PIXFMT_YUY2, 1920, 1080);
+	
+	BigView* view = fileSrc->createSourceView();
+	//BigView* view = new BigView(zRender::RECT_f(0.0, 1, 0.0, 1));
 
 	//zRender::RECT_f regOfBigScreen(0.0, 1.0, 1, 2);
 	//zRender::RECT_f regOfBigViewport(0, 0.5, 0, 0.5);
@@ -525,6 +532,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	//render->draw(displayEle);
 
 	//render->present(0);
+	fileSrc->start(25);
 
 	printf("Press Any key to disattachView  ");
 	system("pause");

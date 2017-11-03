@@ -101,6 +101,7 @@
     <ClCompile Include="d3dAdapterOutputEnumerator.cpp" />
     <ClCompile Include="IndependentBigScreenBackground.cpp" />
     <ClCompile Include="MergedBigScreenBackground.cpp" />
+    <ClCompile Include="RawFileSource.cpp" />
     <ClCompile Include="RenderDrawing.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="ScreenRender.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="d3dAdapterOutputEnumerator.h" />
     <ClInclude Include="IndependentBigScreenBackground.h" />
     <ClInclude Include="MergedBigScreenBackground.h" />
+    <ClInclude Include="RawFileSource.h" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="RenderDrawing.h" />
     <ClInclude Include="Screen.h" />

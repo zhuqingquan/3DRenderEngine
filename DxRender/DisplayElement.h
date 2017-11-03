@@ -186,6 +186,9 @@ namespace zRender
 		float getAlpha() const;
 		void enableTransparent(bool enable);
 		bool isEnableTransparent() const { return m_isEnableTransparent;}
+
+		//////////////////////////支持打开共享显存用于显示///////////////////////////////
+		int openSharedTexture(IRawFrameTexture* sharedTexture);
 	private:
 		DisplayElement(const DisplayElement& rObj);
 		DisplayElement& operator=(const DisplayElement& robj);

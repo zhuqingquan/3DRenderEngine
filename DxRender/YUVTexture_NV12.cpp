@@ -11,7 +11,7 @@ const float factorToFrameBufLen_nv12 = 1.5;
 #define LOG_TAG L"D3D11_YUVTexture_NV12"
 
 YUVTexture_NV12::YUVTexture_NV12(PIXFormat pixfmt)
-	: IRawFrameTexture(pixfmt)
+	: RawFrameTextureBase(pixfmt)
 	, m_yTex(NULL), m_uvTex(NULL)
 	, m_ySRV(NULL), m_uvSRV(NULL)
 {
@@ -95,6 +95,11 @@ int YUVTexture_NV12::create(ID3D11Device* device, int width, int height, const c
 ErrorEnd:
 	destroy();
 	return -3;
+}
+
+int YUVTexture_NV12::create(ID3D11Device * device, int width, int height, TEXTURE_USAGE usage, bool bShared, const char * initData, int dataLen, int pitch)
+{
+	return -1;
 }
 
 int YUVTexture_NV12::destroy()

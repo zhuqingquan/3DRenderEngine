@@ -32,6 +32,7 @@ namespace Render
 		virtual int setEffectiveReg(const zRender::RECT_f& effectiveReg);
 		virtual bool isNeedShow() const;
 
+		bool attachTextureSource(zRender::TextureDataSource* textureDataSrc);
 	private:
 		int createContentProvider();
 		void releaseContentProvider();

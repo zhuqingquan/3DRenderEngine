@@ -13,6 +13,7 @@ class VideoContentProvider : public IDisplayContentProvider
 public:
 	VideoContentProvider(const RECT_f& effctiveReg)
 		: m_srcUpdater(NULL)
+		, m_dataSrc(NULL)
 	{
 		m_vv = new VertexVector(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		zRender::Vertex ver[4];
@@ -33,11 +34,12 @@ public:
 		//PictureTextureDataSource* ptds = new PictureTextureDataSource("D:\\´úÂëºÚ¶´\\datasource\\frame-nv12.nv12", 720, 576, PIXFMT_NV12);
 		//ptds->setEffectiveReg(effctiveReg);
 		//m_dataSrc  = ptds;
-		VideoTextureDataSource* vtds = new VideoTextureDataSource("d:\\InsideMoveVtc.yuv", zRender::PIXFMT_YUY2, 1920, 1080, 1920*2);
-		vtds->setEffectiveReg(effctiveReg);
-		m_dataSrc  = vtds;
-		m_srcUpdater = new VideoTextureSourceUpdater(vtds, 25);
-		m_srcUpdater->start();
+
+		//VideoTextureDataSource* vtds = new VideoTextureDataSource("d:\\InsideMoveVtc.yuv", zRender::PIXFMT_YUY2, 1920, 1080, 1920*2);
+		//vtds->setEffectiveReg(effctiveReg);
+		//m_dataSrc  = vtds;
+		//m_srcUpdater = new VideoTextureSourceUpdater(vtds, 25);
+		//m_srcUpdater->start();
 
 		m_vertexIdentify = 1;
 	}
@@ -55,7 +57,7 @@ public:
 			m_srcUpdater = NULL;
 		}
 
-		delete m_dataSrc;
+		//delete m_dataSrc;
 		m_dataSrc = NULL;
 	}
 
@@ -222,6 +224,12 @@ public:
 		return 0;
 	}
 
+	bool setTextureDataSource(zRender::TextureDataSource* textureDataSrc) 
+	{
+		m_dataSrc = textureDataSrc;
+		return true;
+	}
+
 	TextureDataSource* getTextureDataSource() { return m_dataSrc; }
 	void* getShader() { return NULL; }
 
@@ -310,6 +318,19 @@ bool BigView::isNeedShow() const
 		}
 	}
 	return isNeedShow;
+}
+
+bool SOA::Mirror::Render::BigView::attachTextureSource(zRender::TextureDataSource * textureDataSrc)
+{
+	if (m_contentProvider == NULL)
+		if (0 != createContentProvider())
+			return false;
+	if (m_contentProvider)
+	{
+		VideoContentProvider* vcp = dynamic_cast<VideoContentProvider*>(m_contentProvider);
+		vcp->setTextureDataSource(textureDataSrc);
+	}
+	return true;
 }
 
 int BigView::createContentProvider()

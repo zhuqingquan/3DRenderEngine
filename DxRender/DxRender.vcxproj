@@ -111,6 +111,9 @@
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="LightHelper.cpp" />
     <ClCompile Include="SharedFrameTexture.cpp" />
+    <ClCompile Include="src\RawFrameTextureBase.cpp" />
+    <ClCompile Include="src\SharedTextureSource.cpp" />
+    <ClCompile Include="src\TextureResource.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="VideoContentProvider.cpp" />
@@ -133,6 +136,8 @@
     <ClInclude Include="DxZRenderDLLDefine.h" />
     <ClInclude Include="Effects.h" />
     <ClInclude Include="IDisplayContentProvider.h" />
+    <ClInclude Include="inc\RawFrameTextureBase.h" />
+    <ClInclude Include="inc\SharedTextureSource.h" />
     <ClInclude Include="inc\TextureResource.h" />
     <ClInclude Include="IRawFrameTexture.h" />
     <ClInclude Include="LightHelper.h" />

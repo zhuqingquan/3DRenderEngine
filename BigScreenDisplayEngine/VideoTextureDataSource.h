@@ -7,6 +7,11 @@
 #include <fstream>
 #include <assert.h>
 
+namespace zRender
+{
+	class IRawFrameTexture;
+}
+
 namespace SOA
 {
 namespace Mirror
@@ -133,6 +138,8 @@ namespace Render
 		{
 			return NULL;
 		}
+
+		zRender::IRawFrameTexture* getTexture() { return NULL; }
 
 		int copyDataToTexture(const zRender::RECT_f& textureReg, unsigned char* dstTextureData, int pitch, int height, int& identify)
 		{

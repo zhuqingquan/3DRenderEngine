@@ -12,6 +12,11 @@
 
 #include "IDisplayContentProvider.h"
 
+namespace zRender
+{
+	class IRawFrameTexture;
+}
+
 namespace SOA
 {
 namespace Mirror
@@ -121,6 +126,10 @@ namespace Render
 		
 		zRender::SharedTexture* getSharedTexture(RECT& effectReg, int& identify)
 		{
+			return NULL;
+		}
+
+		zRender::IRawFrameTexture* getTexture() {
 			return NULL;
 		}
 

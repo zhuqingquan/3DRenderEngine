@@ -15,7 +15,7 @@ namespace zRender
 		~TextureResource();
 
 		int create(ID3D11Device* device, int width, int height, DXGI_FORMAT dxgifmt, TEXTURE_USAGE usage, bool bShared, const char* initData, int dataLen, int pitch);
-		int open(HANDLE sharedHandle);
+		int open(ID3D11Device* device, HANDLE sharedHandle);
 		void release();
 		ID3D11Texture2D* getTexture() const { return m_texture; }
 
@@ -35,15 +35,21 @@ namespace zRender
 
 		bool isShared() const { return m_bShared; }
 		HANDLE getSharedHandle() const { return m_sharedHandle; }
+
+		int acquireSync(int key, unsigned int timeout);
+		int releaseSync(int key);
 	private:
-		ID3D11Texture2D*			m_texture;
-		ID3D11ShaderResourceView*	m_rsv;
+		void getSharedHandleFromTexture();
+	private:
+		ID3D11Texture2D*			m_texture;		//init when call create()
+		ID3D11ShaderResourceView*	m_rsv;			//init when call createResourceView()
 		int m_width;
 		int m_height;
 		DXGI_FORMAT m_dxgifmt;
 		TEXTURE_USAGE m_usage;
 		bool m_bShared;
-		HANDLE m_sharedHandle;
+		HANDLE m_sharedHandle;						//be getted when call create() and bShared==true
+		IDXGIKeyedMutex* m_resMutex;				//be getted when call create() and bShared==true
 
 		ID3D11Device* m_device;
 		ID3D11DeviceContext* m_contex;

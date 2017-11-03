@@ -12,7 +12,7 @@
 
 #include <vector>
 #include "DxRenderCommon.h"
-#include "IRawFrameTexture.h"
+#include "inc/RawFrameTextureBase.h"
 
 namespace zRender
 {
@@ -20,7 +20,7 @@ namespace zRender
 	 *	@name	YUVTexture_Planar
 	 *	@brief	YUV图片在显卡中显示所需的Texture资源类，只能用于平面型数据内存布局格式的YUV图片，包括YUV420P（I420）、YV12
 	 **/
-	class YUVTexture_Planar : public IRawFrameTexture
+	class YUVTexture_Planar : public RawFrameTextureBase
 	{
 	public:
 		/**
@@ -43,6 +43,8 @@ namespace zRender
 		 **/
 		int create(ID3D11Device* device, int width, int height,
 					const char* initData, int dataLen);
+
+		virtual int create(ID3D11Device* device, int width, int height, TEXTURE_USAGE usage, bool bShared, const char* initData, int dataLen, int pitch);
 
 		/**
 		 *	@name		destroy

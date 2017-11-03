@@ -8,7 +8,7 @@ using namespace zRender;
 #define LOG_TAG L"D3D11_ARGBTexture_8"
 
 ARGBTexture_8::ARGBTexture_8(PIXFormat pixfmt)
-	: IRawFrameTexture(pixfmt)
+	: RawFrameTextureBase(pixfmt)
 	//, m_rgbTex(NULL), m_rgbSRV(NULL)
 {
 	//ARGBTexture_8类型的Texture只支持ARGB或者RGB内存布局的图片显示
@@ -44,6 +44,11 @@ int ARGBTexture_8::create(ID3D11Device* device, int width, int height,
 	m_width = width;
 	m_height = height;
 	return 0;
+}
+
+int ARGBTexture_8::create(ID3D11Device * device, int width, int height, TEXTURE_USAGE usage, bool bShared, const char * initData, int dataLen, int pitch)
+{
+	return -1;
 }
 
 int ARGBTexture_8::destroy()

@@ -136,7 +136,10 @@ void BigViewportPartition::updateTexture()
 		ret = tds->getTextureProfile(m_regOfBigViewport, dataLen, pitch, uPitch, vPitch, width, height, pixelFmt);
 		if(ret!=0 || dataLen==0 || pixelFmt==0 || width==0 || height==0)
 			return;
-		m_attachedDE->setTexture(pixelFmt, width, height);
+		//m_attachedDE->setTexture(pixelFmt, width, height);
+		zRender::TextureDataSource* texDataSrc = m_cttProvider->getTextureDataSource();
+		zRender::IRawFrameTexture* rawTexture = texDataSrc->getTexture();
+		m_attachedDE->openSharedTexture(rawTexture);
 		m_attachedDE->setTextureDataSource(tds, m_regOfBigViewport);
 		m_attachedDE->createRenderResource();
 		m_attachedDE->updateTexture(m_curDrawedTextureIdentify);

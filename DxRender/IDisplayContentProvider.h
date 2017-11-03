@@ -16,6 +16,7 @@
 namespace zRender
 {
 	class SharedTexture;
+	class IRawFrameTexture;
 
 	/**
 	 *	@name		TextureDataSource
@@ -83,6 +84,8 @@ namespace zRender
 		 *	@return		SharedTexture* 非NULL--共享显存对象	 NULL--无数据
 		 **/
 		virtual SharedTexture* getSharedTexture(RECT& effectReg, int& identify) = 0;
+
+		virtual IRawFrameTexture* getTexture() = 0;
 
 		/**
 		 *	@name		copyDataToTexture

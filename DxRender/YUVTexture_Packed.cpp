@@ -1,13 +1,15 @@
 #include "YUVTexture_Packed.h"
 #include "DxRenderCommon.h"
 #include "DXLogger.h"
+#include "inc/TextureResource.h"
 
 using namespace zRender;
 
 #define LOG_TAG L"D3D11_YUVTexture_Packed"
 
 YUVTexture_Packed::YUVTexture_Packed(PIXFormat pixfmt)
-	: IRawFrameTexture(pixfmt)
+	: RawFrameTextureBase(pixfmt)
+	, m_yuvTexRes(NULL), m_parityTexRes(NULL)
 {
 	//YUVTexture_Packed类型的Texture只支持YUY2这样紧凑型的YUV内存布局的图片显示
 	if(pixfmt!=PIXFMT_YUY2)
@@ -45,8 +47,64 @@ int YUVTexture_Packed::create(ID3D11Device* device, int width, int height,
 	return 0;
 }
 
+int zRender::YUVTexture_Packed::create(ID3D11Device * device, int width, int height, TEXTURE_USAGE usage, bool bShared, const char * initData, int dataLen, int pitch)
+{
+	if (NULL == device || 0 >= width || 0 >= height || (TEXTURE_USAGE_DEFAULT != usage && bShared))
+		return -1;
+	if (PIXFMT_UNKNOW == m_pixfmt)
+	{
+#ifdef _DEBUG
+		printf("Error in YUVTexture_Packed::create : pixel format is Not support.(PIXFMT=%d)\n", m_pixfmt);
+#endif
+		return -2;
+	}
+	TextureResource* yuvTex = new TextureResource();
+	if (0 != yuvTex->create(device, width, height, DXGI_FORMAT_R8G8_UNORM, usage, bShared, initData, dataLen, pitch))
+	{
+		delete yuvTex;
+		return -3;
+	}
+	m_yuvTexRes = yuvTex;
+	TextureResource* parityTexRes = new TextureResource();
+	unsigned char* parityBuf = (unsigned char*)malloc(width*height);
+	for (int indexHeight = 0; indexHeight < height; indexHeight++)
+	{
+		for (int indexWidth = 0; indexWidth < width; indexWidth++)
+		{
+			parityBuf[width*indexHeight + indexWidth] = (indexWidth % 2) * 255;
+		}
+	}
+	if (0 != parityTexRes->create(device, width, height, DXGI_FORMAT_R8_UNORM, usage, bShared, (char*)parityBuf, width*height, width))
+	{
+		free(parityBuf);
+		delete parityTexRes;
+		return -4;
+	}
+	free(parityBuf);
+	m_parityTexRes = parityTexRes;
+	if (m_textureCount >= 2)
+	{
+		m_textureArray[0] = m_yuvTexRes;
+		m_textureArray[1] = m_parityTexRes;
+	}
+	m_device = device;
+	m_width = width;
+	m_height = height;
+	return 0;
+}
+
 int YUVTexture_Packed::destroy()
 {
+	if (m_yuvTexRes)
+	{
+		m_yuvTexRes->release();
+		m_yuvTexRes = NULL;
+	}
+	if (m_parityTexRes)
+	{
+		m_parityTexRes->release();
+		m_parityTexRes = NULL;
+	}
 	m_VideoFrame.destroy();
 	m_device = NULL;
 	m_width = 0;
@@ -67,7 +125,41 @@ int YUVTexture_Packed::getShaderResourceView(ID3D11ShaderResourceView** outYUVSR
 	if(srvsCount<2 || outYUVSRVs==NULL)
 		return -1;
 
-	return m_VideoFrame.getShaderResourceView(outYUVSRVs, srvsCount);
+	if (m_VideoFrame.valid())
+	{
+		return m_VideoFrame.getShaderResourceView(outYUVSRVs, srvsCount);
+	}
+	else
+	{
+		ID3D11ShaderResourceView* srv = m_textureArray[0]->getResourceView();
+		if (srv == NULL)
+		{
+			if (0 == m_textureArray[0]->createResourceView())
+			{
+				srv = m_textureArray[0]->getResourceView();
+			}
+			else
+			{
+				return -2;
+			}
+		}
+		outYUVSRVs[0] = srv;
+		srv = m_textureArray[1]->getResourceView();
+		if (srv == NULL)
+		{
+			if (0 == m_textureArray[1]->createResourceView())
+			{
+				srv = m_textureArray[1]->getResourceView();
+			}
+			else
+			{
+				return -3;
+			}
+		}
+		outYUVSRVs[1] = srv;
+		srvsCount = 2;
+		return 0;
+	}
 }
 
 int YUVTexture_Packed::update(const unsigned char* pData, int dataLen, int yPitch, int uPitch, int vPitch, int width, int height,
@@ -77,9 +169,16 @@ int YUVTexture_Packed::update(const unsigned char* pData, int dataLen, int yPitc
 	{
 		return -1;
 	}
-	FrameTexture& ft = m_VideoFrame;
-	int ret = ft.update(pData, dataLen, yPitch, uPitch, vPitch, width, height, regionUpdated, d3dDevContex);
-	return ret;
+	if (m_VideoFrame.valid())
+	{
+		FrameTexture& ft = m_VideoFrame;
+		int ret = ft.update(pData, dataLen, yPitch, uPitch, vPitch, width, height, regionUpdated, d3dDevContex);
+		return ret;
+	}
+	else if (m_textureArray[0] && m_textureArray[1])
+	{
+		m_textureArray[0]->update(pData, dataLen, yPitch, width, height, regionUpdated);
+	}
 }
 
 int zRender::YUVTexture_Packed::update(SharedTexture* pSharedTexture, const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex)

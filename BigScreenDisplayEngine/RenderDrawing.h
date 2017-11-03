@@ -114,6 +114,8 @@ namespace Render
 		 **/
 		int getHeightInPixel() const;
 		//int get
+
+		zRender::DxRender* getDxRender() const { return m_render; }
 	private:
 		void addViewportPartition(BigViewportPartition* vpPartition);
 		//void removeViewportPartition(BigViewportPartition* vpPartition);
