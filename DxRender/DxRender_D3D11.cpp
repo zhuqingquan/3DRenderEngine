@@ -1043,7 +1043,7 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
 int DxRender_D3D11::present(int type)
 {
 	if(!m_swapChain)	return -1;
-	if (m_renderTargetView)
+	if (m_renderTargetTexture)
 	{
 		setRenderTargetBackbuffer();
 		clearBackbuffer(m_color);

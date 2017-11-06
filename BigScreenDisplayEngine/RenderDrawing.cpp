@@ -149,7 +149,7 @@ int RenderDrawing::doRenderWork()
 		return -2;
 	}
 
-	render->createOffscreenRenderTarget(1920, 1080);
+	//render->createOffscreenRenderTarget(1920, 1080);
 
 	if(m_background)
 	{
