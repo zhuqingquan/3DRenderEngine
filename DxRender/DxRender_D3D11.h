@@ -21,6 +21,7 @@
 #include "DisplayElement.h"
 #include "Effects.h"
 #include "BackgroundDisplayComponent.h"
+#include "rendertextureclass.h"
 
 namespace zRender
 {
@@ -260,6 +261,9 @@ namespace zRender
 		int getSnapshot(unsigned char* pData, UINT& datalen, int& w, int& h, int& pixfmt, int& pitch);
 		int getSnapshot(SharedTexture** outSharedTexture);
 
+		int createOffscreenRenderTarget(int width, int height);
+		void releaseOffscreenRenderTarget();
+
 		int getWidth();
 		int getHeight();
 		int resize(int new_width, int new_height);
@@ -282,6 +286,12 @@ namespace zRender
 
 		ID3D11InputLayout* findInputLayout(PIXFormat pixfmt) const;
 		ID3DX11EffectPass* findEffectPass(PIXFormat pixfmt) const;
+
+		int setRenderTargetTexture();
+		int setRenderTargetBackbuffer();
+		int createDisplayElemForOffscreenRTT();
+		int drawOffscreenRenderTarget();
+		int clearBackbuffer(DWORD color);
 	private:
 		IDXGIAdapter* m_adapter;
 		ID3D11Device* m_device;
@@ -322,6 +332,10 @@ namespace zRender
 		ID3D11BlendState* m_TransparentBS;
 
 		//BackgroundComponent* m_backgroundComponent;
+		DWORD m_color;
+		RenderTextureClass* m_renderTargetTexture;//Offscreen Render Target Texture
+		DisplayElement* m_rttDsplElem;
+		IDisplayContentProvider* m_rttDsplCttPrv;
 	};
 }
 #endif

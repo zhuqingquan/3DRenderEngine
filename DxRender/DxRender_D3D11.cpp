@@ -25,6 +25,8 @@ DxRender_D3D11::DxRender_D3D11()
 	, m_TransparentBS(NULL)
 	, m_bEnable4xMsaa(false)
 	, m_renderTargetView(NULL)
+	, m_renderTargetTexture(NULL), m_rttDsplCttPrv(NULL), m_rttDsplElem(NULL)
+	, m_color(0)
 {
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_worldBaseTransform, I);
@@ -401,6 +403,7 @@ int zRender::DxRender_D3D11::init(HMONITOR hmonitor)
 
 void DxRender_D3D11::deinit()
 {
+	releaseOffscreenRenderTarget();
 	ReleaseCOM(m_TransparentBS);
 	releaseInputLayout();
 	releaseComputeShader();
@@ -832,6 +835,10 @@ void DxRender_D3D11::releaseInputLayout()
 
 int DxRender_D3D11::draw(DisplayElement* displayElem)
 {
+	if (m_renderTargetTexture)
+	{
+		setRenderTargetTexture();
+	}
 	if(m_device==NULL || m_depthView==NULL)
 	{
 #ifdef _DEBUG
@@ -1036,6 +1043,12 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
 int DxRender_D3D11::present(int type)
 {
 	if(!m_swapChain)	return -1;
+	if (m_renderTargetView)
+	{
+		setRenderTargetBackbuffer();
+		clearBackbuffer(m_color);
+		drawOffscreenRenderTarget();
+	}
 	m_swapChain->Present(type, 0);
 	getSnapshot(NULL);
 	return 0;
@@ -1043,14 +1056,20 @@ int DxRender_D3D11::present(int type)
 
 int DxRender_D3D11::clear(DWORD color)
 {
-	int a = (color & 0xff000000) >> 24;
-	int r = (color & 0x00ff0000) >> 16;
-	int g = (color & 0x0000ff00) >> 8;
-	int b = (color & 0x000000ff) >> 0;
-	float colorBack[4] = {(float)r/256, (float)g/256, (float)b/256, (float)a/256};
-	m_context->ClearRenderTargetView(m_renderTargetView, reinterpret_cast<const float*>(colorBack));
-	m_context->ClearDepthStencilView(m_depthView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
-	return 0;
+	m_color = color;
+	if (m_renderTargetTexture)
+	{
+		int a = (color & 0xff000000) >> 24;
+		int r = (color & 0x00ff0000) >> 16;
+		int g = (color & 0x0000ff00) >> 8;
+		int b = (color & 0x000000ff) >> 0;
+		m_renderTargetTexture->ClearRenderTarget(m_context, m_depthView, (float)r / 256, (float)g / 256, (float)b / 256, (float)a / 256);
+		return 0;
+	}
+	else
+	{
+		return clearBackbuffer(color);
+	}
 }
 
 ID3D11InputLayout* DxRender_D3D11::findInputLayout(PIXFormat pixfmt) const
@@ -1290,6 +1309,268 @@ int zRender::DxRender_D3D11::getSnapshot(SharedTexture** outSharedTexture)
  	IDirect3DTexture9* openedTex = NULL;
  	sharedRes->open(dx9Render->getDevice(), (void**)&openedTex);
 	delete sharedRes;
+	return 0;
+}
+
+int zRender::DxRender_D3D11::createOffscreenRenderTarget(int width, int height)
+{
+	if (m_device == NULL)
+		return -1;
+	if (width <= 0 || height <= 0 || width > 1920 * 4 || height > 1080 * 4)
+		return -2;
+	if (m_renderTargetTexture)	return -3;
+	m_renderTargetTexture = new RenderTextureClass();
+	if (!m_renderTargetTexture->Initialize(m_device, width, height))
+	{
+		return -4;
+	}
+	return 0;
+}
+
+void zRender::DxRender_D3D11::releaseOffscreenRenderTarget()
+{
+	if (m_rttDsplElem)
+	{
+		this->releaseDisplayElement(&m_rttDsplElem);
+	}
+	if (m_rttDsplCttPrv)
+	{
+		delete m_rttDsplCttPrv;
+		m_rttDsplCttPrv = NULL;
+	}
+	if (m_renderTargetTexture)
+	{
+		m_renderTargetTexture->Shutdown();
+		delete m_renderTargetTexture;
+		m_renderTargetTexture = NULL;
+	}
+}
+
+#include "VideoContentProvider.h"
+int zRender::DxRender_D3D11::createDisplayElemForOffscreenRTT()
+{
+	DisplayElement* rttDsplElem = this->createDisplayElement(m_visibleReg, 0);
+	IDisplayContentProvider* dsplCttProvider = new VideoContentProvider(NULL);
+	VertexVector* vv[2] = { NULL };
+	int vvCount = 2;
+	int idt = 0;
+	dsplCttProvider->getVertexs(vv, vvCount, idt);
+	rttDsplElem->setVertex(vv[0]);
+	rttDsplElem->createRenderResource();
+	m_rttDsplCttPrv = dsplCttProvider;
+	m_rttDsplElem = rttDsplElem;
+	return 0;
+}
+
+int zRender::DxRender_D3D11::setRenderTargetTexture()
+{
+	if (NULL == m_renderTargetTexture)
+		return -1;
+	m_renderTargetTexture->SetRenderTarget(m_context, m_depthView);
+	m_viewport.TopLeftX = 0;
+	m_viewport.TopLeftY = 0;
+	m_viewport.Width = static_cast<float>(m_renderTargetTexture->GetWidth());
+	m_viewport.Height = static_cast<float>(m_renderTargetTexture->GetHeight());
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
+
+	m_context->RSSetViewports(1, &m_viewport);
+	return 0;
+}
+
+int zRender::DxRender_D3D11::setRenderTargetBackbuffer()
+{
+	if (m_swapChain == NULL || m_renderTargetView==NULL)
+		return -1;
+	m_context->OMSetRenderTargets(1, &m_renderTargetView, m_depthView);
+	m_viewport.TopLeftX = 0;
+	m_viewport.TopLeftY = 0;
+	m_viewport.Width = static_cast<float>(m_winWidth);
+	m_viewport.Height = static_cast<float>(m_winHeight);
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
+
+	m_context->RSSetViewports(1, &m_viewport);
+	return 0;
+}
+
+int zRender::DxRender_D3D11::drawOffscreenRenderTarget()
+{
+	if (NULL == m_renderTargetTexture)
+		return -1;
+	if (m_rttDsplElem == NULL)
+	{
+		createDisplayElemForOffscreenRTT();
+	}
+	ID3DX11EffectPass* selectedPass = NULL;
+	ID3D11InputLayout* inputLayout = NULL;
+	//DXGI_FORMAT texPixfmt = m_renderTargetTexture->GetPixelFormat();
+	assert(m_defaultVideoEffect);
+	selectedPass = findEffectPass(zRender::PIXFMT_B8G8R8A8);
+	inputLayout = findInputLayout(zRender::PIXFMT_B8G8R8A8);
+	if (inputLayout == NULL)
+	{
+#ifdef _DEBUG
+		printf("Error in DxRender_D3D11::drawOffscreenRenderTarget : Can not find InputLayout for PixFormat(%d).\n", texPixfmt);
+#endif
+		TCHAR errmsg[1024] = { 0 };
+		swprintf_s(errmsg, 1024, L"Error in DxRender_D3D11::drawOffscreenRenderTarget : Can not find InputLayout for PixFormat(%d).\n", PIXFMT_B8G8R8A8);
+		log_e(LOG_TAG, errmsg);
+		return -3;
+	}
+	if (selectedPass == NULL)
+	{
+#ifdef _DEBUG
+		printf("Error in DxRender_D3D11::draw : Can not find Effect pass for PixFormat(%d).\n", texPixfmt);
+#endif
+		TCHAR errmsg[1024] = { 0 };
+		swprintf_s(errmsg, 1024, L"Error in DxRender_D3D11::drawOffscreenRenderTarget : Can not find Effect pass for PixFormat(%d).\n", PIXFMT_B8G8R8A8);
+		log_e(LOG_TAG, errmsg);
+		return -5;
+	}
+	ID3D11Buffer* vtBuf = m_rttDsplElem->getVertexBuffer();
+	assert(vtBuf);
+
+	//XMVECTORF32 BackColorBlack = {0.0f, 0.0f, 0.0f, 1.0f};
+	//m_context->ClearRenderTargetView(m_renderTargetView, reinterpret_cast<const float*>(&BackColorBlack));
+	//m_context->ClearDepthStencilView(m_depthView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
+	//Create and set InputLayout
+
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	m_context->IASetInputLayout(inputLayout);
+	m_context->IASetPrimitiveTopology(m_rttDsplElem->getVertex()->getPrimitiveTopology());
+	//ID3D11Buffer* vtBuf = displayElem->getVertexBuffer();
+	ID3D11Buffer* indexBuf = m_rttDsplElem->getIndexBuffer();
+	m_context->IASetVertexBuffers(0, 1, &vtBuf, &stride, &offset);
+	m_context->IASetIndexBuffer(indexBuf, m_rttDsplElem->getIndexBufferFormat(), 0);
+
+	XMMATRIX btf = XMLoadFloat4x4(&m_worldBaseTransform);
+	XMMATRIX elemWorld = XMLoadFloat4x4(&m_rttDsplElem->getWorldTransformMatrices());
+	//elemWorld._11 *= m_aspectRatio;
+	//elemWorld._21 *= m_aspectRatio;
+	//elemWorld._31 *= m_aspectRatio;
+	elemWorld._41 *= m_aspectRatio;
+	XMMATRIX world = btf * elemWorld;
+	XMMATRIX view = XMLoadFloat4x4(&m_viewTransform);
+	XMMATRIX proj = XMLoadFloat4x4(&m_projTransform);
+	XMMATRIX worldViewProj = world*view*proj;
+	m_defaultVideoEffect->setWorld(world);
+	//XMMATRIX worldViewProj = btf*view*proj;
+	//m_defaultVideoEffect->SetWorld(btf);
+	XMMATRIX worldInvTranspose;
+	XMMATRIX A = world;
+	A.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	XMVECTOR det = XMMatrixDeterminant(A);
+	worldInvTranspose = XMMatrixTranspose(XMMatrixInverse(&det, A));
+	XMMATRIX I = XMMatrixIdentity();
+	XMFLOAT4X4 mTexTransform;
+	XMStoreFloat4x4(&mTexTransform, I);
+	m_defaultVideoEffect->setWorldInvTranspose(worldInvTranspose);
+	m_defaultVideoEffect->setTexTransform(XMLoadFloat4x4(&mTexTransform));
+	m_defaultVideoEffect->setWorldViewProj(worldViewProj);
+	m_defaultVideoEffect->setMaterial(m_material);
+
+	if (/*alpha!=1.0f*/m_rttDsplElem->isEnableTransparent())
+	{
+		float alpha = (float)m_rttDsplElem->getAlpha();
+		m_defaultVideoEffect->setTransparent(alpha);
+		//if need transparent effect, setup the transparent blend state
+		float blendFactors[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		m_context->OMSetBlendState(m_TransparentBS, blendFactors, 0xffffffff);
+	}
+	else
+	{
+		//reset to default blend state
+		m_defaultVideoEffect->setTransparent(1.0);//reset the Alpha value of Shader
+		m_context->OMGetBlendState(NULL, NULL, NULL);
+	}
+
+	//IRawFrameTexture* texture = displayElem->getTexture();
+	if (m_renderTargetTexture)
+	{
+		//texture->acquireSync(0, INFINITE);
+		/*std::ifstream yuy2FileStream( "D:\\´úÂëºÚ¶´\\datasource\\Frame-720X576.yuy2", std::ios::in | std::ios::binary);
+		if(!yuy2FileStream)
+		return false;
+		int frameWidth = 720;
+		int height = 576;
+		int yuy2FrameDataLen = frameWidth * height * 2;
+		char* frameData = (char*)malloc(yuy2FrameDataLen);
+		assert(frameData);
+		yuy2FileStream.read(frameData, yuy2FrameDataLen);
+		yuy2FileStream.close();
+		int tex2dCount = 2;
+		ID3D11Texture2D* tex2d[2] = {NULL, NULL};
+		texture->getTexture(tex2d, tex2dCount);
+		D3D11_MAPPED_SUBRESOURCE mappedRes;
+		ZeroMemory(&mappedRes, sizeof(mappedRes));
+		D3D11_TEXTURE2D_DESC texDesc;
+		tex2d[0]->GetDesc(&texDesc);
+		m_context->Map(tex2d[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
+		char* pDes = (char*)mappedRes.pData;
+		char* pSrc = (char*)frameData;
+		int dataPitch = frameWidth*2;
+		//assert(subRes.RowPitch==dataPitch);
+
+		for(int i=0; i<height; i++)
+		{
+		memcpy(pDes, pSrc, dataPitch);
+		pDes += mappedRes.RowPitch;
+		pSrc += dataPitch;
+		}
+		m_context->Unmap(tex2d[0], 0);
+		free(frameData);
+		//texture->update(frameData, yuy2FrameDataLen, 0);
+		*/
+		//int srvCount = 4;
+		//ID3D11ShaderResourceView* srvList[4] = { NULL, NULL, NULL, NULL };
+		//texture->getShaderResourceView(srvList, srvCount);
+		//switch (srvCount)
+		//{
+		//case 1:
+		//	m_defaultVideoEffect->setTexture_Y(srvList[0]);
+		//	break;
+		//case 2:
+		//	m_defaultVideoEffect->setTexture_Y(srvList[0]);
+		//	m_defaultVideoEffect->setTexture_U(srvList[1]);
+		//	break;
+		//case 3:
+		//	m_defaultVideoEffect->setTexture_Y(srvList[0]);
+		//	m_defaultVideoEffect->setTexture_U(srvList[1]);
+		//	m_defaultVideoEffect->setTexture_V(srvList[2]);
+		//	break;
+		//default:
+		//	return -6;
+		//	break;
+		//}
+		//if (texPixfmt == PIXFMT_YUY2)
+		//{
+		//	int width = texture->getWidth();
+		//	float dx = 1 / (float)width;
+		//	m_defaultVideoEffect->setDx(dx);
+		//}
+		ID3D11ShaderResourceView* rttSRV = m_renderTargetTexture->GetShaderResourceView();
+		if (rttSRV)	m_defaultVideoEffect->setTexture_Y(rttSRV);
+	}
+
+	selectedPass->Apply(0, m_context);
+	VertexVector* vv = m_rttDsplElem->getVertex();
+	size_t indexCount = vv ? vv->getIndexCount() : 0;
+	m_context->DrawIndexed(indexCount, 0, 0);
+
+	return 0;
+}
+
+int zRender::DxRender_D3D11::clearBackbuffer(DWORD color)
+{
+	int a = (color & 0xff000000) >> 24;
+	int r = (color & 0x00ff0000) >> 16;
+	int g = (color & 0x0000ff00) >> 8;
+	int b = (color & 0x000000ff) >> 0;
+	float colorBack[4] = { (float)r / 256, (float)g / 256, (float)b / 256, (float)a / 256 };
+	m_context->ClearRenderTargetView(m_renderTargetView, reinterpret_cast<const float*>(colorBack));
+	m_context->ClearDepthStencilView(m_depthView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	return 0;
 }
 

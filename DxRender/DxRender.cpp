@@ -224,6 +224,16 @@ int zRender::DxRender::resize( int new_width, int new_height )
 	return m_renderImp->resize(new_width, new_height);
 }
 
+int zRender::DxRender::createOffscreenRenderTarget(int width, int height)
+{
+	return m_renderImp->createOffscreenRenderTarget(width, height);
+}
+
+void zRender::DxRender::releaseOffscreenRenderTarget()
+{
+	m_renderImp->releaseOffscreenRenderTarget();
+}
+
 int zRender::DxRender::createSharedTexture(SharedTexture** ppSharedTex, PIXFormat pixfmt)
 {
 	return m_renderImp->createSharedTexture(ppSharedTex, pixfmt);

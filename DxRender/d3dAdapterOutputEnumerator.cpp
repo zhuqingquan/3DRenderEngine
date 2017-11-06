@@ -25,6 +25,8 @@ HRESULT DXGI_getOutputs(IDXGIAdapter* adapter, std::vector<IDXGIOutput*>& output
 	IDXGIOutput* pOutput = NULL;
 	while( SUCCEEDED(adapter->EnumOutputs(outputIndex, &pOutput)) )
 	{
+		DXGI_ADAPTER_DESC desc;
+		adapter->GetDesc(&desc);
 		outputVec.push_back(pOutput);
 		++outputIndex;
 	}

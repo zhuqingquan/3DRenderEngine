@@ -149,6 +149,8 @@ int RenderDrawing::doRenderWork()
 		return -2;
 	}
 
+	render->createOffscreenRenderTarget(1920, 1080);
+
 	if(m_background)
 	{
 		IDisplayContentProvider* dcp = m_background->getDataContentOfBigscreenCell(m_ltPointX, m_ltPointY);

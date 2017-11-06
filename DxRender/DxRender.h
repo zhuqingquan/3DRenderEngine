@@ -236,6 +236,9 @@ namespace zRender
 		int getWidth();
 		int getHeight();
 		int resize(int new_width, int new_height);
+
+		int createOffscreenRenderTarget(int width, int height);
+		void releaseOffscreenRenderTarget();
 	private:
 		DxRender(const DxRender&);
 		DxRender& operator=(const DxRender&);
