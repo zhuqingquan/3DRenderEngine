@@ -4,6 +4,7 @@
 #include <assert.h>
 #include "BigViewportPartition.h"
 #include <tchar.h>
+#include "inc/TextureResource.h"
 
 using namespace SOA::Mirror::Render;
 using namespace zRender;
@@ -149,7 +150,7 @@ int RenderDrawing::doRenderWork()
 		return -2;
 	}
 
-	//render->createOffscreenRenderTarget(1920, 1080);
+	render->createOffscreenRenderTarget(1920, 1080);
 
 	if(m_background)
 	{
@@ -219,6 +220,14 @@ int RenderDrawing::doRenderWork()
 		}
 		render->present(0);
 		//将RenderTarget中的内容保存到文件中
+		//zRender::TextureResource* snpRes = m_render->getSnapshot(TEXTURE_USAGE_STAGE, false, true);
+		zRender::TextureResource* snpRes = m_render->getSnapshot(TEXTURE_USAGE_DEFAULT, true, true);
+		if (snpRes != NULL)
+		{
+			//dump Texture to file
+			//snpRes->dumpToFile(_T("dx_render_snapshot.rgb"));
+			delete snpRes;
+		}
 		//if(0==m_render->getSnapshot(pdstData, dstDataLen, dstWidth, dstHeight, dstPixfmt, dstPitch))
 		//{
 		//	int len = dstPitch * dstHeight;

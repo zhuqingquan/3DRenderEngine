@@ -27,6 +27,7 @@ public:
 	void SetRenderTarget(ID3D11DeviceContext*, ID3D11DepthStencilView*);
 	void ClearRenderTarget(ID3D11DeviceContext*, ID3D11DepthStencilView*, float, float, float, float);
 	ID3D11ShaderResourceView* GetShaderResourceView();
+	ID3D11Texture2D* getRenderTargetTexture() const { return m_renderTargetTexture; }
 
 	int GetWidth() const { return m_width; }
 	int GetHeight() const { return m_height; }

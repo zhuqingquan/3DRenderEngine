@@ -10,6 +10,7 @@
 #include "DXLogger.h"
 #include "libtext.h"
 #include "SharedFrameTexture.h"
+#include "inc/TextureResource.h"
 
 using namespace zRender;
 
@@ -1312,6 +1313,30 @@ int zRender::DxRender_D3D11::getSnapshot(SharedTexture** outSharedTexture)
 	return 0;
 }
 
+TextureResource * zRender::DxRender_D3D11::getSnapshot(TEXTURE_USAGE usage, bool bShared, bool fromOffscreenTexture)
+{
+	if (TEXTURE_USAGE_STAGE == usage && bShared) return NULL;
+	ID3D11Texture2D* renderTargetTex = getRenderTargetTexture();
+	if (NULL == renderTargetTex)	return NULL;
+	D3D11_TEXTURE2D_DESC desc;
+	renderTargetTex->GetDesc(&desc);
+	TextureResource* frameTexture = new TextureResource();
+	if (0 != frameTexture->create(m_device, desc.Width, desc.Height, desc.Format, usage, bShared, NULL, 0, 0))
+	{
+		delete frameTexture;
+		return NULL;
+	}
+	if (0 != frameTexture->copyTexture(renderTargetTex))
+	{
+		delete frameTexture;
+	}
+	if (NULL == m_renderTargetTexture)
+	{
+		ReleaseCOM(renderTargetTex);
+	}
+	return frameTexture;
+}
+
 int zRender::DxRender_D3D11::createOffscreenRenderTarget(int width, int height)
 {
 	if (m_device == NULL)
@@ -1572,6 +1597,22 @@ int zRender::DxRender_D3D11::clearBackbuffer(DWORD color)
 	m_context->ClearRenderTargetView(m_renderTargetView, reinterpret_cast<const float*>(colorBack));
 	m_context->ClearDepthStencilView(m_depthView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 	return 0;
+}
+
+ID3D11Texture2D * zRender::DxRender_D3D11::getRenderTargetTexture()
+{
+	if (m_renderTargetTexture)
+	{
+		return m_renderTargetTexture->getRenderTargetTexture();
+	}
+	else
+	{
+		if (NULL == m_swapChain)	return NULL;
+		ID3D11Texture2D* backBuffer;
+		if (S_OK != m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer)))
+			return NULL;
+		return backBuffer;
+	}
 }
 
 int zRender::DxRender_D3D11::resize( int new_width, int new_height )

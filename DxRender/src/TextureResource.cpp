@@ -179,6 +179,38 @@ int TextureResource::copyResource(const TextureResource* res)
 	return 0;
 }
 
+int zRender::TextureResource::copyTexture(ID3D11Texture2D * d3dTex2D)
+{
+	if (NULL == d3dTex2D)	return -1;
+	if (NULL == m_texture) return -2;
+	D3D11_TEXTURE2D_DESC srcDesc; 
+	D3D11_TEXTURE2D_DESC dstDesc;
+	d3dTex2D->GetDesc(&srcDesc);
+	m_texture->GetDesc(&dstDesc);
+	if (srcDesc.Width != dstDesc.Width || srcDesc.Height != dstDesc.Height || srcDesc.Format != dstDesc.Format)
+		return -3;
+	if (isShared())
+	{
+		acquireSync(0, INFINITE);
+	}
+	//fixme 可能需要考虑如果源Texture是共享的时候是否需要先acquireSync
+	//copy full texture
+	D3D11_BOX box;
+	box.front = 0;
+	box.back = 1;
+	box.left = 0;
+	box.right = srcDesc.Width;
+	box.top = 0;
+	box.bottom = srcDesc.Height;
+	m_contex->CopySubresourceRegion(m_texture, 0, 0, 0, 0, d3dTex2D, 0, &box);
+
+	if (isShared())
+	{
+		releaseSync(0);
+	}
+	return 0;
+}
+
 int TextureResource::update(const unsigned char* pData, int dataLen, int dataPitch, int width, int height, const RECT& regionUpdated)
 {
 	//fixme 暂时忽略regionUpdated参数
@@ -254,6 +286,62 @@ int zRender::TextureResource::releaseSync(int key)
 		m_resMutex->ReleaseSync(0);
 	}
 	return 0;
+}
+
+#include "D3DX11tex.h"
+#include <fstream>
+bool zRender::TextureResource::dumpToFile(const TCHAR * filePathName)
+{
+	if (isShared())
+	{
+		TextureResource* stagingTex = new TextureResource();
+		if (0 != stagingTex->create(m_device, m_width, m_height, m_dxgifmt, TEXTURE_USAGE_STAGE, false, NULL, 0, 0))
+		{
+			delete stagingTex;
+			return false;
+		}
+		acquireSync(0, INFINITE);
+		if (0 != stagingTex->copyTexture(m_texture))
+		{
+			releaseSync(0);
+			delete stagingTex;
+			return false;
+		}
+		bool ret = stagingTex->dumpToFile(filePathName);
+		releaseSync(0);
+		delete stagingTex;
+		return ret;
+	}
+	else
+	{
+		if (m_usage == TEXTURE_USAGE_STAGE)
+		{
+			std::ofstream outFile(filePathName, std::ios::binary | std::ios::out);
+			if (!outFile)
+			{
+				return false;
+			}
+			HRESULT rslt = S_FALSE;
+			D3D11_MAPPED_SUBRESOURCE mappedRes;
+			ZeroMemory(&mappedRes, sizeof(mappedRes));
+			if (S_OK != (rslt = m_contex->Map(m_texture, 0, D3D11_MAP_READ, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
+			{
+				return -5;
+			}
+			unsigned char* dst = (unsigned char*)mappedRes.pData;
+			int pitch = mappedRes.RowPitch;
+			for (UINT i = 0; i<m_height; i++)
+			{
+				outFile.write((char*)dst, pitch);
+				dst += mappedRes.RowPitch;
+			}
+			outFile.flush();
+			outFile.close();
+			m_contex->Unmap(m_texture, 0);
+		}
+		//D3DX11SaveTextureToFile(m_contex, m_texture, D3DX11_IFF_BMP, filePathName);
+	}
+	return false;
 }
 
 void zRender::TextureResource::getSharedHandleFromTexture()

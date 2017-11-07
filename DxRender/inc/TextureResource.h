@@ -8,7 +8,7 @@
 
 namespace zRender
 {
-	class TextureResource
+	class DX_ZRENDER_EXPORT_IMPORT TextureResource
 	{
 	public:
 		TextureResource();
@@ -30,6 +30,7 @@ namespace zRender
 		ID3D11ShaderResourceView* getResourceView() const { return m_rsv; }
 
 		int copyResource(const TextureResource* res);
+		int copyTexture(ID3D11Texture2D* d3dTex2D);
 		int update(const unsigned char* pData, int dataLen, int dataPitch, int width, int height,
 			const RECT& regionUpdated);
 
@@ -38,6 +39,8 @@ namespace zRender
 
 		int acquireSync(int key, unsigned int timeout);
 		int releaseSync(int key);
+
+		bool dumpToFile(const TCHAR* filePathName);
 	private:
 		void getSharedHandleFromTexture();
 	private:

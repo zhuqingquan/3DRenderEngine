@@ -27,6 +27,7 @@ namespace zRender
 	class IDisplayContentProvider;
 	class SharedTexture;
 	class IRawFrameTexture;
+	class TextureResource;
 
 	/**
 	 *	@name		DxRender
@@ -232,6 +233,17 @@ namespace zRender
 		 **/
 		int getSnapshot(unsigned char* pData, UINT& datalen, int& w, int& h, int& pixfmt, int& pitch);
 		int getSnapshot(SharedTexture** outSharedTexture);
+		/**
+		*	@name			getSnapshot
+		*	@brief			将RenderTarget中的内容拷贝出来
+		*					当有调用createOffscreenRenderTarget成功时，通过参数判断时需要获取Offscreen texture还是Backbuffer的Texture
+		*	@param[in]		TEXTURE_USAGE usage The texture usage type for saved the snapshot
+		*	@param[in]		bool bShared Is the result texture can be shared
+		*	@param[in]		bool fromOffscreenTexture True for get the snapshot of Offscreen texture, otherwise get Backbuffer snapshot
+		*					if createOffscreenRenderTarget never called success, allways get the snapshot of Offscreen texture
+		*	@return			TextureResource* result of Texture saved the snapshot.NULL for failed.
+		**/
+		TextureResource* getSnapshot(TEXTURE_USAGE usage, bool bShared, bool fromOffscreenTexture);
 
 		int getWidth();
 		int getHeight();

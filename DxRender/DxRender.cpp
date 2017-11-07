@@ -199,6 +199,11 @@ int zRender::DxRender::unlockBackbufferHDC( HDC hdc )
 	return m_renderImp->unlockBackbufferHDC(hdc);
 }
 
+TextureResource * zRender::DxRender::getSnapshot(TEXTURE_USAGE usage, bool bShared, bool fromOffscreenTexture)
+{
+	return m_renderImp->getSnapshot(usage, bShared,fromOffscreenTexture);
+}
+
 int zRender::DxRender::getWidth()
 {
 	return m_renderImp->getWidth();
