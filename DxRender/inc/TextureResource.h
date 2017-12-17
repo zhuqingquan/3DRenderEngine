@@ -41,6 +41,7 @@ namespace zRender
 		int releaseSync(int key);
 
 		bool dumpToFile(const TCHAR* filePathName);
+		bool dumpToBuffer(unsigned char* outBuffer, int* in_outBufferLen, int* outPitch);
 	private:
 		void getSharedHandleFromTexture();
 	private:

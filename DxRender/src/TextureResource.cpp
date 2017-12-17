@@ -108,6 +108,7 @@ int TextureResource::open(ID3D11Device* device, HANDLE sharedHandle)
 	m_width = texDesc.Width;
 	m_height = texDesc.Height;
 	m_dxgifmt = texDesc.Format;
+	m_bShared = true;
 	switch (texDesc.Usage)
 	{
 	case D3D11_USAGE_STAGING:
@@ -154,14 +155,9 @@ int TextureResource::copyResource(const TextureResource* res)
 {
 	if (res == NULL || !res->valid() || !valid())
 		return -1;
-	if (m_resMutex)
+	if (isShared())
 	{
-		DWORD syncResult = m_resMutex->AcquireSync(0, INFINITE);
-		if (syncResult != WAIT_OBJECT_0)
-		{
-			// Handle unable to acquire shared surface error.
-			return -2;
-		}
+		acquireSync(0, INFINITE);
 	}
 	//copy full texture
 	D3D11_BOX box;
@@ -172,9 +168,9 @@ int TextureResource::copyResource(const TextureResource* res)
 	box.top = 0;
 	box.bottom = m_height;
 	m_contex->CopySubresourceRegion(m_texture, 0, 0, 0, 0, res->m_texture, 0, &box);
-	if (m_resMutex)
+	if (isShared())
 	{
-		m_resMutex->ReleaseSync(0);
+		releaseSync(0);
 	}
 	return 0;
 }
@@ -316,7 +312,7 @@ bool zRender::TextureResource::dumpToFile(const TCHAR * filePathName)
 	{
 		if (m_usage == TEXTURE_USAGE_STAGE)
 		{
-			std::ofstream outFile(filePathName, std::ios::binary | std::ios::out);
+			std::ofstream outFile(filePathName, std::ios::binary | std::ios::out | std::ios::ate | std::ios::app);
 			if (!outFile)
 			{
 				return false;
@@ -326,7 +322,7 @@ bool zRender::TextureResource::dumpToFile(const TCHAR * filePathName)
 			ZeroMemory(&mappedRes, sizeof(mappedRes));
 			if (S_OK != (rslt = m_contex->Map(m_texture, 0, D3D11_MAP_READ, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
 			{
-				return -5;
+				return false;
 			}
 			unsigned char* dst = (unsigned char*)mappedRes.pData;
 			int pitch = mappedRes.RowPitch;
@@ -338,6 +334,65 @@ bool zRender::TextureResource::dumpToFile(const TCHAR * filePathName)
 			outFile.flush();
 			outFile.close();
 			m_contex->Unmap(m_texture, 0);
+			return true;
+		}
+		//D3DX11SaveTextureToFile(m_contex, m_texture, D3DX11_IFF_BMP, filePathName);
+	}
+	return false;
+}
+
+bool zRender::TextureResource::dumpToBuffer(unsigned char * outBuffer, int * in_outBufferLen, int * outPitch)
+{
+	if (outBuffer == NULL || in_outBufferLen == NULL || outPitch == NULL)
+		return false;
+	if (isShared())
+	{
+		TextureResource* stagingTex = new TextureResource();
+		if (0 != stagingTex->create(m_device, m_width, m_height, m_dxgifmt, TEXTURE_USAGE_STAGE, false, NULL, 0, 0))
+		{
+			delete stagingTex;
+			return false;
+		}
+		acquireSync(0, INFINITE);
+		if (0 != stagingTex->copyTexture(m_texture))
+		{
+			releaseSync(0);
+			delete stagingTex;
+			return false;
+		}
+		bool ret = stagingTex->dumpToBuffer(outBuffer, in_outBufferLen, outPitch);
+		releaseSync(0);
+		delete stagingTex;
+		return ret;
+	}
+	else
+	{
+		if (m_usage == TEXTURE_USAGE_STAGE)
+		{
+			HRESULT rslt = S_FALSE;
+			D3D11_MAPPED_SUBRESOURCE mappedRes;
+			ZeroMemory(&mappedRes, sizeof(mappedRes));
+			if (S_OK != (rslt = m_contex->Map(m_texture, 0, D3D11_MAP_READ, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
+			{
+				return false;
+			}
+			if (*in_outBufferLen < mappedRes.RowPitch*m_height)
+			{
+				m_contex->Unmap(m_texture, 0);
+				return false;
+			}
+			unsigned char* src = (unsigned char*)mappedRes.pData;
+			int pitch = mappedRes.RowPitch;
+			for (UINT i = 0; i<m_height; i++)
+			{
+				memcpy(outBuffer, src, pitch);
+				src += pitch;
+				outBuffer += pitch;
+			}
+			m_contex->Unmap(m_texture, 0);
+			*in_outBufferLen = mappedRes.RowPitch*m_height;
+			*outPitch = pitch;
+			return true;
 		}
 		//D3DX11SaveTextureToFile(m_contex, m_texture, D3DX11_IFF_BMP, filePathName);
 	}

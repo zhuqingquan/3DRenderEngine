@@ -114,6 +114,10 @@ namespace zRender
 
 		int releaseSharedTexture(SharedTexture** ppSharedTex);
 
+		int createTextureResource(TextureResource** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char* initData= NULL, int dataLen = 0, int pitch = 0);
+		int openSharedTextureResource(TextureResource** ppOutTexRes, HANDLE hSharedRes);
+		void releaseTextureResource(TextureResource** ppOutTexRes);
+
 		/**
 		 *	@name		createTexture
 		 *	@brief		创建Texture对象

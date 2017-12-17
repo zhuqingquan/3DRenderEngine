@@ -248,3 +248,18 @@ int zRender::DxRender::releaseSharedTexture(SharedTexture** ppSharedTex)
 {
 	return m_renderImp->releaseSharedTexture(ppSharedTex);
 }
+
+int zRender::DxRender::createTextureResource(TextureResource ** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char * initData, int dataLen, int pitch)
+{
+	return m_renderImp->createTextureResource(ppOutTexRes, width, height, dxgiFmt, usage, bShared, initData, dataLen, pitch);
+}
+
+int zRender::DxRender::openSharedTextureResource(TextureResource ** ppOutTexRes, HANDLE hSharedRes)
+{
+	return m_renderImp->openSharedTextureResource(ppOutTexRes, hSharedRes);
+}
+
+void zRender::DxRender::releaseTextureResource(TextureResource ** ppOutTexRes)
+{
+	m_renderImp->releaseTextureResource(ppOutTexRes);
+}

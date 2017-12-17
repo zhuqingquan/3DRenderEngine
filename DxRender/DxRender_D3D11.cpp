@@ -1051,6 +1051,12 @@ int DxRender_D3D11::present(int type)
 		drawOffscreenRenderTarget();
 	}
 	m_swapChain->Present(type, 0);
+	//if (m_renderTargetTexture)
+	//{
+	//	ID3D11ShaderResourceView* rttSRV = m_renderTargetTexture->GetShaderResourceView();
+	//	if (rttSRV)	m_defaultVideoEffect->setTexture_Y(NULL);
+	//	m_context->PSSetShader(NULL, NULL, 0);
+	//}
 	getSnapshot(NULL);
 	return 0;
 }
@@ -1765,4 +1771,44 @@ int zRender::DxRender_D3D11::releaseSharedTexture(SharedTexture** ppSharedTex)
 		return 0;
 	}
 	return -1;
+}
+
+int zRender::DxRender_D3D11::createTextureResource(TextureResource ** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char * initData, int dataLen, int pitch)
+{
+	if (ppOutTexRes == NULL)	return -1;
+	TextureResource* frameTexture = new TextureResource();
+	if (0 != frameTexture->create(m_device, width, height, dxgiFmt, usage, bShared, initData, dataLen, pitch))
+	{
+		delete frameTexture;
+		return -2;
+	}
+	*ppOutTexRes = frameTexture;
+	return 0;
+}
+
+int zRender::DxRender_D3D11::openSharedTextureResource(TextureResource ** ppOutTexRes, HANDLE hSharedRes)
+{
+	if (ppOutTexRes == NULL)	return -1;
+	TextureResource* frameTexture = new TextureResource();
+	if (0 != frameTexture->open(m_device, hSharedRes))
+	{
+		delete frameTexture;
+	}
+	*ppOutTexRes = frameTexture;
+	return 0;
+}
+
+void zRender::DxRender_D3D11::releaseTextureResource(TextureResource ** ppOutTexRes)
+{
+	if (ppOutTexRes)
+	{
+		TextureResource* pTexRes = *ppOutTexRes;
+		if (pTexRes)
+		{
+			printf("do DxRender_D3D11::releaseTextureResource\n");
+			pTexRes->release();
+			delete pTexRes;
+			*ppOutTexRes = NULL;
+		}
+	}
 }
