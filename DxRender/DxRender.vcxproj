@@ -108,7 +108,9 @@
     <ClCompile Include="DxRender_D3D11.cpp" />
     <ClCompile Include="DxRender_D3D9.cpp" />
     <ClCompile Include="DxUtility.cpp" />
+    <ClCompile Include="EffectPass.cpp" />
     <ClCompile Include="Effects.cpp" />
+    <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="LightHelper.cpp" />
     <ClCompile Include="rendertextureclass.cpp" />
     <ClCompile Include="SharedFrameTexture.cpp" />
@@ -135,11 +137,14 @@
     <ClInclude Include="DxRender_D3D9.h" />
     <ClInclude Include="DxUtility.h" />
     <ClInclude Include="DxZRenderDLLDefine.h" />
+    <ClInclude Include="EffectPass.h" />
     <ClInclude Include="Effects.h" />
+    <ClInclude Include="ElemDsplModel.h" />
     <ClInclude Include="IDisplayContentProvider.h" />
     <ClInclude Include="inc\RawFrameTextureBase.h" />
     <ClInclude Include="inc\SharedTextureSource.h" />
     <ClInclude Include="inc\TextureResource.h" />
+    <ClInclude Include="InputLayout.h" />
     <ClInclude Include="IRawFrameTexture.h" />
     <ClInclude Include="LightHelper.h" />
     <ClInclude Include="rendertextureclass.h" />
