@@ -45,6 +45,27 @@ namespace zRender
 					 (this->bottom-other.top < dx)||
 					 (this->top-other.bottom > dx));
 		}
+
+		bool isValid() const
+		{
+			//0.00001µÄÎó²î·¶Î§
+			return ((right - left) > 0.00001) && ((bottom - top) > 0.00001);
+		}
+
+		bool operator==(const RECT_f& robj) const
+		{
+			return (left-robj.left < 0.00001) && (right-robj.right < 0.00001)
+				&& (top-robj.top < 0.00001) && (bottom-robj.bottom < 0.00001)
+				&& (robj.left-left < 0.00001) && (robj.right-right< 0.00001)
+				&& (robj.top-top < 0.00001) && (robj.bottom - bottom < 0.00001);
+		}
+		void operator=(const RECT_f& robj)
+		{
+			left = robj.left;
+			top = robj.top;
+			right = robj.right;
+			bottom = robj.bottom;
+		}
 	};
 
 	/**

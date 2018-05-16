@@ -52,9 +52,9 @@ public:
 	void setEyePosW(const XMFLOAT3& v)                  { EyePosW ? EyePosW->SetRawValue(&v, 0, sizeof(XMFLOAT3)) : S_FALSE; }
 	void setDirLights(const DirectionalLight* lights)   { DirLights ? DirLights->SetRawValue(lights, 0, 3*sizeof(DirectionalLight)) : S_FALSE; }
 	void setMaterial(const Material& mat)               { Mat ? Mat->SetRawValue(&mat, 0, sizeof(Material)) : S_FALSE; }
-	void setTexture_Y(ID3D11ShaderResourceView* tex)   { yTexture ? yTexture->SetResource(tex) : S_FALSE; }
-	void setTexture_U(ID3D11ShaderResourceView* tex)   { uTexture ? uTexture->SetResource(tex) : S_FALSE; }
-	void setTexture_V(ID3D11ShaderResourceView* tex)   { vTexture ? vTexture->SetResource(tex) : S_FALSE; }
+	void setTexture_Y(ID3D11ShaderResourceView* tex)   { yTexture->SetResource(tex);/*yTexture ? yTexture->SetResource(tex) : S_FALSE;*/ }
+	void setTexture_U(ID3D11ShaderResourceView* tex)   { uTexture->SetResource(tex);/*uTexture ? uTexture->SetResource(tex) : S_FALSE;*/ }
+	void setTexture_V(ID3D11ShaderResourceView* tex)   { vTexture->SetResource(tex);/*vTexture ? vTexture->SetResource(tex) : S_FALSE;*/ }
 	void setDx(float fDx)							   { dx ? dx->SetRawValue	(&fDx, 0, sizeof(float)) : S_FALSE; }
 	void setTransparent(float fTransparent)			   { transparent ? transparent->SetRawValue(&fTransparent, 0, sizeof(float)) : S_FALSE; }
 

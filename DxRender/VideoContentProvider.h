@@ -25,6 +25,10 @@ namespace zRender
 
 		int getVertexs(VertexVector** vv, int& vvCount, int& identify);
 
+		virtual int setRotation(int rotate);
+		virtual int setRotation_x(int rotate);
+		virtual int setRotation_y(int rotate);
+
 		TextureDataSource* getTextureDataSource() { return m_dataSrc; }
 		void* getShader();
 
@@ -36,6 +40,10 @@ namespace zRender
 		int m_vertexIdentify;
 		VertexVector* m_vv;
 		int m_vvCount;
+
+		int m_rotate;
+		int m_rotateX;
+		int m_rotateY;
 	};
 
 }

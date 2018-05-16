@@ -159,6 +159,10 @@ namespace zRender
 		 **/
 		virtual void* getShader() = 0;
 
+		virtual int setRotation(int rotate) {return 0;};
+		virtual int setRotation_x(int rotate) {return 0;};
+		virtual int setRotation_y(int rotate) {return 0;}
+
 		virtual void increaseAuthorization() {};
 		virtual void decreaseAuthorization() {};
 	};
