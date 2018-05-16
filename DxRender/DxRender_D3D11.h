@@ -353,6 +353,7 @@ namespace zRender
 		RenderTextureClass* m_renderTargetTexture;//Offscreen Render Target Texture
 		DisplayElement* m_rttDsplElem;
 		IDisplayContentProvider* m_rttDsplCttPrv;
+		int m_drawCount;
 	};
 }
 #endif

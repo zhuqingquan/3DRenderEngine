@@ -3,12 +3,14 @@
 #include <Windows.h>
 #include <stdio.h>
 #include "DXLogger.h"
+#include "inc/TextureResource.h"
 
 using namespace zRender;
 #define LOG_TAG L"D3D11_ARGBTexture_8"
 
 ARGBTexture_8::ARGBTexture_8(PIXFormat pixfmt)
 	: RawFrameTextureBase(pixfmt)
+	, m_rgb32TexRes(NULL)
 	//, m_rgbTex(NULL), m_rgbSRV(NULL)
 {
 	//ARGBTexture_8类型的Texture只支持ARGB或者RGB内存布局的图片显示
@@ -48,11 +50,62 @@ int ARGBTexture_8::create(ID3D11Device* device, int width, int height,
 
 int ARGBTexture_8::create(ID3D11Device * device, int width, int height, TEXTURE_USAGE usage, bool bShared, const char * initData, int dataLen, int pitch)
 {
-	return -1;
+	if (NULL == device || 0 >= width || 0 >= height || (TEXTURE_USAGE_DEFAULT != usage && bShared))
+		return -1;
+	if (PIXFMT_UNKNOW == m_pixfmt)
+	{
+#ifdef _DEBUG
+		printf("Error in ARGBTexture_8::create : pixel format is Not support.(PIXFMT=%d)\n", m_pixfmt);
+#endif
+		return -2;
+	}
+	DXGI_FORMAT dstPixfmt = DXGI_FORMAT_UNKNOWN;
+	switch (m_pixfmt)
+	{
+	case PIXFMT_A8R8G8B8:
+	case PIXFMT_R8G8B8A8:
+		dstPixfmt = DXGI_FORMAT_R8G8B8A8_UNORM;
+		break;
+	case PIXFMT_R8G8B8:
+		dstPixfmt = DXGI_FORMAT_B8G8R8A8_UNORM;
+		break;
+	case PIXFMT_B8G8R8A8:
+		dstPixfmt = DXGI_FORMAT_B8G8R8A8_UNORM;
+		break;
+	case PIXFMT_B8G8R8X8:
+		dstPixfmt = DXGI_FORMAT_B8G8R8X8_UNORM;
+		break;
+	case PIXFMT_X8R8G8B8:
+		dstPixfmt = DXGI_FORMAT_B8G8R8X8_UNORM;
+		break;
+	default:
+		return -3;
+	}
+	TextureResource* rgb32Tex = new TextureResource();
+	if (0 != rgb32Tex->create(device, width, height, dstPixfmt, usage, bShared, initData, dataLen, pitch))
+	{
+		delete rgb32Tex;
+		return -4;
+	}
+	m_rgb32TexRes = rgb32Tex;
+	if (m_textureCount >= 1)
+	{
+		m_textureArray[0] = m_rgb32TexRes;
+	}
+	m_device = device;
+	m_width = width;
+	m_height = height;
+	return 0;
 }
 
 int ARGBTexture_8::destroy()
 {
+	if (m_rgb32TexRes)
+	{
+		m_textureArray[0] = NULL;
+		m_rgb32TexRes->release();
+		m_rgb32TexRes = NULL;
+	}
 	m_VideoFrame.destroy();
 	m_device = NULL;
 	m_width = 0;
@@ -67,13 +120,34 @@ int ARGBTexture_8::getTexture(ID3D11Texture2D** outYUVTexs, int& texsCount) cons
 
 int ARGBTexture_8::getShaderResourceView(ID3D11ShaderResourceView** outYUVSRVs, int& srvsCount) const
 {
-	return m_VideoFrame.getShaderResourceView(outYUVSRVs, srvsCount);
+	if (m_VideoFrame.valid())
+	{
+		return m_VideoFrame.getShaderResourceView(outYUVSRVs, srvsCount);
+	}
+	else
+	{
+		ID3D11ShaderResourceView* srv = m_textureArray[0]->getResourceView();
+		if (srv == NULL)
+		{
+			if (0 == m_textureArray[0]->createResourceView())
+			{
+				srv = m_textureArray[0]->getResourceView();
+			}
+			else
+			{
+				return -2;
+			}
+		}
+		outYUVSRVs[0] = srv;
+		srvsCount = 1;
+		return 0;
+	}
 }
 
 int ARGBTexture_8::update(const unsigned char* pData, int dataLen, int yPitch, int uPitch, int vPitch, int width, int height,
 							const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex)
 {
-	if(PIXFMT_UNKNOW==m_pixfmt || !m_VideoFrame.valid())
+	if(PIXFMT_UNKNOW==m_pixfmt || (!m_VideoFrame.valid() && m_textureArray[0] == NULL))
 	{
 #ifdef _DEBUG
 		printf("Error in ARGBTexture_8::update : Texture Not inite yet.(PIXFMT=%d Tex=%d SRV=%d)\n", 
@@ -82,7 +156,7 @@ int ARGBTexture_8::update(const unsigned char* pData, int dataLen, int yPitch, i
 		return -1;
 	}
 	if(width<=0 || height<=0 || pData==NULL || yPitch<FRAMEPITCH(width, m_pixfmt)
-		|| dataLen < yPitch*height || d3dDevContex==NULL)
+		|| dataLen < yPitch*height || (m_VideoFrame.valid() && d3dDevContex==NULL))
 	{
 #ifdef _DEBUG
 		printf("Error in ARGBTexture_8::update : param invalid.(Data=%d dataLen=%d Pitch=%d width=%d height=%d Ctx=%d)\n",
@@ -90,19 +164,27 @@ int ARGBTexture_8::update(const unsigned char* pData, int dataLen, int yPitch, i
 #endif
 		return -2;
 	}
-	switch(m_pixfmt)
+	if (m_VideoFrame.valid())
 	{
-	case PIXFMT_A8R8G8B8:
-	case PIXFMT_R8G8B8A8:
-	case PIXFMT_B8G8R8A8:
-	case PIXFMT_X8R8G8B8:
-	case PIXFMT_B8G8R8X8:
-		return m_VideoFrame.update_A8R8G8B8(pData, dataLen, yPitch, width, height, regionUpdated, d3dDevContex);
-	case PIXFMT_R8G8B8:
-		return m_VideoFrame.update_R8G8B8(pData, dataLen, yPitch, width, height, regionUpdated, d3dDevContex);
-	default:
-		return -8;
+		switch (m_pixfmt)
+		{
+		case PIXFMT_A8R8G8B8:
+		case PIXFMT_R8G8B8A8:
+		case PIXFMT_B8G8R8A8:
+		case PIXFMT_X8R8G8B8:
+		case PIXFMT_B8G8R8X8:
+			return m_VideoFrame.update_A8R8G8B8(pData, dataLen, yPitch, width, height, regionUpdated, d3dDevContex);
+		case PIXFMT_R8G8B8:
+			return m_VideoFrame.update_R8G8B8(pData, dataLen, yPitch, width, height, regionUpdated, d3dDevContex);
+		default:
+			return -8;
+		}
 	}
+	else if(m_textureArray[0]!=NULL)
+	{
+		return m_rgb32TexRes->update(pData, dataLen, yPitch, width, height, regionUpdated);
+	}
+	return -10;
 //	if(m_pixfmt==PIXFMT_A8R8G8B8)
 //		return m_VideoFrame.update_A8R8G8B8(pData, dataLen, yPitch, width, height, regionUpdated, d3dDevContex);
 //	else if(m_pixfmt==PIXFMT_R8G8B8)

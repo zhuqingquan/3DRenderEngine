@@ -115,6 +115,7 @@ namespace zRender
 			const char* initData, int dataLen);
 
 		FrameTexture m_VideoFrame;
+		TextureResource* m_rgb32TexRes;
 
 		//int update_A8R8G8B8(const unsigned char* pData, int dataLen, int dataPitch, int width, int height,
 		//	const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex);

@@ -36,6 +36,8 @@ private:
 	ID3D11Texture2D* m_renderTargetTexture;
 	ID3D11RenderTargetView* m_renderTargetView;
 	ID3D11ShaderResourceView* m_shaderResourceView;
+	ID3D11Texture2D* m_depthBuffer;
+	ID3D11DepthStencilView* m_depthView;
 	int m_width;
 	int m_height;
 };

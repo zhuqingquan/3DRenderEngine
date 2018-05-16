@@ -28,6 +28,7 @@ DxRender_D3D11::DxRender_D3D11()
 	, m_renderTargetView(NULL)
 	, m_renderTargetTexture(NULL), m_rttDsplCttPrv(NULL), m_rttDsplElem(NULL)
 	, m_color(0)
+	, m_drawCount(0)
 {
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_worldBaseTransform, I);
@@ -836,10 +837,15 @@ void DxRender_D3D11::releaseInputLayout()
 
 int DxRender_D3D11::draw(DisplayElement* displayElem)
 {
-	if (m_renderTargetTexture)
+	if (m_drawCount == 0 && m_renderTargetTexture)
 	{
 		setRenderTargetTexture();
 	}
+	else if (m_renderTargetTexture)
+	{
+		OutputDebugStringA("---------\n");
+	}
+	m_drawCount++;
 	if(m_device==NULL || m_depthView==NULL)
 	{
 #ifdef _DEBUG
@@ -961,7 +967,7 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
  	{
 		//reset to default blend state
 		m_defaultVideoEffect->setTransparent(1.0);//reset the Alpha value of Shader
-		m_context->OMGetBlendState(NULL, NULL, NULL);
+		m_context->OMSetBlendState(NULL, NULL, 0xffffffff);
  	}
 
 	//IRawFrameTexture* texture = displayElem->getTexture();
@@ -1051,6 +1057,7 @@ int DxRender_D3D11::present(int type)
 		drawOffscreenRenderTarget();
 	}
 	m_swapChain->Present(type, 0);
+	m_drawCount = 0;
 	//if (m_renderTargetTexture)
 	//{
 	//	ID3D11ShaderResourceView* rttSRV = m_renderTargetTexture->GetShaderResourceView();
@@ -1502,19 +1509,19 @@ int zRender::DxRender_D3D11::drawOffscreenRenderTarget()
 	m_defaultVideoEffect->setWorldViewProj(worldViewProj);
 	m_defaultVideoEffect->setMaterial(m_material);
 
-	if (/*alpha!=1.0f*/m_rttDsplElem->isEnableTransparent())
-	{
-		float alpha = (float)m_rttDsplElem->getAlpha();
-		m_defaultVideoEffect->setTransparent(alpha);
-		//if need transparent effect, setup the transparent blend state
-		float blendFactors[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		m_context->OMSetBlendState(m_TransparentBS, blendFactors, 0xffffffff);
-	}
-	else
+	//if (/*alpha!=1.0f*/m_rttDsplElem->isEnableTransparent())
+	//{
+	//	float alpha = (float)m_rttDsplElem->getAlpha();
+	//	m_defaultVideoEffect->setTransparent(alpha);
+	//	//if need transparent effect, setup the transparent blend state
+	//	float blendFactors[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	//	m_context->OMSetBlendState(m_TransparentBS, blendFactors, 0xffffffff);
+	//}
+	//else
 	{
 		//reset to default blend state
 		m_defaultVideoEffect->setTransparent(1.0);//reset the Alpha value of Shader
-		m_context->OMGetBlendState(NULL, NULL, NULL);
+		m_context->OMSetBlendState(NULL, NULL, 0xffffffff);
 	}
 
 	//IRawFrameTexture* texture = displayElem->getTexture();
@@ -1583,12 +1590,18 @@ int zRender::DxRender_D3D11::drawOffscreenRenderTarget()
 		//}
 		ID3D11ShaderResourceView* rttSRV = m_renderTargetTexture->GetShaderResourceView();
 		if (rttSRV)	m_defaultVideoEffect->setTexture_Y(rttSRV);
+		m_defaultVideoEffect->setTexture_U(NULL);
+		m_defaultVideoEffect->setTexture_V(NULL);
 	}
 
 	selectedPass->Apply(0, m_context);
 	VertexVector* vv = m_rttDsplElem->getVertex();
 	size_t indexCount = vv ? vv->getIndexCount() : 0;
 	m_context->DrawIndexed(indexCount, 0, 0);
+
+	m_defaultVideoEffect->setTexture_Y(NULL);
+	m_defaultVideoEffect->setTexture_U(NULL);
+	m_defaultVideoEffect->setTexture_V(NULL);
 
 	return 0;
 }
