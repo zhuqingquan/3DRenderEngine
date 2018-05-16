@@ -140,6 +140,10 @@ void BigViewportPartition::updateTexture()
 		zRender::TextureDataSource* texDataSrc = m_cttProvider->getTextureDataSource();
 		zRender::IRawFrameTexture* rawTexture = texDataSrc->getTexture();
 		m_attachedDE->openSharedTexture(rawTexture);
+		if (pixelFmt == PIXFMT_A8R8G8B8 || PIXFMT_R8G8B8A8 == pixelFmt || PIXFMT_B8G8R8A8 == pixelFmt)
+		{
+			m_attachedDE->enableTransparent(true);
+		}
 		m_attachedDE->setTextureDataSource(tds, m_regOfBigViewport);
 		m_attachedDE->createRenderResource();
 		m_attachedDE->updateTexture(m_curDrawedTextureIdentify);
@@ -167,7 +171,7 @@ bool BigViewportPartition::isValid() const
 void BigViewportPartition::setZIndex(int zIndex)
 {
 	m_ZIndex = zIndex;
-	if (isValid())
+	if (m_attachedDE != NULL)
 	{
 		m_attachedDE->setDisplayZIndex(zIndex);
 	}

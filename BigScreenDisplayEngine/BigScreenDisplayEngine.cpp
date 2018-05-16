@@ -451,8 +451,30 @@ int _tmain(int argc, _TCHAR* argv[])
 	ScreenRender* sr = screen->getScreenRender(0, 0);
 	RenderDrawing* rd = sr->getRenderDrawing();
 	zRender::DxRender* dxrender = rd->getDxRender();
+
+	BigViewport* backVideoViewport = screen->createViewport(zRender::RECT_f(0.3, 1, 0.3, 1), 150);
+	if (backVideoViewport)
+	{
+		const TCHAR* fileName = _T("D:\\InsideMoveVtc.yuv");
+		zRender::RawFileSource* videoFileSrc = new zRender::RawFileSource(dxrender);
+		if (videoFileSrc->open(fileName, zRender::PIXFMT_YUY2, 1920, 1080))
+		{
+			BigView* videoView = videoFileSrc->createSourceView();
+			if (videoView)
+			{
+				backVideoViewport->attachView(videoView);
+			}
+			videoFileSrc->start(25);
+		}
+		else
+		{
+			wprintf(_T("Create RawFileSource failed.[%s]\n"), fileName);
+		}
+	}
+
 	zRender::RawFileSource* fileSrc = new zRender::RawFileSource(dxrender);
-	fileSrc->open(_T("D:\\InsideMoveVtc.yuv"), zRender::PIXFMT_YUY2, 1920, 1080);
+	//fileSrc->open(_T("D:\\InsideMoveVtc.yuv"), zRender::PIXFMT_YUY2, 1920, 1080);
+	fileSrc->open(_T("D:\\transImag_500_282.rgb32"), zRender::PIXFMT_R8G8B8A8, 500, 282);
 	
 	BigView* view = fileSrc->createSourceView();
 	//BigView* view = new BigView(zRender::RECT_f(0.0, 1, 0.0, 1));
@@ -478,7 +500,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	//rd3->addBigViewportPartition(bvv3);
 	//bvv3->attachBigView(view);
 
-	BigViewport* bvp = screen->createViewport(zRender::RECT_f(0, 1, 0, 1), 99);
+	BigViewport* bvp = screen->createViewport(zRender::RECT_f(0, 0.7, 0, 0.7), 99);
 	if (bvp)
 		bvp->attachView(view);
 
