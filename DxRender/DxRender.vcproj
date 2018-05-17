@@ -116,7 +116,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;..\..\depends\dw3rd\directx-jun2010\include&quot;;..\Effects11\Inc;..\libtext;$(NOINHERIT)"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)&quot;;&quot;..\..\depends\dw3rd\directx-jun2010\include&quot;;..\Effects11\Inc;..\libtext;$(NOINHERIT)"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS;DX_ZRENDER_DLL_RXPORT"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -227,11 +227,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\RawFrameTextureBase.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\rendertextureclass.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SharedFrameTexture.cpp"
 				>
 			</File>
 			<File
+				RelativePath=".\src\SharedTextureSource.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\TextureResource.cpp"
 				>
 			</File>
 			<File
@@ -325,7 +341,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\inc\RawFrameTextureBase.h"
+				>
+			</File>
+			<File
+				RelativePath=".\rendertextureclass.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SharedFrameTexture.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inc\SharedTextureSource.h"
 				>
 			</File>
 			<File
@@ -334,6 +362,10 @@
 			</File>
 			<File
 				RelativePath=".\targetver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\inc\TextureResource.h"
 				>
 			</File>
 			<File

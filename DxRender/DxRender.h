@@ -81,6 +81,23 @@ namespace zRender
 
 		/**
 		 *	@name		init
+		 *	@brief		初始化显示引擎，创建显示所需的资源
+		 *				本方法创建的时OffscreenRenderTarget
+		 *	@param[in]	int width 宽，像素
+		 *	@param[in]	int height 高，像素
+		 *	@param[in]	const wchar_t* effectFileName 显示所需的Shader文件，effect文件的路径名称
+		 *				可以是相对路径或者绝对路径
+		 *	@param[in]	isEnable4XMSAA 是否支持MSAA，默认为false
+		 *				如果该参数为true，则isSDICompatible不能为true
+		 *	@param[in]	isSDICompatible 是否支持获取HDC句柄用于GDI渲染
+		 *				如果该参数为false，则lockBackbufferHDC接口调用失败
+		 *				如果该参数为true，则isEnable4XMSAA不能为true
+		 *	@return		int 0--成功  非0--失败
+		 */
+		int init(int width, int height, int adapter, const wchar_t* effectFileName, bool isEnable4XMSAA = false, bool isSDICompatible = false);
+
+		/**
+		 *	@name		init
 		 *	@brief		该方法将使用hmonitor桌面连接的Adapter上创建Device
 		 *				该方法只创建Device，而不创建其他present所需的资源，这样可以用于createSharedTexture接口的调用
 		 *	@param[in]	HMONITOR hmonitor 系统桌面的句柄

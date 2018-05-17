@@ -37,6 +37,11 @@ int DxRender::init(HWND hWnd, const wchar_t* effectFileName, bool isEnable4XMSAA
 	return m_renderImp->init(hWnd, effectFileName, isEnable4XMSAA, isSDICompatible);
 }
 
+int DxRender::init(int width, int height, int adapter, const wchar_t* effectFileName, bool isEnable4XMSAA/* = false*/, bool isSDICompatible/* = false*/)
+{
+	return m_renderImp->init(width, height, adapter, effectFileName, isEnable4XMSAA, isSDICompatible);
+}
+
 int zRender::DxRender::init(HMONITOR hmonitor)
 {
 	return m_renderImp->init(hmonitor);
