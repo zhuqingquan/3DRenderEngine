@@ -3,17 +3,18 @@
 #include <assert.h>
 #include "DXLogger.h"
 #include "SharedFrameTexture.h"
+#include "ElemDsplModel.h"
 
 using namespace zRender;
 #define LOG_TAG L"DxRender_DisplayElement"
 
-DisplayElement::DisplayElement(DxRender_D3D11* dxRender, ID3D11Device* d3dDevice, ID3D11DeviceContext* contex)
-	: m_dxRender(dxRender), m_device(d3dDevice), m_contex(contex)
+DisplayElement::DisplayElement(DxRender_D3D11* dxRender, ID3D11Device* d3dDevice, ID3D11DeviceContext* context)
+	: m_dxRender(dxRender), m_device(d3dDevice), m_context(context)
 	, m_IndexBuf(NULL), m_IndexFmt(DXGI_FORMAT_UNKNOWN), m_VertexBuf(NULL)
 	, m_texture(NULL), m_isTextureUpdated(false)
 	, m_curVerVec(NULL), m_isVertexInfoUpdated(false)
 	, m_TexFmt(PIXFMT_UNKNOW), m_TexWidth(0), m_TexHeight(0), m_TexDataSrc(NULL)
-	, m_Effect(NULL)
+	, m_dsplModel(NULL)
 	, m_alpha(1.0f), m_isEnableTransparent(false)
 {
 	XMMATRIX I = XMMatrixIdentity();
@@ -276,10 +277,10 @@ bool DisplayElement::isValid() const
 
 int DisplayElement::updateTexture(int& identify)
 {
-	if(m_contex==NULL)
+	if(m_context==NULL)
 	{
 #ifdef _DEBUG
-		printf("Error in DisplayElement::updateTexture : m_contex is NULL.\n");
+		printf("Error in DisplayElement::updateTexture : m_context is NULL.\n");
 #endif
 		return -1003;
 	}
@@ -321,22 +322,22 @@ int DisplayElement::updateTexture(int& identify)
 	copyedReg.top = (LONG)(effectReg.top + (effectRegHeight * m_TexEffectiveReg.top + 0.5));
 	copyedReg.bottom = (LONG)(effectReg.top + (effectRegHeight * m_TexEffectiveReg.bottom + 0.5));
 	return m_TexDataSrc->copyDataToTexture(RECT_f(0, 1, 0, 1), pData, yPitch, height, identify);
-	return m_texture->update(pData, dataLen, yPitch, uPitch, vPitch, width, height, copyedReg, m_contex);
+	return m_texture->update(pData, dataLen, yPitch, uPitch, vPitch, width, height, copyedReg, m_context);
 	return -1005;
 	}
  	//else
  	//{
- 	//	return m_texture->update(shTex, effectReg, m_contex);
+ 	//	return m_texture->update(shTex, effectReg, m_context);
  	//}
 	////////////////////////////////////////////////////////////////////////////////
 // 	D3D11_MAPPED_SUBRESOURCE mappedRes;
 // 	ZeroMemory(&mappedRes, sizeof(mappedRes));
 // 	D3D11_TEXTURE2D_DESC texDesc;
 // 	tex2d[0]->GetDesc(&texDesc);
-// 	m_contex->Map(tex2d[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
+// 	m_context->Map(tex2d[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
 // 	unsigned char* pDes = (unsigned char*)mappedRes.pData;
 // 	m_TexDataSrc->copyDataToTexture(m_TexEffectiveReg, pDes, mappedRes.RowPitch, m_TexHeight, identify);
-// 	m_contex->Unmap(tex2d[0], 0);
+// 	m_context->Unmap(tex2d[0], 0);
 // 	return 0;
 }
 
@@ -375,5 +376,205 @@ int zRender::DisplayElement::openSharedTexture(IRawFrameTexture * sharedTexture)
 	m_texture = m_dxRender->openSharedTexture(sharedTexture);
 	if (NULL == m_texture)
 		return -2;
+	return 0;
+}
+
+int zRender::DisplayElement::draw()
+{
+	//如果没有显示模型，则该Element无法完成显示，因为根本不知道该如何显示
+	if (m_dsplModel == NULL)
+		return -1;
+	if(0!=this->createRenderResource() || !this->isValid() )
+	{
+		#ifdef _DEBUG
+		printf("Error in DxRender_D3D11::draw : DisplayElement is invalid.\n");
+		#endif
+		TCHAR errmsg[512] = {0};
+		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::draw : DisplayElement is invalid.");
+		log_e(LOG_TAG, errmsg);
+		return -4;
+	}
+	PIXFormat texPixfmt;
+	IRawFrameTexture* texture = this->getTexture();
+	if(NULL==texture)
+	{
+		//不需要渲染Texture时，将PIXFormat设为PIXFMT_UNKNOW，这样就会使用不需要Texture的Shader进行渲染
+		texPixfmt = PIXFMT_UNKNOW;
+	}
+	else
+	{
+		texPixfmt = texture->getPixelFormat();
+	}
+
+	BasicEffect* effect = NULL;
+	int ret = m_dsplModel->getEffect(&effect);
+	if (NULL == effect)
+	{
+		//fixme log
+		return -2;
+	}
+	ID3DX11EffectPass* selectedPass = effect->getEffectPass(texPixfmt);
+	ID3D11InputLayout* inputLayout = effect->getInputLayout(selectedPass);
+	//if(displayElem->getShader()==NULL)
+	//{
+	//assert(m_defaultVideoEffect);
+	//selectedPass = findEffectPass(texPixfmt);
+	//inputLayout = findInputLayout(texPixfmt);
+	//}
+	if(inputLayout==NULL)
+	{
+		#ifdef _DEBUG
+			printf("Error in DxRender_D3D11::draw : Can not find InputLayout for PixFormat(%d).\n", texPixfmt);
+		#endif
+		TCHAR errmsg[1024] = {0};
+		swprintf_s(errmsg, 1024, L"Error in DxRender_D3D11::draw : Can not find InputLayout for PixFormat(%d).\n", texPixfmt);
+		log_e(LOG_TAG, errmsg);
+		return -3;
+	}
+	if(selectedPass==NULL)
+	{
+		#ifdef _DEBUG
+			printf("Error in DxRender_D3D11::draw : Can not find Effect pass for PixFormat(%d).\n", texPixfmt);
+		#endif
+		TCHAR errmsg[1024] = {0};
+		swprintf_s(errmsg, 1024, L"Error in DxRender_D3D11::draw : Can not find Effect pass for PixFormat(%d).\n", texPixfmt);
+		log_e(LOG_TAG, errmsg);
+		return -5;
+	}
+	
+	ID3D11Buffer* vtBuf = this->getVertexBuffer();
+	assert(vtBuf);
+
+	//Create and set InputLayout
+
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	m_context->IASetInputLayout(inputLayout);
+	m_context->IASetPrimitiveTopology(this->getVertex()->getPrimitiveTopology());
+	//ID3D11Buffer* vtBuf = displayElem->getVertexBuffer();
+	ID3D11Buffer* indexBuf = this->getIndexBuffer();
+	m_context->IASetVertexBuffers(0, 1, &vtBuf, &stride, &offset);
+	m_context->IASetIndexBuffer(indexBuf, this->getIndexBufferFormat(), 0);
+
+	XMMATRIX btf = XMLoadFloat4x4(&m_dxRender->getWorldBaseTransformMatrix());
+	XMMATRIX elemWorld = XMLoadFloat4x4(&this->getWorldTransformMatrices());
+	//elemWorld._11 *= m_aspectRatio;
+	//elemWorld._21 *= m_aspectRatio;
+	//elemWorld._31 *= m_aspectRatio;
+	elemWorld._41 *= m_dxRender->getAspectRatio();
+	XMMATRIX world = btf * elemWorld;
+	XMMATRIX view  = XMLoadFloat4x4(&m_dxRender->getViewTransformMatrix());
+	XMMATRIX proj  = XMLoadFloat4x4(&m_dxRender->getProjectionTransformMatrix());
+	XMMATRIX worldViewProj = world*view*proj;
+	effect->setWorld(world);
+	//XMMATRIX worldViewProj = btf*view*proj;
+	//m_defaultVideoEffect->SetWorld(btf);
+	XMMATRIX worldInvTranspose;
+	XMMATRIX A = world;
+	A.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	XMVECTOR det = XMMatrixDeterminant(A);
+	worldInvTranspose = XMMatrixTranspose(XMMatrixInverse(&det, A));
+	XMMATRIX I = XMMatrixIdentity();
+	XMFLOAT4X4 mTexTransform;
+	XMStoreFloat4x4(&mTexTransform, I);
+	effect->setWorldInvTranspose(worldInvTranspose);
+	effect->setTexTransform(XMLoadFloat4x4(&mTexTransform));
+	effect->setWorldViewProj(worldViewProj);
+	Material m_material;
+	m_material.Ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+	m_material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	m_material.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
+	effect->setMaterial(m_material);
+	/////////////////////////////set blend state/////////////////////////////////////////
+	if(/*alpha!=1.0f*/this->isEnableTransparent())
+	{
+		float alpha = (float)this->getAlpha();
+		effect->setTransparent(alpha);
+		//if need transparent effect, setup the transparent blend state
+		float blendFactors[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		//fixme create transparent blend state
+		//m_context->OMSetBlendState(m_TransparentBS, blendFactors, 0xffffffff);
+	}
+	else
+	{
+		//reset to default blend state
+		effect->setTransparent(1.0);//reset the Alpha value of Shader
+		m_context->OMGetBlendState(NULL, NULL, NULL);
+	}
+
+	//IRawFrameTexture* texture = displayElem->getTexture();
+	if (texture)
+	{
+		texture->acquireSync(0, INFINITE);
+		/*std::ifstream yuy2FileStream( "D:\\代码黑洞\\datasource\\Frame-720X576.yuy2", std::ios::in | std::ios::binary);
+		if(!yuy2FileStream)
+		return false;
+		int frameWidth = 720;
+		int height = 576;
+		int yuy2FrameDataLen = frameWidth * height * 2;
+		char* frameData = (char*)malloc(yuy2FrameDataLen);
+		assert(frameData);
+		yuy2FileStream.read(frameData, yuy2FrameDataLen);
+		yuy2FileStream.close();
+		int tex2dCount = 2;
+		ID3D11Texture2D* tex2d[2] = {NULL, NULL};
+		texture->getTexture(tex2d, tex2dCount);
+		D3D11_MAPPED_SUBRESOURCE mappedRes;
+		ZeroMemory(&mappedRes, sizeof(mappedRes));
+		D3D11_TEXTURE2D_DESC texDesc;
+		tex2d[0]->GetDesc(&texDesc);
+		m_context->Map(tex2d[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedRes);
+		char* pDes = (char*)mappedRes.pData;
+		char* pSrc = (char*)frameData;
+		int dataPitch = frameWidth*2;
+		//assert(subRes.RowPitch==dataPitch);
+
+		for(int i=0; i<height; i++)
+		{
+		memcpy(pDes, pSrc, dataPitch);
+		pDes += mappedRes.RowPitch;
+		pSrc += dataPitch;
+		}
+		m_context->Unmap(tex2d[0], 0);
+		free(frameData);
+		//texture->update(frameData, yuy2FrameDataLen, 0);
+		*/
+		int srvCount = 4;
+		ID3D11ShaderResourceView* srvList[4] = { NULL, NULL, NULL, NULL };
+		texture->getShaderResourceView(srvList, srvCount);
+		switch (srvCount)
+		{
+		case 1:
+			effect->setTexture_Y(srvList[0]);
+			break;
+		case 2:
+			effect->setTexture_Y(srvList[0]);
+			effect->setTexture_U(srvList[1]);
+			break;
+		case 3:
+			effect->setTexture_Y(srvList[0]);
+			effect->setTexture_U(srvList[1]);
+			effect->setTexture_V(srvList[2]);
+			break;
+		default:
+			return -6;
+			break;
+		}
+		if (texPixfmt == PIXFMT_YUY2)
+		{
+			int width = texture->getWidth();
+			float dx = 1 / (float)width;
+			effect->setDx(dx);
+		}
+	}
+
+	selectedPass->Apply(0, m_context);
+	VertexVector* vv = this->getVertex();
+	size_t indexCount = vv ? vv->getIndexCount() : 0;
+	m_context->DrawIndexed(indexCount, 0, 0);
+	if (texture)
+	{
+		texture->releaseSync(0);
+	}
 	return 0;
 }

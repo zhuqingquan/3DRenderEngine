@@ -279,9 +279,15 @@ namespace zRender
 		int createOffscreenRenderTarget(int width, int height);
 		void releaseOffscreenRenderTarget();
 
+		void* getDevice() const;
 		int getWidth();
 		int getHeight();
+		float getAspectRatio() const { return m_aspectRatio; }
 		int resize(int new_width, int new_height);
+
+		const XMFLOAT4X4& getWorldBaseTransformMatrix() const { return m_worldBaseTransform; }
+		const XMFLOAT4X4& getViewTransformMatrix() const { return m_viewTransform; }
+		const XMFLOAT4X4& getProjectionTransformMatrix() const { return m_projTransform; }
 	private:
 		DxRender_D3D11(const DxRender_D3D11&);
 		DxRender_D3D11& operator=(const DxRender_D3D11&);

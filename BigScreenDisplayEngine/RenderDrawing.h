@@ -13,11 +13,13 @@
 #define _SOA_RENDER_RENDERDRAWING_H_
 
 #include "BigScreenBackground.h"
+#include "ElemDsplModel.h"
 
 namespace zRender
 {
 	class DisplayElement;
 	class DxRender;
+	class BasicEffect;
 }
 
 namespace SOA
@@ -136,6 +138,7 @@ namespace Render
 		BigScreenBackground* m_background;
 
 		std::list<BigViewportPartition*> m_vpPartitions;
+		zRender::ElemDsplModel<zRender::BasicEffect>* m_dsplModel;
 	};
 }
 }

@@ -12,6 +12,7 @@
 #ifdef _WINDOWS
 #include <Windows.h>
 #include <D3D11.h>
+#include <xnamath.h>
 #endif
 #include "DxZRenderDLLDefine.h"
 #include "DxRenderCommon.h"
@@ -249,9 +250,15 @@ namespace zRender
 		**/
 		TextureResource* getSnapshot(TEXTURE_USAGE usage, bool bShared, bool fromOffscreenTexture);
 
+		void* getDevice() const;
 		int getWidth();
 		int getHeight();
 		int resize(int new_width, int new_height);
+		float getAspectRatio() const;
+
+		const XMFLOAT4X4& getWorldBaseTransformMatrix() const;
+		const XMFLOAT4X4& getViewTransformMatrix() const;
+		const XMFLOAT4X4& getProjectionTransformMatrix() const;
 
 		int createOffscreenRenderTarget(int width, int height);
 		void releaseOffscreenRenderTarget();

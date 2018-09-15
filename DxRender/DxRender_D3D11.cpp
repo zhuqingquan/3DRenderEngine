@@ -855,6 +855,12 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
 #endif
 		return -2;
 	}
+	if (displayElem->getParentDxRender() != this)
+	{
+		//fixme log
+		return -3;
+	}
+	return displayElem->draw();
 	if(0!=displayElem->createRenderResource() || !displayElem->isValid() )
 	{
 #ifdef _DEBUG
@@ -879,7 +885,7 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
 
 	ID3DX11EffectPass* selectedPass = NULL;
 	ID3D11InputLayout* inputLayout = NULL;
-	if(displayElem->getShader()==NULL)
+	//if(displayElem->getShader()==NULL)
 	{
 		assert(m_defaultVideoEffect);
 		selectedPass = findEffectPass(texPixfmt);
@@ -1148,6 +1154,11 @@ int zRender::DxRender_D3D11::unlockBackbufferHDC( HDC hdc )
 		ReleaseCOM(m_bkbufDxgiSurface);
 	}
 	return 0;
+}
+
+void* zRender::DxRender_D3D11::getDevice() const
+{
+	return (void*)m_device;
 }
 
 int zRender::DxRender_D3D11::getWidth()

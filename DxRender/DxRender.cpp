@@ -204,6 +204,11 @@ TextureResource * zRender::DxRender::getSnapshot(TEXTURE_USAGE usage, bool bShar
 	return m_renderImp->getSnapshot(usage, bShared,fromOffscreenTexture);
 }
 
+void* zRender::DxRender::getDevice() const
+{
+	return m_renderImp->getDevice();
+}
+
 int zRender::DxRender::getWidth()
 {
 	return m_renderImp->getWidth();
@@ -227,6 +232,26 @@ int zRender::DxRender::getSnapshot(SharedTexture** outSharedTexture)
 int zRender::DxRender::resize( int new_width, int new_height )
 {
 	return m_renderImp->resize(new_width, new_height);
+}
+
+float zRender::DxRender::getAspectRatio() const
+{
+	return m_renderImp->getAspectRatio();
+}
+
+const XMFLOAT4X4& zRender::DxRender::getWorldBaseTransformMatrix() const
+{
+	return m_renderImp->getWorldBaseTransformMatrix();
+}
+
+const XMFLOAT4X4& zRender::DxRender::getViewTransformMatrix() const
+{
+	return m_renderImp->getViewTransformMatrix();
+}
+
+const XMFLOAT4X4& zRender::DxRender::getProjectionTransformMatrix() const
+{
+	return m_renderImp->getProjectionTransformMatrix();
 }
 
 int zRender::DxRender::createOffscreenRenderTarget(int width, int height)

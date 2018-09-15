@@ -5,6 +5,7 @@
 #include "BigViewportPartition.h"
 #include <tchar.h>
 #include "inc/TextureResource.h"
+#include "ElemDsplModel.h"
 
 using namespace SOA::Mirror::Render;
 using namespace zRender;
@@ -17,6 +18,7 @@ RenderDrawing::RenderDrawing(HWND attatchWnd, float ltPointX, float ltPointY, fl
 	, m_thread(NULL)
 	, m_ltPointX(ltPointX), m_ltPointY(ltPointY), m_rbPointX(rbPointX), m_rbPointY(rbPointY)
 	, m_background(background)
+	, m_dsplModel(NULL)
 {
 }
 
@@ -105,6 +107,10 @@ zRender::DisplayElement* RenderDrawing::createDisplayElement(BigViewportPartitio
 	RECT_f regOfBigScreen = vpPartition->getRegOfBigScreen();
 	int zIndex = vpPartition->getZIndex();
 	DisplayElement* de = m_render->createDisplayElement(regOfBigScreen, zIndex);
+	if (m_dsplModel)
+	{
+		de->setDsplModel(m_dsplModel);
+	}
 	return de;
 }
 
@@ -150,7 +156,7 @@ int RenderDrawing::doRenderWork()
 		return -2;
 	}
 
-	render->createOffscreenRenderTarget(1920, 1080);
+	//render->createOffscreenRenderTarget(1920, 1080);
 
 	if(m_background)
 	{
@@ -185,6 +191,12 @@ int RenderDrawing::doRenderWork()
 	std::ofstream dstOuput("output.rgb32", std::ios::out | std::ios::binary);
 	//////////////////////////////////////////////////////////////////////////
 
+	zRender::ElemDsplModel<zRender::BasicEffect>* pDsplModel = NULL;
+	if (0 != zRender::CreateDsplModel<zRender::BasicEffect>(_T("D:\\´úÂëºÚ¶´\\3DRenderEngine\\DxRender\\FX\\DefaultVideo.fxo"), m_render, &pDsplModel) || NULL==pDsplModel)
+	{
+		return 0;
+	}
+	m_dsplModel = pDsplModel;
 	while(m_isRunning)
 	{
 		QueryPerformanceCounter(&cur);
@@ -215,6 +227,11 @@ int RenderDrawing::doRenderWork()
 					delete vpp;
 				}
 				continue;
+			}
+			de = vpp->getAttachedDisplayElement();
+			if (de->getDsplModel() == NULL && NULL != m_dsplModel)
+			{
+				de->setDsplModel(m_dsplModel);
 			}
 			drawBigViewportPartition(render, vpp);
 		}

@@ -18,6 +18,7 @@
 #include "IRawFrameTexture.h"
 #include "DxRenderCommon.h"
 #include "Effects.h"
+#include "ElemDsplModel.h"
 
 #pragma warning(push)
 #pragma warning(disable:4251)
@@ -26,6 +27,8 @@ namespace zRender
 {
 	class Texture;
 	class DxRender_D3D11;
+	class BasicEffect;
+	//template<> class ElemDsplModel<BasicEffect>;
 
 	/**
 	 *	@name	DisplayElement
@@ -110,27 +113,6 @@ namespace zRender
 		VertexVector* getVertex() const { return m_curVerVec; }
 
 		/**
-		 *	@name		setShader
-		 *	@brief		设置渲染所用的Shader，此接口暂时不用
-		 *	@return		int 0--成功 <0--失败
-		 **/
-		int setShader(Effect* shader)
-		{
-			m_Effect = shader;
-			return 0;
-		}
-
-		/**
-		 *	@name		getShader
-		 *	@brief		获取设置的渲染Shader
-		 *	@return		Effect* 渲染的Shader
-		 **/
-		Effect* getShader() const
-		{
-			return m_Effect;
-		}
-
-		/**
 		 *	@name		createRenderResource
 		 *	@brief		创建Render渲染绘制所需要的系统资源
 		 *				创建的资源包括：顶点Buffer，Index Buffer，Texture，Shader
@@ -187,6 +169,34 @@ namespace zRender
 		void enableTransparent(bool enable);
 		bool isEnableTransparent() const { return m_isEnableTransparent;}
 
+		int createDsplModel(ElemDsplModel<BasicEffect>** ppModel)
+		{
+			if (ppModel == NULL)	return -1;
+			ElemDsplModel<BasicEffect>* model = new ElemDsplModel<BasicEffect>();
+			if (NULL == model)	return -2;
+			*ppModel = model;
+			return 0;
+		}
+
+		void ReleaseDsplModel(ElemDsplModel<BasicEffect>** ppModel)
+		{
+			if (ppModel && *ppModel)
+			{
+				ElemDsplModel<BasicEffect>* model = *ppModel;
+				delete model;
+				*ppModel = NULL;
+			}
+		}
+
+		bool setDsplModel(ElemDsplModel<BasicEffect>* model)
+		{
+			if (NULL == model)	return false;
+			m_dsplModel = model;
+			return true;
+		}
+
+		ElemDsplModel<BasicEffect>* getDsplModel() const { return m_dsplModel; }
+		int draw();
 		//////////////////////////支持打开共享显存用于显示///////////////////////////////
 		int openSharedTexture(IRawFrameTexture* sharedTexture);
 	private:
@@ -203,7 +213,9 @@ namespace zRender
 
 		DxRender_D3D11* m_dxRender;
 		ID3D11Device*	m_device;
-		ID3D11DeviceContext* m_contex;
+		ID3D11DeviceContext* m_context;
+
+		ElemDsplModel<BasicEffect>* m_dsplModel;
 
 		VertexVector* m_curVerVec;
 		bool m_isVertexInfoUpdated;
@@ -219,7 +231,6 @@ namespace zRender
 		ID3D11Buffer*		m_IndexBuf;//std::shared_ptr<ID3D11Buffer*>
 		DXGI_FORMAT			m_IndexFmt;//
 		XMFLOAT4X4			m_WorldTransformMat;
-		Effect*				m_Effect;
 		float				m_alpha;
 		bool				m_isEnableTransparent;
 	};
