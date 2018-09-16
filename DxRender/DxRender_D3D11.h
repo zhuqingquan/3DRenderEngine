@@ -25,7 +25,9 @@
 
 namespace zRender
 {
+	class SharedResource;
 	class SharedTexture;
+	class D3D11TextureRender;
 
 	/**
 	 *	@name	DxRender_D3D11
@@ -263,7 +265,7 @@ namespace zRender
 		 *	@return			bool 0--success other--failed
 		 **/
 		int getSnapshot(unsigned char* pData, UINT& datalen, int& w, int& h, int& pixfmt, int& pitch);
-		int getSnapshot(SharedTexture** outSharedTexture);
+		int getSnapshot(SharedResource** outSharedTexture);
 		/**
 		*	@name			getSnapshot
 		*	@brief			将RenderTarget中的内容拷贝出来
@@ -295,22 +297,9 @@ namespace zRender
 		ID3D11Buffer* createBuffer(int byteCount, const unsigned char* initData, int initDataLen,
 									D3D11_USAGE usage, UINT bindFlag);
 
-		int createComputeShader(const std::wstring& fxFileName);
-		void releaseComputeShader();
-
-		void createInputLayout();
-		void releaseInputLayout();
-
-		void initEffectPass();
-		void createEffectPass(PIXFormat pixfmt);
-		ID3D11InputLayout* createInputLayout(ID3DX11EffectPass* effectPass);
-
-		ID3D11InputLayout* findInputLayout(PIXFormat pixfmt) const;
-		ID3DX11EffectPass* findEffectPass(PIXFormat pixfmt) const;
-
 		int setRenderTargetTexture();
 		int setRenderTargetBackbuffer();
-		int createDisplayElemForOffscreenRTT();
+
 		int drawOffscreenRenderTarget();
 		int clearBackbuffer(DWORD color);
 
@@ -324,21 +313,7 @@ namespace zRender
 		D3D_FEATURE_LEVEL m_curFeatureLv;
 		ID3D11Texture2D* m_depthBuffer;
 		ID3D11DepthStencilView* m_depthView;
-		BasicEffect* m_defaultVideoEffect;
 		D3D11_VIEWPORT m_viewport;
-		//ID3D11InputLayout* m_InputLayout;
-
-		struct EffectPassInputLayoutPair
-		{
-			ID3DX11EffectPass* effectPass;
-			ID3D11InputLayout* inputLayout;
-
-			EffectPassInputLayoutPair()
-				: effectPass(NULL), inputLayout(NULL)
-			{
-			}
-		};
-		std::map<PIXFormat, EffectPassInputLayoutPair> m_defaultPassAndInputLayout;
 
 		HWND m_hWnd;
 		int m_winWidth;
@@ -357,8 +332,7 @@ namespace zRender
 		//BackgroundComponent* m_backgroundComponent;
 		DWORD m_color;
 		RenderTextureClass* m_renderTargetTexture;//Offscreen Render Target Texture
-		DisplayElement* m_rttDsplElem;
-		IDisplayContentProvider* m_rttDsplCttPrv;
+		D3D11TextureRender* m_offscreenRttRender;	//当启用了offscreen的rendertarget，则渲染到Offscreen之后再通过这个对象实现将offscreen的RTT渲染到Backbuffer中
 	};
 }
 #endif

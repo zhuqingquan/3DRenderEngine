@@ -28,6 +28,7 @@ namespace zRender
 	class BackgroundComponent;
 	class IDisplayContentProvider;
 	class SharedTexture;
+	class SharedResource;
 	class IRawFrameTexture;
 	class TextureResource;
 
@@ -237,7 +238,7 @@ namespace zRender
 		 *	@return			bool 0--success other--failed
 		 **/
 		int getSnapshot(unsigned char* pData, UINT& datalen, int& w, int& h, int& pixfmt, int& pitch);
-		int getSnapshot(SharedTexture** outSharedTexture);
+		int getSnapshot(SharedResource** outSharedTexture);
 		/**
 		*	@name			getSnapshot
 		*	@brief			将RenderTarget中的内容拷贝出来

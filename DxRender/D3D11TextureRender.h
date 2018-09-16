@@ -18,7 +18,7 @@ namespace zRender
 		D3D11TextureRender(ID3D11Device* device, ID3D11DeviceContext* context);
 		~D3D11TextureRender();
 
-		int draw(ID3D11Texture2D* texture, ID3D11ShaderResourceView* shaderResView, const RECT& rect);
+		int draw(ID3D11Texture2D* texture, ID3D11ShaderResourceView* shaderResView, const RECT& rect, IDXGISwapChain* swapChain);
 		int draw(ID3D11Texture2D* texture, ID3D11ShaderResourceView* shaderResView, const RECT& rect, UINT uNumRtt, ID3D11RenderTargetView** ppRttArray);
 
 	private:
@@ -42,7 +42,7 @@ namespace zRender
 		bool createRasterizerState();
 		void releaseRasterizerState();
 
-		bool createRenderTargetViewForBackbuffer();
+		bool createRenderTargetViewForBackbuffer(ID3D11Resource* backbuffer);
 		void releaseBackbufferRenderTargetView();
 	private:
 		ID3D11Device*			m_device; 

@@ -98,7 +98,7 @@ D3D11TextureRender::~D3D11TextureRender()
 	releaseResource();
 }
 
-int D3D11TextureRender::draw(ID3D11Texture2D* texture, ID3D11ShaderResourceView* shaderResView, const RECT& rect)
+int D3D11TextureRender::draw(ID3D11Texture2D* texture, ID3D11ShaderResourceView* shaderResView, const RECT& rect, IDXGISwapChain* swapChain)
 {
 	if (texture == NULL || shaderResView == NULL)
 		return -1;
@@ -108,11 +108,30 @@ int D3D11TextureRender::draw(ID3D11Texture2D* texture, ID3D11ShaderResourceView*
 		return -3;
 	if (!m_initSuccess)
 		return -4;
+	if (NULL == swapChain)
+	{
+		return -7;
+	}
 	// 此时为将Texture绘制到Backbuffer中，此时需要为Backbuffer创建RenderTargetView
 	if (m_backbufferRTTView == NULL)
 	{
-		if (!createRenderTargetViewForBackbuffer())
+		ID3D11Resource* backbuffer = NULL;
+		IDXGIResource* dxgiRes = NULL;
+		HRESULT hr = swapChain->GetBuffer(0, __uuidof(IUnknown), (void**)&dxgiRes);
+		if (FAILED(hr))
+			return -8;
+		hr = dxgiRes->QueryInterface(__uuidof(ID3D11Resource), (void**)&backbuffer);
+		dxgiRes->Release();
+		if (FAILED(hr))
+		{
+			return -9;
+		}
+		if (!createRenderTargetViewForBackbuffer(backbuffer))
+		{
+			backbuffer->Release();
 			return -5;
+		}
+		//backbuffer->Release();
 	}
 	struct d3d11_state oldState = { 0 };
 	d3d11_save_state(&oldState, m_context);
@@ -449,9 +468,18 @@ void D3D11TextureRender::releaseRasterizerState()
 	SAFE_RELEASE(m_rasterizerState);
 }
 
-bool D3D11TextureRender::createRenderTargetViewForBackbuffer()
+bool D3D11TextureRender::createRenderTargetViewForBackbuffer(ID3D11Resource* backbuffer)
 {
-	return false;
+	if (nullptr == backbuffer)
+		return false;
+	HRESULT result = m_device->CreateRenderTargetView(backbuffer, nullptr, &m_backbufferRTTView);
+	if (FAILED(result))
+	{
+		//hlog_hr("d3d11_int_user_content_create_render_target_view: create render target view failed.\n", result);
+		return false;
+	}
+	//hlog("d3d11_int_user_content_create_render_target_view: done\n");
+	return true;
 }
 
 void D3D11TextureRender::releaseBackbufferRenderTargetView()

@@ -224,7 +224,7 @@ int zRender::DxRender::getSnapshot( unsigned char* pData, UINT& datalen, int& w,
 	return m_renderImp->getSnapshot(pData, datalen, w, h, pixfmt, pitch);
 }
 
-int zRender::DxRender::getSnapshot(SharedTexture** outSharedTexture)
+int zRender::DxRender::getSnapshot(SharedResource** outSharedTexture)
 {
 	return m_renderImp->getSnapshot(outSharedTexture);
 }
