@@ -12,6 +12,7 @@
 #ifdef _WINDOWS
 #include <Windows.h>
 #include <D3D11.h>
+#include <xnamath.h>
 #endif
 #include "DxZRenderDLLDefine.h"
 #include "DxRenderCommon.h"
@@ -27,6 +28,7 @@ namespace zRender
 	class BackgroundComponent;
 	class IDisplayContentProvider;
 	class SharedTexture;
+	class SharedResource;
 	class IRawFrameTexture;
 	class TextureResource;
 
@@ -253,7 +255,7 @@ namespace zRender
 		 *	@return			bool 0--success other--failed
 		 **/
 		int getSnapshot(unsigned char* pData, UINT& datalen, int& w, int& h, int& pixfmt, int& pitch);
-		int getSnapshot(SharedTexture** outSharedTexture);
+		int getSnapshot(SharedResource** outSharedTexture);
 		/**
 		*	@name			getSnapshot
 		*	@brief			将RenderTarget中的内容拷贝出来
@@ -266,9 +268,15 @@ namespace zRender
 		**/
 		TextureResource* getSnapshot(TEXTURE_USAGE usage, bool bShared, bool fromOffscreenTexture);
 
+		void* getDevice() const;
 		int getWidth();
 		int getHeight();
 		int resize(int new_width, int new_height);
+		float getAspectRatio() const;
+
+		const XMFLOAT4X4& getWorldBaseTransformMatrix() const;
+		const XMFLOAT4X4& getViewTransformMatrix() const;
+		const XMFLOAT4X4& getProjectionTransformMatrix() const;
 
 		int createOffscreenRenderTarget(int width, int height);
 		void releaseOffscreenRenderTarget();

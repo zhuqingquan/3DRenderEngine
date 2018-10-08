@@ -100,6 +100,8 @@
   <ItemGroup>
     <ClCompile Include="AdapterOutputHelper.cpp" />
     <ClCompile Include="ARGBTexture_8.cpp" />
+    <ClCompile Include="d3d11StateHelper.cpp" />
+    <ClCompile Include="D3D11TextureRender.cpp" />
     <ClCompile Include="d3dAdapterOutputEnumerator.cpp" />
     <ClCompile Include="DisplayElement.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -108,10 +110,13 @@
     <ClCompile Include="DxRender_D3D11.cpp" />
     <ClCompile Include="DxRender_D3D9.cpp" />
     <ClCompile Include="DxUtility.cpp" />
+    <ClCompile Include="EffectPass.cpp" />
     <ClCompile Include="Effects.cpp" />
+    <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="LightHelper.cpp" />
     <ClCompile Include="rendertextureclass.cpp" />
     <ClCompile Include="SharedFrameTexture.cpp" />
+    <ClCompile Include="src\ElemDsplModel.cpp" />
     <ClCompile Include="src\RawFrameTextureBase.cpp" />
     <ClCompile Include="src\SharedTextureSource.cpp" />
     <ClCompile Include="src\TextureResource.cpp" />
@@ -126,6 +131,8 @@
     <ClInclude Include="AdapterOutputHelper.h" />
     <ClInclude Include="ARGBTexture_8.h" />
     <ClInclude Include="BackgroundDisplayComponent.h" />
+    <ClInclude Include="d3d11StateHelper.h" />
+    <ClInclude Include="D3D11TextureRender.h" />
     <ClInclude Include="d3dAdapterOutputEnumerator.h" />
     <ClInclude Include="DisplayElement.h" />
     <ClInclude Include="DXLogger.h" />
@@ -135,11 +142,14 @@
     <ClInclude Include="DxRender_D3D9.h" />
     <ClInclude Include="DxUtility.h" />
     <ClInclude Include="DxZRenderDLLDefine.h" />
+    <ClInclude Include="EffectPass.h" />
     <ClInclude Include="Effects.h" />
+    <ClInclude Include="ElemDsplModel.h" />
     <ClInclude Include="IDisplayContentProvider.h" />
     <ClInclude Include="inc\RawFrameTextureBase.h" />
     <ClInclude Include="inc\SharedTextureSource.h" />
     <ClInclude Include="inc\TextureResource.h" />
+    <ClInclude Include="InputLayout.h" />
     <ClInclude Include="IRawFrameTexture.h" />
     <ClInclude Include="LightHelper.h" />
     <ClInclude Include="rendertextureclass.h" />

@@ -10,6 +10,8 @@
 #define _ZRENDER_EFFECTS_H_
 
 #include <string>
+#include <map>
+#include "DxZRenderDLLDefine.h"
 #ifdef _WINDOWS
 
 #include <D3D11.h>
@@ -22,24 +24,35 @@ namespace zRender
 {
 
 #pragma region Effect
-class Effect
+class DX_ZRENDER_EXPORT_IMPORT Effect
 {
 public:
 	Effect(ID3D11Device* device, const std::wstring& filename);
 	virtual ~Effect();
 
 	bool isValid() const;
+
+	virtual ID3DX11EffectPass* getEffectPass(const LPCSTR techName, const LPCSTR passName) const;
+	virtual ID3DX11EffectPass* getEffectPass(int techIndex, int passIndex) const;
+
+	virtual ID3D11InputLayout* getInputLayout(const ID3DX11EffectPass* pass) = 0;
+
+protected:
+	//继承类需要实现这两个方法以完成、自定义Pass与InputLayout的定义
+	virtual bool initEffectPass() = 0;
+	virtual bool initInputLayout() = 0;
 private:
 	Effect(const Effect& rhs);
 	Effect& operator=(const Effect& rhs);
 
 protected:
 	ID3DX11Effect* mFX;
+	ID3D11Device* m_device;
 };
 #pragma endregion
 
 #pragma region BasicEffect
-class BasicEffect : public Effect
+class DX_ZRENDER_EXPORT_IMPORT BasicEffect : public Effect
 {
 public:
 	BasicEffect(ID3D11Device* device, const std::wstring& filename);
@@ -59,6 +72,7 @@ public:
 	void setTransparent(float fTransparent)			   { transparent ? transparent->SetRawValue(&fTransparent, 0, sizeof(float)) : S_FALSE; }
 
 	ID3DX11EffectPass* getEffectPass(PIXFormat pixfmt) const;
+	ID3D11InputLayout* getInputLayout(const ID3DX11EffectPass* pass);
 	//ID3DX11EffectTechnique* Light1Tech;
 	//ID3DX11EffectTechnique* Light2Tech;
 	//ID3DX11EffectTechnique* Light3Tech;
@@ -68,6 +82,23 @@ public:
 	//ID3DX11EffectTechnique* Light2TexTech;
 	//ID3DX11EffectTechnique* Light3TexTech;
 private:
+	virtual bool initEffectPass();
+	virtual bool initInputLayout();
+
+	void createEffectPass(PIXFormat pixfmt);
+
+	struct EffectPassInputLayoutPair
+	{
+		ID3DX11EffectPass* effectPass;
+		ID3D11InputLayout* inputLayout;
+
+		EffectPassInputLayoutPair()
+			: effectPass(NULL), inputLayout(NULL)
+		{
+		}
+	};
+	std::map<PIXFormat, EffectPassInputLayoutPair> m_defaultPassAndInputLayout;
+
 	ID3DX11EffectTechnique* Light1TechNoTex;
 	ID3DX11EffectTechnique* Light0TexYUV420Tech;
 	ID3DX11EffectTechnique* Light0TexNV12Tech;

@@ -6,7 +6,7 @@ TextureResource::TextureResource()
 	: m_width(0), m_height(0)
 	, m_dxgifmt(DXGI_FORMAT_UNKNOWN), m_usage(TEXTURE_USAGE_DEFAULT)
 	, m_texture(NULL), m_rsv(NULL)
-	, m_device(NULL), m_contex(NULL)
+	, m_device(NULL), m_context(NULL)
 	, m_bShared(false), m_sharedHandle(INVALID_HANDLE_VALUE)
 	, m_resMutex(NULL)
 {
@@ -69,7 +69,7 @@ int TextureResource::create(ID3D11Device* device, int width, int height, DXGI_FO
 	m_height = height;
 	m_dxgifmt = dxgifmt;
 	m_device = device;
-	m_device->GetImmediateContext(&m_contex);
+	m_device->GetImmediateContext(&m_context);
 	m_bShared = bShared;
 	m_usage = usage;
 	return 0;
@@ -102,7 +102,7 @@ int TextureResource::open(ID3D11Device* device, HANDLE sharedHandle)
 		// 		relKey = 0;
 	}
 	m_device = device;
-	m_device->GetImmediateContext(&m_contex);
+	m_device->GetImmediateContext(&m_context);
 	D3D11_TEXTURE2D_DESC texDesc;
 	m_texture->GetDesc(&texDesc);
 	m_width = texDesc.Width;
@@ -167,7 +167,7 @@ int TextureResource::copyResource(const TextureResource* res)
 	box.right = m_width;
 	box.top = 0;
 	box.bottom = m_height;
-	m_contex->CopySubresourceRegion(m_texture, 0, 0, 0, 0, res->m_texture, 0, &box);
+	m_context->CopySubresourceRegion(m_texture, 0, 0, 0, 0, res->m_texture, 0, &box);
 	if (isShared())
 	{
 		releaseSync(0);
@@ -198,7 +198,7 @@ int zRender::TextureResource::copyTexture(ID3D11Texture2D * d3dTex2D)
 	box.right = srcDesc.Width;
 	box.top = 0;
 	box.bottom = srcDesc.Height;
-	m_contex->CopySubresourceRegion(m_texture, 0, 0, 0, 0, d3dTex2D, 0, &box);
+	m_context->CopySubresourceRegion(m_texture, 0, 0, 0, 0, d3dTex2D, 0, &box);
 
 	if (isShared())
 	{
@@ -212,7 +212,7 @@ int TextureResource::update(const unsigned char* pData, int dataLen, int dataPit
 	//fixme 暂时忽略regionUpdated参数
 	if(NULL==pData || 0>=dataLen || 0>=width || 0>=height)
 		return -1;
-	if (NULL == m_texture || m_device==NULL || m_contex==NULL)
+	if (NULL == m_texture || m_device==NULL || m_context==NULL)
 		return -2;
 	//如果是DEFAULT类型的显存Texture，则不支持update
 	//同时如果是共享显存则必须为DEFAULT类型，因此共享显存调用update也必将导致失败
@@ -234,7 +234,7 @@ int TextureResource::update(const unsigned char* pData, int dataLen, int dataPit
 	HRESULT rslt = S_FALSE;
 	D3D11_MAPPED_SUBRESOURCE mappedRes;
 	ZeroMemory(&mappedRes, sizeof(mappedRes));
-	if (S_OK != (rslt = m_contex->Map(m_texture, 0, D3D11_MAP_WRITE, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
+	if (S_OK != (rslt = m_context->Map(m_texture, 0, D3D11_MAP_WRITE, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
 	{
 		// 		TCHAR errmsg[1024] = {0};
 		// 		swprintf_s(errmsg, 1024, L"YUVTexture_Planar::update : ID3D11DeviceContext obj is Not match to this Y-Texture.this=[%d] result=[%d] errmsg=[%s]\n",
@@ -253,7 +253,7 @@ int TextureResource::update(const unsigned char* pData, int dataLen, int dataPit
 		dst += mappedRes.RowPitch;
 		src += dataPitch;
 	}
-	m_contex->Unmap(m_texture, 0);
+	m_context->Unmap(m_texture, 0);
 	if (m_resMutex)
 	{
 		m_resMutex->ReleaseSync(0);
@@ -320,7 +320,7 @@ bool zRender::TextureResource::dumpToFile(const TCHAR * filePathName)
 			HRESULT rslt = S_FALSE;
 			D3D11_MAPPED_SUBRESOURCE mappedRes;
 			ZeroMemory(&mappedRes, sizeof(mappedRes));
-			if (S_OK != (rslt = m_contex->Map(m_texture, 0, D3D11_MAP_READ, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
+			if (S_OK != (rslt = m_context->Map(m_texture, 0, D3D11_MAP_READ, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
 			{
 				return false;
 			}
@@ -333,10 +333,10 @@ bool zRender::TextureResource::dumpToFile(const TCHAR * filePathName)
 			}
 			outFile.flush();
 			outFile.close();
-			m_contex->Unmap(m_texture, 0);
+			m_context->Unmap(m_texture, 0);
 			return true;
 		}
-		//D3DX11SaveTextureToFile(m_contex, m_texture, D3DX11_IFF_BMP, filePathName);
+		//D3DX11SaveTextureToFile(m_context, m_texture, D3DX11_IFF_BMP, filePathName);
 	}
 	return false;
 }
@@ -372,13 +372,13 @@ bool zRender::TextureResource::dumpToBuffer(unsigned char * outBuffer, int * in_
 			HRESULT rslt = S_FALSE;
 			D3D11_MAPPED_SUBRESOURCE mappedRes;
 			ZeroMemory(&mappedRes, sizeof(mappedRes));
-			if (S_OK != (rslt = m_contex->Map(m_texture, 0, D3D11_MAP_READ, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
+			if (S_OK != (rslt = m_context->Map(m_texture, 0, D3D11_MAP_READ, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
 			{
 				return false;
 			}
 			if (*in_outBufferLen < mappedRes.RowPitch*m_height)
 			{
-				m_contex->Unmap(m_texture, 0);
+				m_context->Unmap(m_texture, 0);
 				return false;
 			}
 			unsigned char* src = (unsigned char*)mappedRes.pData;
@@ -389,12 +389,12 @@ bool zRender::TextureResource::dumpToBuffer(unsigned char * outBuffer, int * in_
 				src += pitch;
 				outBuffer += pitch;
 			}
-			m_contex->Unmap(m_texture, 0);
+			m_context->Unmap(m_texture, 0);
 			*in_outBufferLen = mappedRes.RowPitch*m_height;
 			*outPitch = pitch;
 			return true;
 		}
-		//D3DX11SaveTextureToFile(m_contex, m_texture, D3DX11_IFF_BMP, filePathName);
+		//D3DX11SaveTextureToFile(m_context, m_texture, D3DX11_IFF_BMP, filePathName);
 	}
 	return false;
 }

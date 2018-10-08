@@ -6,12 +6,15 @@
 #include <fstream>
 #include <vector>
 #include "DxRenderCommon.h"
+#include <assert.h>
+#include "Vertex.h"
 
 using namespace zRender;
 
 #pragma region Effect
 Effect::Effect(ID3D11Device* device, const std::wstring& filename)
-	: mFX(0)
+	: mFX(NULL)
+	, m_device(NULL)
 {
 	//fix me share the memory
 	std::ifstream fin(filename.c_str(), std::ios::binary);
@@ -31,6 +34,8 @@ Effect::Effect(ID3D11Device* device, const std::wstring& filename)
 	{
 		printf("D3DX11CreateEffectFromMemory failed.\n");
 	}
+
+	m_device = device;
 }
 
 Effect::~Effect()
@@ -40,9 +45,42 @@ Effect::~Effect()
 
 bool zRender::Effect::isValid() const
 {
-	return mFX!=NULL;
+	return mFX!=NULL && m_device!=NULL;
 }
 
+ID3DX11EffectPass* Effect::getEffectPass(const LPCSTR techName, const LPCSTR passName) const
+{
+	if (!isValid())
+		return NULL;
+	ID3DX11EffectTechnique* tech = mFX->GetTechniqueByName(techName);
+	if (NULL == tech)
+	{
+		return NULL;
+	}
+	ID3DX11EffectPass* pass = tech->GetPassByName(passName);
+	if (pass == NULL)
+	{
+		//fixme log
+	}
+	return pass;
+}
+
+ID3DX11EffectPass* Effect::getEffectPass(int techIndex, int passIndex) const
+{
+	if (!isValid())
+		return NULL;
+	ID3DX11EffectTechnique* tech = mFX->GetTechniqueByIndex(techIndex);
+	if (NULL == tech)
+	{
+		return NULL;
+	}
+	ID3DX11EffectPass* pass = tech->GetPassByIndex(passIndex);
+	if (pass == NULL)
+	{
+		//fixme log
+	}
+	return pass;
+}
 #pragma endregion
 
 #pragma region BasicEffect
@@ -82,6 +120,17 @@ BasicEffect::BasicEffect(ID3D11Device* device, const std::wstring& filename)
 	yTexture        = mFX->GetVariableByName("yTexture")->AsShaderResource();
 	uTexture        = mFX->GetVariableByName("uTexture")->AsShaderResource();
 	vTexture        = mFX->GetVariableByName("vTexture")->AsShaderResource();
+
+	if (!initEffectPass())
+	{
+		//fixme log
+		return;
+	}
+	if (!initInputLayout())
+	{
+		//fixme log
+		return;
+	}
 }
 
 BasicEffect::~BasicEffect()
@@ -121,6 +170,83 @@ ID3DX11EffectPass* BasicEffect::getEffectPass(PIXFormat pixfmt) const
 		break;
 	}
 	return pass;
+}
+
+ID3D11InputLayout* BasicEffect::getInputLayout(const ID3DX11EffectPass* pass)
+{
+	std::map<PIXFormat, EffectPassInputLayoutPair>::const_iterator iter = m_defaultPassAndInputLayout.begin();
+	for (; iter != m_defaultPassAndInputLayout.end(); iter++)
+	{
+		const BasicEffect::EffectPassInputLayoutPair& passInputLayout = iter->second;
+		if (passInputLayout.effectPass == pass)
+		{
+			return passInputLayout.inputLayout;
+		}
+	}
+	return NULL;
+}
+
+void BasicEffect::createEffectPass(PIXFormat pixfmt)
+{
+	ID3DX11EffectPass* pass = getEffectPass(pixfmt);
+	assert(pass);
+	EffectPassInputLayoutPair effInlayoutPair;
+	effInlayoutPair.effectPass = pass;
+	if (m_defaultPassAndInputLayout.find(pixfmt) != m_defaultPassAndInputLayout.end())
+	{
+		//TCHAR errmsg[1024] = { 0 };
+		//swprintf_s(errmsg, 1024, L"Create Effect pass failed.unsurport Pixfmt.[Fmt=%d]", pixfmt);
+		//log_e(LOG_TAG, errmsg);
+		return;
+	}
+	m_defaultPassAndInputLayout[pixfmt] = effInlayoutPair;
+}
+
+/*virtual*/ bool BasicEffect::initEffectPass()
+{
+	createEffectPass(PIXFMT_YUY2);
+	createEffectPass(PIXFMT_YUV420P);
+	createEffectPass(PIXFMT_YV12);
+	createEffectPass(PIXFMT_NV12);
+	createEffectPass(PIXFMT_A8R8G8B8);
+	createEffectPass(PIXFMT_X8R8G8B8);
+	createEffectPass(PIXFMT_R8G8B8);
+	createEffectPass(PIXFMT_R8G8B8A8);
+	createEffectPass(PIXFMT_B8G8R8A8);
+	createEffectPass(PIXFMT_B8G8R8X8);
+	createEffectPass(PIXFMT_UNKNOW);
+	return true;
+}
+
+ID3D11InputLayout* createInputLayout(ID3D11Device* device, ID3DX11EffectPass* effectPass)
+{
+	ID3D11InputLayout* inputlayout = NULL;
+	if (effectPass == NULL || NULL == device)
+		return inputlayout;
+	D3DX11_PASS_DESC passDesc;
+	effectPass->GetDesc(&passDesc);
+	if (S_OK != device->CreateInputLayout(InputLayoutDesc::Basic32, 4, passDesc.pIAInputSignature,
+		passDesc.IAInputSignatureSize, &inputlayout))
+	{
+#ifdef _DEBUG
+		printf("Error in DxRender_D3D11::createInputLayout : CreateInputLayout failed.\n");
+#endif
+	}
+	return inputlayout;
+}
+
+bool BasicEffect::initInputLayout()
+{
+	std::map<PIXFormat, EffectPassInputLayoutPair>::iterator iter = m_defaultPassAndInputLayout.begin();
+	for (; iter != m_defaultPassAndInputLayout.end(); iter++)
+	{
+		ID3DX11EffectPass* pass = iter->second.effectPass;
+		ID3D11InputLayout* layout = createInputLayout((ID3D11Device*)m_device, pass);
+		if (NULL == layout)
+			continue;
+		iter->second.inputLayout = layout;
+	}
+	return true;
 }
 
 #pragma endregion

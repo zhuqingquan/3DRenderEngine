@@ -56,7 +56,7 @@ namespace zRender
 		IDXGIKeyedMutex* m_resMutex;				//be getted when call create() and bShared==true
 
 		ID3D11Device* m_device;
-		ID3D11DeviceContext* m_contex;
+		ID3D11DeviceContext* m_context;
 	};
 }
 
