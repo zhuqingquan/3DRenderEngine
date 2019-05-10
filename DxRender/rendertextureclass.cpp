@@ -164,7 +164,7 @@ void RenderTextureClass::Shutdown()
 }
 
 
-void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView)
+void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext* deviceContext)
 {
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
 	ID3D11ShaderResourceView* resView = NULL;
@@ -175,7 +175,7 @@ void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext* deviceContext, ID3
 }
 
 
-void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext* deviceContext, ID3D11DepthStencilView* depthStencilView, 
+void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext* deviceContext, 
 										   float red, float green, float blue, float alpha)
 {
 	float color[4];

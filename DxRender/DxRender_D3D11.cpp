@@ -289,9 +289,9 @@ int DxRender_D3D11::init(HWND hWnd, const wchar_t* effectFileName, bool isEnable
 
 	m_context->RSSetViewports(1, &m_viewport);
 
-	m_material.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	m_material.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_material.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
+// 	m_material.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+// 	m_material.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+// 	m_material.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
 
 	//create transparent blend state
 	D3D11_BLEND_DESC transparentDesc = {0};
@@ -385,6 +385,70 @@ int zRender::DxRender_D3D11::init(HMONITOR hmonitor)
 	return 0;
 }
 
+int createDeviceAndContext(IDXGIAdapter* adapter, UINT createDeviceFlags, 
+	ID3D11Device** ppDevice, ID3D11DeviceContext** ppContext, D3D_FEATURE_LEVEL& level)
+{
+	if (ppDevice == nullptr || ppContext == nullptr)
+		return -1;
+	D3D_FEATURE_LEVEL curFeatureLv = D3D_FEATURE_LEVEL_9_1;
+	D3D_FEATURE_LEVEL featureLvs[] = {
+		//D3D_FEATURE_LEVEL_11_1,
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0,
+		D3D_FEATURE_LEVEL_9_3,
+		D3D_FEATURE_LEVEL_9_2,
+		D3D_FEATURE_LEVEL_9_1
+	};
+
+	ID3D11Device* device = nullptr;
+	ID3D11DeviceContext* context = nullptr;
+	HRESULT hr = D3D11CreateDevice(
+		adapter,			         // use selected adapter
+		D3D_DRIVER_TYPE_UNKNOWN,	//adapter is No NULL
+		0,							// no software device
+		createDeviceFlags,
+		featureLvs, ARRAYSIZE(featureLvs),// default feature level array
+		D3D11_SDK_VERSION,
+		&device,
+		&curFeatureLv,
+		&context);
+	if (S_OK != hr)
+	{
+		TCHAR errmsg[512] = { 0 };
+		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : faile to Create device with param Adapter(%d) CreateFlag(%d) ErrorCode=%d",
+			(int)adapter, createDeviceFlags, (int)hr);
+#ifdef _DEBUG
+		printf("Error in DxRender_D3D11::init : faile to Create device with param Adapter(%d) CreateFlag(%d) ErrorCode=%d\n",
+			(int)dstAdapter, createDeviceFlags, (int)hr);
+#endif
+		log_e(LOG_TAG, errmsg);
+		return -4;
+	}
+
+	if (curFeatureLv < D3D_FEATURE_LEVEL_11_0)
+	{
+#ifdef _DEBUG
+		printf("Error in DxRender_D3D11::init : Direct3D Feature Level 11 unsupported.\n");
+#endif
+		TCHAR errmsg[512] = { 0 };
+		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : Direct3D Feature Level 11 unsupported. FeatureLevel=%d",
+			(int)curFeatureLv);
+		log_e(LOG_TAG, errmsg);
+		return -5;
+	}
+	*ppDevice = device;
+	*ppContext = context;
+	level = curFeatureLv;
+	return 0;
+}
+
+int checkMultiSampleLevel(DXGI_FORMAT fmt, int sampleCount)
+{
+	// fixme
+	return -1;
+}
+
 int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wchar_t* effectFileName, bool isEnable4XMSAA /*= false*/, bool isSDICompatible /*= false*/ )
 {
 	//判断参数是否有效
@@ -394,7 +458,7 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 		log_e(LOG_TAG, L"DXGI get adapter list failed.");
 		return -1;
 	}
-	if(adapter>=adapterVec.size())
+	if(adapter>=(int)adapterVec.size())
 	{
 		log_e(LOG_TAG, L"Param invalid. adapter is too big");
 		DXGI_releaseAdaptersObjs(adapterVec);
@@ -411,7 +475,19 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 	//#if defined(DEBUG) || defined(_DEBUG)  
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 	//#endif
-
+	D3D_FEATURE_LEVEL level = D3D_FEATURE_LEVEL_9_1;
+	int ret = createDeviceAndContext(adapterVec[adapter], createDeviceFlags, &m_device, &m_context, level);
+	if (0 != ret)
+	{
+		TCHAR errmsg[512] = { 0 };
+		swprintf_s(errmsg, 512, L"Error in createDeviceAndContext : ret=%d", ret);
+#ifdef _DEBUG
+		printf("Error in createDeviceAndContext : ret=%d", ret);
+#endif
+		log_e(LOG_TAG, errmsg);
+		return -4;
+	}
+/*
 	D3D_FEATURE_LEVEL curFeatureLv = D3D_FEATURE_LEVEL_9_1;
 	D3D_FEATURE_LEVEL featureLvs[] = {
 		//D3D_FEATURE_LEVEL_11_1,
@@ -445,9 +521,9 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 		log_e(LOG_TAG, errmsg);
 		DXGI_releaseAdaptersObjs(adapterVec);
 		return -4;
-	}
+	}*/
 	DXGI_releaseAdaptersObjs(adapterVec);
-
+/*
 	if( curFeatureLv < D3D_FEATURE_LEVEL_11_0 )
 	{
 #ifdef _DEBUG
@@ -459,7 +535,7 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 		log_e(LOG_TAG, errmsg);
 		return -5;
 	}
-
+	*/
 	// Check 4X MSAA quality support for our back buffer format.
 	// All Direct3D 11 capable devices support 4X MSAA for all render 
 	// target formats, so we only need to check quality support.
@@ -484,6 +560,12 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 		return -6;
 	}
 
+	m_renderTargetTexture = new RenderTextureClass();
+	if (!m_renderTargetTexture->Initialize(m_device, width, height))
+	{
+		return -7;
+	}
+	/*
 	//创建RenderTarget buffer与Render Target View
 	D3D11_TEXTURE2D_DESC textureDesc;
 	HRESULT result;
@@ -527,7 +609,7 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : create Render Target view for offscreen Texture2D failed.");
 		return -8;
 	}
-
+	
 // 	// Setup the description of the shader resource view.
 // 	shaderResourceViewDesc.Format = textureDesc.Format;
 // 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
@@ -587,152 +669,8 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 		log_e(LOG_TAG, errmsg);
 		return -10;
 	}
-/*	在这种场景下SWAP CHAIN可能不再需要
-	DXGI_SWAP_CHAIN_DESC sd;
-	sd.BufferDesc.Width  = m_winWidth;
-	sd.BufferDesc.Height = m_winHeight;
-	sd.BufferDesc.RefreshRate.Numerator = 60;
-	sd.BufferDesc.RefreshRate.Denominator = 1;
-	sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	sd.BufferUsage  = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.BufferCount  = 1;
-	sd.OutputWindow = hWnd;
-	sd.Windowed     = true;
-	sd.SwapEffect   = DXGI_SWAP_EFFECT_DISCARD;
-	sd.Flags        =  0;
-	if(isSDICompatible)
-	{
-		sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-		sd.Flags |= DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE;
-	}
-	// Use 4X MSAA? 
-	if( isEnable4XMSAA )
-	{
-		sd.SampleDesc.Count   = 4;
-		sd.SampleDesc.Quality = i4xMsaaQuality-1;
-	}
-	// No MSAA
-	else
-	{
-		sd.SampleDesc.Count   = 1;
-		sd.SampleDesc.Quality = 0;
-	}
-
-	// To correctly create the swap chain, we must use the IDXGIFactory that was
-	// used to create the device.  If we tried to use a different IDXGIFactory instance
-	// (by calling CreateDXGIFactory), we get an error: "IDXGIFactory::CreateSwapChain: 
-	// This function is being called with a device from a different IDXGIFactory."
-	IDXGIDevice1* dxgiDevice = 0;
-	if(S_OK!=m_device->QueryInterface(__uuidof(IDXGIDevice1), (void**)&dxgiDevice))
-	{
-		TCHAR errmsg[512] = {0};
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : QueryInterface IDXGIDevice failed.");
-		log_e(LOG_TAG, errmsg);
-		return -5;	      
-	}
-	IDXGIAdapter1* dxgiAdapter = 0;
-	if(S_OK!=dxgiDevice->GetParent(__uuidof(IDXGIAdapter1), (void**)&dxgiAdapter))
-	{
-		TCHAR errmsg[512] = {0};
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : QueryInterface IDXGIAdapter failed.");
-		log_e(LOG_TAG, errmsg);
-		return -6;
-	}
-	IDXGIFactory1* dxgiFactory = 0;
-	if(S_OK!=dxgiAdapter->GetParent(__uuidof(IDXGIFactory1), (void**)&dxgiFactory))
-	{
-		TCHAR errmsg[512] = {0};
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : QueryInterface IDXGIFactory failed.");
-		log_e(LOG_TAG, errmsg);
-		return -7;
-	}
-	m_hWnd = hWnd;
-
-	HRESULT rslt = S_FALSE;
-	if(S_OK!= (rslt=dxgiFactory->CreateSwapChain(m_device, &sd, &m_swapChain)))
-	{
-#ifdef _DEBUG
-		printf("Error in DxRender_D3D11::init : Create Swap Chain failed.(Width=%d, Height=%d, SampleCount=%d, SampleQuality=%d)\n",
-			sd.BufferDesc.Width, sd.BufferDesc.Height, sd.SampleDesc.Count, sd.SampleDesc.Quality);
-#endif
-		TCHAR errmsg[1024] = {0};
-		swprintf_s(errmsg, 1024, L"Error in DxRender_D3D11::init : Create Swap Chain failed.ERR:%s (Width=%d, Height=%d, Format=%d Flags=%d SampleCount=%d, SampleQuality=%d)\n",
-			DXGetErrorDescription(rslt), sd.BufferDesc.Width, sd.BufferDesc.Height, sd.BufferDesc.Format, sd.Flags, sd.SampleDesc.Count, sd.SampleDesc.Quality);
-		log_e(LOG_TAG, errmsg);
-		return -8;
-	}
-
-	//	rslt = m_swapChain->ResizeBuffers(1, m_winWidth, m_winHeight, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_GDI_COMPATIBLE);
-	// 	if(FAILED(rslt))
-	// 	{
-	// 		printf("Failed to CreateSwapChain %s", DXGetErrorDescriptionA(rslt));
-	// 		return -8;
-	// 	}
-	ReleaseCOM(dxgiDevice);
-	ReleaseCOM(dxgiAdapter);
-	ReleaseCOM(dxgiFactory);
-
-	ID3D11Texture2D* backBuffer;
-	if(S_OK!=m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer)))
-		return -9;
-	if(S_OK!=m_device->CreateRenderTargetView(m_renderTargetBuffer, 0, &m_renderTargetView))
-	{
-		ReleaseCOM(backBuffer);
-		TCHAR errmsg[512] = {0};
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : CreateRenderTargetView failed.");
-		log_e(LOG_TAG, errmsg);
-		return -10;
-	}
-	ReleaseCOM(backBuffer);
-
-	// Create the depth/stencil buffer and view.
-
-	D3D11_TEXTURE2D_DESC depthStencilDesc;
-
-	depthStencilDesc.Width     = m_winWidth;
-	depthStencilDesc.Height    = m_winHeight;;
-	depthStencilDesc.MipLevels = 1;
-	depthStencilDesc.ArraySize = 1;
-	depthStencilDesc.Format    = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-	// Use 4X MSAA? --must match swap chain MSAA values.
-	if( isEnable4XMSAA )
-	{
-		depthStencilDesc.SampleDesc.Count   = 4;
-		depthStencilDesc.SampleDesc.Quality = i4xMsaaQuality-1;
-	}
-	// No MSAA
-	else
-	{
-		depthStencilDesc.SampleDesc.Count   = 1;
-		depthStencilDesc.SampleDesc.Quality = 0;
-	}
-	m_bEnable4xMsaa = isEnable4XMSAA;
-
-	depthStencilDesc.Usage          = D3D11_USAGE_DEFAULT;
-	depthStencilDesc.BindFlags      = D3D11_BIND_DEPTH_STENCIL;
-	depthStencilDesc.CPUAccessFlags = 0; 
-	depthStencilDesc.MiscFlags      = 0;
-
-	if(S_OK!=m_device->CreateTexture2D(&depthStencilDesc, 0, &m_depthBuffer))
-	{
-		TCHAR errmsg[512] = {0};
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : create depth buffer failed.");
-		log_e(LOG_TAG, errmsg);
-		return -11;
-	}
-	if(S_OK!=m_device->CreateDepthStencilView(m_depthBuffer, 0, &m_depthView))
-	{
-		TCHAR errmsg[512] = {0};
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : create depth stencil view failed.");
-		log_e(LOG_TAG, errmsg);
-		return -12;
-	}
-*/
 	// Bind the render target view and depth/stencil view to the pipeline.
-
+	
 	m_context->OMSetRenderTargets(1, &m_renderTargetView, m_depthView);
 
 
@@ -746,13 +684,13 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 	m_viewport.MaxDepth = 1.0f;
 
 	m_context->RSSetViewports(1, &m_viewport);
-
+	*/
 	m_winWidth = width;
 	m_winHeight = height;
-
-	m_material.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
-	m_material.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	m_material.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
+/*
+ 	m_material.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
+ 	m_material.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+ 	m_material.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
 
 	if(0!=createComputeShader(effectFileName))
 	{
@@ -763,7 +701,14 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 	}
 	initEffectPass();
 	createInputLayout();
-
+*/
+	if (0 != (ret=setRenderTargetTexture()))
+	{
+		TCHAR errmsg[1024] = { 0 };
+		swprintf_s(errmsg, 1024, L"Error in DxRender_D3D11::init : setRenderTargetTexture failed. ret=%d", ret);
+		log_e(LOG_TAG, errmsg);
+		return -13;
+	}
 	//create transparent blend state
 	D3D11_BLEND_DESC transparentDesc = {0};
 	transparentDesc.AlphaToCoverageEnable = false;
@@ -1136,15 +1081,10 @@ int DxRender_D3D11::releaseBuffer(ID3D11Buffer** buffer)
 
 int DxRender_D3D11::draw(DisplayElement* displayElem)
 {
-	if (m_drawCount == 0 && m_renderTargetTexture)
+	if (m_renderTargetTexture)
 	{
 		setRenderTargetTexture();
 	}
-	else if (m_renderTargetTexture)
-	{
-		OutputDebugStringA("---------\n");
-	}
-	m_drawCount++;
 	if(m_device==NULL || m_depthView==NULL)
 	{
 #ifdef _DEBUG
@@ -1171,8 +1111,9 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
 int DxRender_D3D11::present(int type)
 {
 	if(!m_swapChain)	return -1;
-	if (m_renderTargetTexture)
+	if (m_renderTargetTexture && m_swapChain)
 	{
+		// 即创建的offscreen rendertarget，又创建了SwapChain渲染到Backbuffer
 		setRenderTargetBackbuffer();
 		clearBackbuffer(m_color);
 		drawOffscreenRenderTarget();
@@ -1191,7 +1132,7 @@ int DxRender_D3D11::clear(DWORD color)
 		int r = (color & 0x00ff0000) >> 16;
 		int g = (color & 0x0000ff00) >> 8;
 		int b = (color & 0x000000ff) >> 0;
-		m_renderTargetTexture->ClearRenderTarget(m_context, m_depthView, (float)r / 256, (float)g / 256, (float)b / 256, (float)a / 256);
+		m_renderTargetTexture->ClearRenderTarget(m_context, (float)r / 256, (float)g / 256, (float)b / 256, (float)a / 256);
 		return 0;
 	}
 	else
@@ -1407,8 +1348,9 @@ TextureResource * zRender::DxRender_D3D11::getSnapshot(TEXTURE_USAGE usage, bool
 	{
 		delete frameTexture;
 	}
-	if (NULL == m_renderTargetTexture && NULL==m_renderTargetBuffer)
+	if (NULL == m_renderTargetTexture)
 	{
+		// 此时renderTargetTex为从SwapChain中获取的Texture（backbuffer）
 		ReleaseCOM(renderTargetTex);
 	}
 	return frameTexture;
@@ -1452,7 +1394,7 @@ int zRender::DxRender_D3D11::setRenderTargetTexture()
 {
 	if (NULL == m_renderTargetTexture)
 		return -1;
-	m_renderTargetTexture->SetRenderTarget(m_context, m_depthView);
+	m_renderTargetTexture->SetRenderTarget(m_context);
 	m_viewport.TopLeftX = 0;
 	m_viewport.TopLeftY = 0;
 	m_viewport.Width = static_cast<float>(m_renderTargetTexture->GetWidth());
@@ -1512,10 +1454,6 @@ ID3D11Texture2D * zRender::DxRender_D3D11::getRenderTargetTexture()
 	{
 		return m_renderTargetTexture->getRenderTargetTexture();
 	}
-	else if(m_renderTargetBuffer)
-	{
-		return m_renderTargetBuffer;
-	}
 	else
 	{
 		if (NULL == m_swapChain)	return NULL;
@@ -1528,19 +1466,20 @@ ID3D11Texture2D * zRender::DxRender_D3D11::getRenderTargetTexture()
 
 int zRender::DxRender_D3D11::resize( int new_width, int new_height )
 {
+	assert(false);
+	// fixme
 	if(new_width<=0 || new_height<=0)
 		return -1;
 	assert(m_context);
 	assert(m_device);
 	assert(m_swapChain);
-	if(m_context==NULL || NULL==m_device || (NULL==m_swapChain && m_renderTargetBuffer==NULL))
+	if(m_context==NULL || NULL==m_device || (NULL==m_swapChain && m_renderTargetTexture==nullptr))
 	{
 		return -2;
 	}
 	// Release the old views, as they hold references to the buffers we
 	// will be destroying.  Also release the old depth/stencil buffer.
 
-	ReleaseCOM(m_renderTargetBuffer);
 	ReleaseCOM(m_bkbufDxgiSurface);
 	ReleaseCOM(m_renderTargetView);
 	ReleaseCOM(m_depthView);
@@ -1590,13 +1529,13 @@ int zRender::DxRender_D3D11::resize( int new_width, int new_height )
 		textureDesc.MiscFlags = 0;
 
 		// Create the render target texture.
-		result = m_device->CreateTexture2D(&textureDesc, NULL, &m_renderTargetBuffer);
-		if(FAILED(result))
-		{
-			TCHAR errmsg[512] = {0};
-			swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::resize : create Texture2D for render target failed.");
-			return -7;
-		}
+// 		result = m_device->CreateTexture2D(&textureDesc, NULL, &m_renderTargetBuffer);
+// 		if(FAILED(result))
+// 		{
+// 			TCHAR errmsg[512] = {0};
+// 			swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::resize : create Texture2D for render target failed.");
+// 			return -7;
+// 		}
 	}
 	
 	// Setup the description of the render target view.

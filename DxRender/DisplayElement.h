@@ -25,7 +25,6 @@
 
 namespace zRender
 {
-	class Texture;
 	class DxRender_D3D11;
 	class BasicEffect;
 	//template<> class ElemDsplModel<BasicEffect>;

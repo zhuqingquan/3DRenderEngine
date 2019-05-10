@@ -101,11 +101,11 @@ namespace zRender
 **/
 #define FRAMEPITCH(width, pixfmt) ((width)*(zRender::PixelByteCount[pixfmt]))
 
-	typedef enum TEXTURE_USAGE
+	typedef enum _TEXTURE_USAGE
 	{
 		TEXTURE_USAGE_DEFAULT = 0,	//在物理显存中申请资源，不支持CPU读写，支持共享
 		TEXTURE_USAGE_STAGE,		//在内存中申请资源，支持CPU读写，不可共享
-	};
+	}TEXTURE_USAGE;
 }
 
 #endif //_zRENDER_DXRENDER_COMMON_H_

@@ -65,6 +65,7 @@ namespace zRender
 		/**
 		 *	@name		init
 		 *	@brief		初始化显示引擎，创建显示所需的资源
+		 *				此种方式创建的显示引擎将默认创建Swapchain直接与窗口hWnd关联，用户绘制的内容默认直接渲染在窗口上
 		 *	@param[in]	HWND hWnd 用于显示内容的Windows窗口句柄
 		 *	@param[in]	const wchar_t* effectFileName 显示所需的Shader文件，effect文件的路径名称
 		 *				可以是相对路径或者绝对路径
@@ -81,9 +82,10 @@ namespace zRender
 		/**
 		 *	@name		init
 		 *	@brief		初始化显示引擎，创建显示所需的资源
-		 *				本方法创建的时OffscreenRenderTarget
+		 *				本方法创建的是Offscreen RenderTarget，且所有资源都从adapter指定的显卡上创建
 		 *	@param[in]	int width 宽，像素
 		 *	@param[in]	int height 高，像素
+		 *	@param[in]	int adapter 显卡序号
 		 *	@param[in]	const wchar_t* effectFileName 显示所需的Shader文件，effect文件的路径名称
 		 *				可以是相对路径或者绝对路径
 		 *	@param[in]	isEnable4XMSAA 是否支持MSAA，默认为false
@@ -130,8 +132,24 @@ namespace zRender
 		 */
 		int releaseDisplayElement(DisplayElement** displayElement);
 
+		/**
+		 *	@name		createSharedTexture
+		 *	@brief		根据像素格式pixfmt创建SharedTexture对象。
+		 *	@param[in]	SharedTexture** ppSharedTex 保存指向SharedTexture对象的指针
+		 *				该对象用DxRender创建，并使用releaseSharedTexture释放
+		 *	@param[in]	PIXFormat pixfmt Texture内存保存的像素格式
+		 *	@return		int 0--成功   <0--失败
+		 **/
 		int createSharedTexture(SharedTexture** ppSharedTex, PIXFormat pixfmt);
 
+		/**
+		*	@name		releaseSharedTexture
+		*	@brief		释放由createSharedTexture创建的SharedTexture对象
+		*	@param[in]	SharedTexture** ppSharedTex 保存指向SharedTexture对象的指针
+		*				该对象用DxRender创建，并使用releaseSharedTexture释放
+		*	@param[in]	PIXFormat pixfmt Texture内存保存的像素格式
+		*	@return		int 0--成功   <0--失败
+		**/
 		int releaseSharedTexture(SharedTexture** ppSharedTex);
 
 		int createTextureResource(TextureResource** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char* initData= NULL, int dataLen = 0, int pitch = 0);
@@ -197,8 +215,6 @@ namespace zRender
 		 *	@return		int 0--成功   <0--失败
 		 **/
 		int releaseBuffer(ID3D11Buffer** buffer);
-
-		Texture* openSharedTexture(void* texHandle);////////////////////////////////////////////////////
 
 		/**
 		 *	@name		setupBackground
@@ -343,7 +359,7 @@ namespace zRender
 		XMFLOAT4X4 m_worldBaseTransform;
 		XMFLOAT4X4 m_viewTransform;
 		XMFLOAT4X4 m_projTransform;
-		Material m_material;
+		//Material m_material;
 		IDXGISurface1* m_bkbufDxgiSurface;
 		ID3D11BlendState* m_TransparentBS;
 

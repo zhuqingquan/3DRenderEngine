@@ -24,8 +24,8 @@ public:
 	bool Initialize(ID3D11Device*, int, int);
 	void Shutdown();
 
-	void SetRenderTarget(ID3D11DeviceContext*, ID3D11DepthStencilView*);
-	void ClearRenderTarget(ID3D11DeviceContext*, ID3D11DepthStencilView*, float, float, float, float);
+	void SetRenderTarget(ID3D11DeviceContext*);
+	void ClearRenderTarget(ID3D11DeviceContext*, float, float, float, float);
 	ID3D11ShaderResourceView* GetShaderResourceView();
 	ID3D11Texture2D* getRenderTargetTexture() const { return m_renderTargetTexture; }
 
