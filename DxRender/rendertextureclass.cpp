@@ -2,6 +2,7 @@
 // Filename: rendertextureclass.cpp
 ////////////////////////////////////////////////////////////////////////////////
 #include "rendertextureclass.h"
+#include "ConstDefine.h"
 
 
 RenderTextureClass::RenderTextureClass()
@@ -55,7 +56,7 @@ bool RenderTextureClass::Initialize(ID3D11Device* device, int textureWidth, int 
 	{
 		return false;
 	}
-
+	
 	// Setup the description of the render target view.
 	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -209,4 +210,14 @@ DXGI_FORMAT RenderTextureClass::GetPixelFormat() const
 	D3D11_TEXTURE2D_DESC desc;
 	m_renderTargetTexture->GetDesc(&desc);
 	return desc.Format;
+}
+
+int RenderTextureClass::LockBackbufferHDC(BOOL Discard, HDC* outHDC)
+{
+	return DXRENDER_RESULT_OPT_NOT_SUPPORT;
+}
+
+int RenderTextureClass::unlockBackbufferHDC(HDC hdc)
+{
+	return DXRENDER_RESULT_OPT_NOT_SUPPORT;
 }

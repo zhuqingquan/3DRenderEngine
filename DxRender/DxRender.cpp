@@ -29,7 +29,7 @@ int DxRender::setVisibleRegion(const RECT_f& visibleReg)
 
 RECT_f DxRender::getVisibleRegion() const
 {
-	return m_renderImp->getVisibleREgion();
+	return m_renderImp->getVisibleRegion();
 }
 
 int DxRender::init(HWND hWnd, const wchar_t* effectFileName, bool isEnable4XMSAA /*= false*/, bool isSDICompatible/* = false*/)
@@ -100,7 +100,7 @@ int DxRender::setupBackground(IDisplayContentProvider* contentProvider, const RE
 		return -1;
 	}
 	if(NULL==contentProvider || displayReg.width()<=0 || displayReg.height()<=0 
-		|| !displayReg.isIntersect(m_renderImp->getVisibleREgion()))
+		|| !displayReg.isIntersect(m_renderImp->getVisibleRegion()))
 	{
 		printf("Error in DxRender::setupBackground : param invalid.(Provider=%d Reg.L=%f Reg.R=%f Reg.T=%f Reg.B=%f)\n",
 			(int)contentProvider, displayReg.left, displayReg.right, displayReg.top, displayReg.bottom);

@@ -32,6 +32,9 @@ public:
 	int GetWidth() const { return m_width; }
 	int GetHeight() const { return m_height; }
 	DXGI_FORMAT GetPixelFormat() const;
+
+	int LockBackbufferHDC(BOOL Discard, HDC* outHDC);
+	int unlockBackbufferHDC(HDC hdc);
 private:
 	ID3D11Texture2D* m_renderTargetTexture;
 	ID3D11RenderTargetView* m_renderTargetView;

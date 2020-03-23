@@ -102,6 +102,9 @@
     <ClCompile Include="D3D11TextureRender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BackbufferRT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdapterOutputHelper.h">
@@ -201,6 +204,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D3D11TextureRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BackbufferRT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstDefine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

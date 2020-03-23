@@ -48,7 +48,7 @@ int DisplayElement::setDisplayRegion(const RECT_f& displayReg, float zIndex)
 		log_e(LOG_TAG, errmsg);
 		return -2;
 	}
-	RECT_f	renderVisibleReg = m_dxRender->getVisibleREgion();
+	RECT_f	renderVisibleReg = m_dxRender->getVisibleRegion();
 	if(!renderVisibleReg.isIntersect(displayReg))	//该DisplayElement的显示位置与DxRender没有交集
 	{
 		TCHAR errmsg[512] = {0};

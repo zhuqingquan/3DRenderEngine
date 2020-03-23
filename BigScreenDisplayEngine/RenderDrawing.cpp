@@ -156,7 +156,7 @@ int RenderDrawing::doRenderWork()
 		return -2;
 	}
 
-	render->createOffscreenRenderTarget(1920, 1080);
+//	render->createOffscreenRenderTarget(1920, 1080);
 
 	if(m_background)
 	{
@@ -197,8 +197,19 @@ int RenderDrawing::doRenderWork()
 		return 0;
 	}
 	m_dsplModel = pDsplModel;
+	int countForResize = 0;
+	static const int MaxCountForResize = 300;
 	while(m_isRunning)
 	{
+		++countForResize;
+		if (countForResize % (MaxCountForResize * 2) == 0)
+		{
+			m_render->resize(1920, 1080);
+		}
+		else if (countForResize % MaxCountForResize == 0)
+		{
+			m_render->resize(800, 600);
+		}
 		QueryPerformanceCounter(&cur);
 		nowTime = cur.QuadPart * 1000 / freq.QuadPart;
 		if(lastTime!=0)
@@ -236,7 +247,7 @@ int RenderDrawing::doRenderWork()
 			drawBigViewportPartition(render, vpp);
 		}
 		render->present(0);
-		//将RenderTarget中的内容保存到文件中
+		/*//将RenderTarget中的内容保存到文件中
 		//zRender::TextureResource* snpRes = m_render->getSnapshot(TEXTURE_USAGE_STAGE, false, true);
 		zRender::TextureResource* snpRes = m_render->getSnapshot(TEXTURE_USAGE_DEFAULT, true, true);
 		if (snpRes != NULL)
@@ -249,7 +260,7 @@ int RenderDrawing::doRenderWork()
 		//{
 		//	int len = dstPitch * dstHeight;
 		//	dstOuput.write((char*)pdstData, len);
-		//}
+		//}*/
 		Sleep(10);
 	}
 	free(pdstData);

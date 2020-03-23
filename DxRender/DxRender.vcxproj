@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -14,18 +14,18 @@
     <ProjectGuid>{171C8235-4516-44FC-8238-04D2FD4B5892}</ProjectGuid>
     <RootNamespace>DxRender</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -100,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="AdapterOutputHelper.cpp" />
     <ClCompile Include="ARGBTexture_8.cpp" />
+    <ClCompile Include="BackbufferRT.cpp" />
     <ClCompile Include="d3d11StateHelper.cpp" />
     <ClCompile Include="D3D11TextureRender.cpp" />
     <ClCompile Include="d3dAdapterOutputEnumerator.cpp" />
@@ -130,7 +131,9 @@
   <ItemGroup>
     <ClInclude Include="AdapterOutputHelper.h" />
     <ClInclude Include="ARGBTexture_8.h" />
+    <ClInclude Include="BackbufferRT.h" />
     <ClInclude Include="BackgroundDisplayComponent.h" />
+    <ClInclude Include="ConstDefine.h" />
     <ClInclude Include="d3d11StateHelper.h" />
     <ClInclude Include="D3D11TextureRender.h" />
     <ClInclude Include="d3dAdapterOutputEnumerator.h" />

@@ -28,6 +28,7 @@ namespace zRender
 	class SharedResource;
 	class SharedTexture;
 	class D3D11TextureRender;
+	class BackbufferRenderTarget;
 
 	/**
 	 *	@name	DxRender_D3D11
@@ -60,7 +61,7 @@ namespace zRender
 		 *	@name	getVisibleREgion
 		 *	@brief	获取该Device显示坐标系中的区域
 		 **/
-		RECT_f getVisibleREgion() const;
+		RECT_f getVisibleRegion() const;
 
 		/**
 		 *	@name		init
@@ -242,6 +243,16 @@ namespace zRender
 		int draw(DisplayElement* displayElem);
 
 		/**
+		 *	@name		draw
+		 *	@brief		直接将TextureResource的数据绘制到RenderTarget上
+		 *				没有层次的处理，如果发生重叠，则最新绘制的将覆盖前面绘制的内容
+		 *	@param[in]	TextureResource * texture Texture资源
+		 *	@param[in]	const RECT & region texture绘制的区域
+		 *	@return		int 0--成功 <0--失败
+		 **/
+		int draw(TextureResource* texture, const RECT& region);
+
+		/**
 		 *	@name		clear
 		 *	@brief		将DxRender中所有显示内容清除，显示背景颜色
 		 *	@param[in]	DWORD color 背景颜色
@@ -342,19 +353,13 @@ namespace zRender
 		IDXGIAdapter* m_adapter;
 		ID3D11Device* m_device;
 		ID3D11DeviceContext* m_context;
-		IDXGISwapChain* m_swapChain;
 		ID3D11RenderTargetView* m_renderTargetView;
 		D3D_FEATURE_LEVEL m_curFeatureLv;
-		ID3D11Texture2D* m_depthBuffer;
-		ID3D11DepthStencilView* m_depthView;
 		D3D11_VIEWPORT m_viewport;
 
 		HWND m_hWnd;
-		int m_winWidth;
-		int m_winHeight;
 		RECT_f m_visibleReg;
 		float m_aspectRatio;
-		bool m_bEnable4xMsaa;
 
 		XMFLOAT4X4 m_worldBaseTransform;
 		XMFLOAT4X4 m_viewTransform;
@@ -365,6 +370,7 @@ namespace zRender
 
 		//BackgroundComponent* m_backgroundComponent;
 		DWORD m_color;
+		BackbufferRenderTarget* m_bkbufRT;
 		RenderTextureClass* m_renderTargetTexture;//Offscreen Render Target Texture
 		D3D11TextureRender* m_offscreenRttRender;	//当启用了offscreen的rendertarget，则渲染到Offscreen之后再通过这个对象实现将offscreen的RTT渲染到Backbuffer中
 	};

@@ -331,7 +331,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	doCommand(cfgFileStream);
 
 	//等待用户输入使用哪些显示器显示视频
-	printf("请输入显示器序号选择需要创建窗口的显示器（格式如 1(0_0)，2(1_0)，3(0_1)）：");
+	printf("请输入显示器序号选择需要创建窗口的显示器（格式如 0(0_0)，1(1_0)，2(0_1)）：");
 	std::string inputString;
 	cin >> inputString;
 
@@ -474,7 +474,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	zRender::RawFileSource* fileSrc = new zRender::RawFileSource(dxrender);
 	//fileSrc->open(_T("D:\\InsideMoveVtc.yuv"), zRender::PIXFMT_YUY2, 1920, 1080);
-	fileSrc->open(_T("D:\\transImag_500_282.rgb32"), zRender::PIXFMT_R8G8B8A8, 500, 282);
+	fileSrc->open(_T("D:\\测试用视频\\transImag_500_282.rgb32"), zRender::PIXFMT_R8G8B8A8, 500, 282);
 	
 	BigView* view = fileSrc->createSourceView();
 	//BigView* view = new BigView(zRender::RECT_f(0.0, 1, 0.0, 1));

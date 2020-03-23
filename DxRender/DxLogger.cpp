@@ -1,4 +1,5 @@
 #include "DXLogger.h"
+#include <stdarg.h>
 
 using namespace zRender;
 
@@ -22,4 +23,15 @@ int zRender::log_e(const std::wstring& tag, const std::wstring& msg, int rate/*=
 	{
 		return -1;
 	}
+}
+
+int zRender::log(const std::wstring& tag, LogLevel level, const wchar_t* format, ...)
+{
+	wchar_t errmsg[1024] = { 0 };
+	va_list argList;
+	va_start(argList, format);
+	swprintf_s(errmsg, 512, format, argList);
+	log_e(tag, errmsg);
+	va_end(argList);
+	return 0;
 }

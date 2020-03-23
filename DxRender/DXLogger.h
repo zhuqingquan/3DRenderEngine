@@ -13,6 +13,15 @@
 
 namespace zRender
 {
+	typedef enum LogLevel
+	{
+		LL_ERROR = 1,
+		LL_WARNING,
+		LL_INFO,
+		LL_DEBUG,
+		LL_VERBOSE,
+	};
+
 	typedef void (*DxLogFunc)(const std::wstring& tag, const std::wstring& msg, int rate, const std::wstring& key);
 	/**
 	 *	@name			setDxLogFunc
@@ -30,6 +39,8 @@ namespace zRender
 	 *	@return			int 0--success others--failed
 	 **/
 	int log_e(const std::wstring& tag, const std::wstring& msg, int rate=0, const std::wstring& key=L"");
+
+	int log(const std::wstring& tag, LogLevel level, const wchar_t* format, ...);
 }
 
 #endif//_DX_RENDER_LOGGER_H_
