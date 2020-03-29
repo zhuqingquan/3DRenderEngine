@@ -68,8 +68,6 @@ namespace zRender
 		 *	@brief		初始化显示引擎，创建显示所需的资源
 		 *				此种方式创建的显示引擎将默认创建Swapchain直接与窗口hWnd关联，用户绘制的内容默认直接渲染在窗口上
 		 *	@param[in]	HWND hWnd 用于显示内容的Windows窗口句柄
-		 *	@param[in]	const wchar_t* effectFileName 显示所需的Shader文件，effect文件的路径名称
-		 *				可以是相对路径或者绝对路径
 		 *	@param[in]	isEnable4XMSAA 是否支持MSAA，默认为false
 		 *				如果该参数为true，则isSDICompatible不能为true
 		 *	@param[in]	isSDICompatible 是否支持获取HDC句柄用于GDI渲染
@@ -77,7 +75,7 @@ namespace zRender
 		 *				如果该参数为true，则isEnable4XMSAA不能为true
 		 *	@return		int 0--成功  非0--失败
 		 */
-		int init(HWND hWnd, const wchar_t* effectFileName, bool isEnable4XMSAA = false, bool isSDICompatible = false);
+		int init(HWND hWnd, bool isEnable4XMSAA = false, bool isSDICompatible = false);
 
 		
 		/**
@@ -87,16 +85,12 @@ namespace zRender
 		 *	@param[in]	int width 宽，像素
 		 *	@param[in]	int height 高，像素
 		 *	@param[in]	int adapter 显卡序号
-		 *	@param[in]	const wchar_t* effectFileName 显示所需的Shader文件，effect文件的路径名称
-		 *				可以是相对路径或者绝对路径
-		 *	@param[in]	isEnable4XMSAA 是否支持MSAA，默认为false
-		 *				如果该参数为true，则isSDICompatible不能为true
 		 *	@param[in]	isSDICompatible 是否支持获取HDC句柄用于GDI渲染
 		 *				如果该参数为false，则lockBackbufferHDC接口调用失败
 		 *				如果该参数为true，则isEnable4XMSAA不能为true
 		 *	@return		int 0--成功  非0--失败
 		 */
-		int init(int width, int height, int adapter, const wchar_t* effectFileName, bool isEnable4XMSAA = false, bool isSDICompatible = false);
+		int init(int width, int height, int adapter = 0, bool isSDICompatible = false);
 
 		/**
 		 *	@name		init
@@ -267,7 +261,7 @@ namespace zRender
 		 *	@param[in]	DWORD color 背景颜色
 		 *	@return		int 0--成功   <0--失败
 		 */
-		int clear(const RECT_f& clearReg, DWORD color);
+		//int clear(const RECT_f& clearReg, DWORD color);  // fixme
 
 		/**
 		 *	@name		present
@@ -345,10 +339,16 @@ namespace zRender
 		int setRenderTargetTexture();
 		int setRenderTargetBackbuffer();
 
-		int drawOffscreenRenderTarget();
+		int drawOffscreenRenderTarget(); 
 		int clearBackbuffer(DWORD color);
+		int clearRenderTargetTexture(DWORD color);
 
 		ID3D11Texture2D* getRenderTargetTexture();
+
+		// 判断是否RenderTarget初始化设置成功
+		bool isRenderTargetSetted();
+
+		bool CreateTransparentBlendState();
 	private:
 		IDXGIAdapter* m_adapter;
 		ID3D11Device* m_device;

@@ -321,18 +321,12 @@ namespace zRender
 	{
 		if (m_backbuffer == NULL)
 		{
-#ifdef _DEBUG
-			printf("DxRender_D3D11 Object have not be inited yet.\n");
-			assert(false);
-#endif
+			log_e(L"BackbufferRenderTarget", L"DxRender_D3D11 Object have not be inited yet.\n");
 			return DXRENDER_RESULT_NOT_INIT_YET;
 		}
 		if (m_bkbufDxgiSurface != NULL)
 		{
-#ifdef _DEBUG
-			printf("DxRender_D3D11 lock already and do not unlock.\n");
-			assert(false);
-#endif
+			log_e(L"BackbufferRenderTarget", L"DxRender_D3D11 lock already and do not unlock.\n");
 			return DXRENDER_RESULT_FUNC_REENTRY_INVALID;
 		}
 

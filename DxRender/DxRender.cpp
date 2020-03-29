@@ -32,14 +32,14 @@ RECT_f DxRender::getVisibleRegion() const
 	return m_renderImp->getVisibleRegion();
 }
 
-int DxRender::init(HWND hWnd, const wchar_t* effectFileName, bool isEnable4XMSAA /*= false*/, bool isSDICompatible/* = false*/)
+int DxRender::init(HWND hWnd, bool isEnable4XMSAA /*= false*/, bool isSDICompatible/* = false*/)
 {
-	return m_renderImp->init(hWnd, effectFileName, isEnable4XMSAA, isSDICompatible);
+	return m_renderImp->init(hWnd, isEnable4XMSAA, isSDICompatible);
 }
 
-int DxRender::init(int width, int height, int adapter, const wchar_t* effectFileName, bool isEnable4XMSAA/* = false*/, bool isSDICompatible/* = false*/)
+int DxRender::init(int width, int height, int adapter, bool isSDICompatible/* = false*/)
 {
-	return m_renderImp->init(width, height, adapter, effectFileName, isEnable4XMSAA, isSDICompatible);
+	return m_renderImp->init(width, height, adapter, isSDICompatible);
 }
 
 int zRender::DxRender::init(HMONITOR hmonitor)

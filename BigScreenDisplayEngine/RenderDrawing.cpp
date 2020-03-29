@@ -134,8 +134,9 @@ int RenderDrawing::doRenderWork()
 	zRender::DxRender* render = new zRender::DxRender();
 	int ret = -1;
 	int width = 1920, height = 1080;
-	if( 0!=(ret=render->init(m_hwnd, _T("D:\\代码黑洞\\3DRenderEngine\\DxRender\\FX\\DefaultVideo.fxo"))) )
-		//if( 0!=(ret=render->init(width, height, _T("G:\\代码黑洞\\MediaCloudDirector\\mshow_v3.0.1.1_GT_anchor_pb\\bin\\Release\\DefaultVideo.fxo"))) )
+	//ret = render->init(m_hwnd);   // 使用HWND进行创建，绘制到窗口中
+	ret = render->init(width, height);  // 使用Texture中，使用Texture的Width、Height进行创建
+	if( 0!=ret )
 	{
 #ifdef _DEBUG
 		printf("Error in RenderDrawing::doRenderWork : failed to init DxRender.(HWND=%d)\n", (int)m_hwnd);
@@ -256,11 +257,12 @@ int RenderDrawing::doRenderWork()
 			//snpRes->dumpToFile(_T("dx_render_snapshot.rgb"));
 			delete snpRes;
 		}
-		//if(0==m_render->getSnapshot(pdstData, dstDataLen, dstWidth, dstHeight, dstPixfmt, dstPitch))
-		//{
-		//	int len = dstPitch * dstHeight;
-		//	dstOuput.write((char*)pdstData, len);
-		//}*/
+		*/
+		if(0== render->getSnapshot(pdstData, dstDataLen, dstWidth, dstHeight, dstPixfmt, dstPitch))
+		{
+			int len = dstPitch * dstHeight;
+			dstOuput.write((char*)pdstData, len);
+		}
 		Sleep(10);
 	}
 	free(pdstData);

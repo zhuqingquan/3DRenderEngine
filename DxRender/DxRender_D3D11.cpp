@@ -28,9 +28,9 @@ DxRender_D3D11::DxRender_D3D11()
 	, m_bkbufDxgiSurface(NULL)
 	, m_TransparentBS(NULL)
 	, m_renderTargetView(NULL)
-	, m_renderTargetTexture(NULL)
+	, m_renderTargetTexture(NULL), m_bkbufRT(nullptr)
 	, m_color(0)
-	, m_offscreenRttRender(NULL), m_bkbufRT(nullptr)
+	, m_offscreenRttRender(NULL)
 {
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_worldBaseTransform, I);
@@ -44,7 +44,7 @@ DxRender_D3D11::~DxRender_D3D11()
 	deinit();
 }
 
-int DxRender_D3D11::init(HWND hWnd, const wchar_t* effectFileName, bool isEnable4XMSAA /*= false*/, bool isSDICompatible/* = false*/)
+int DxRender_D3D11::init(HWND hWnd, bool isEnable4XMSAA /*= false*/, bool isSDICompatible/* = false*/)
 {
 	if (nullptr != m_bkbufRT)
 	{
@@ -109,8 +109,15 @@ int DxRender_D3D11::init(HWND hWnd, const wchar_t* effectFileName, bool isEnable
 // 	m_material.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 // 	m_material.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
 
+	CreateTransparentBlendState();
+	log_e(LOG_TAG, L"init success.");
+	return 0;
+}
+
+bool zRender::DxRender_D3D11::CreateTransparentBlendState()
+{
 	//create transparent blend state
-	D3D11_BLEND_DESC transparentDesc = {0};
+	D3D11_BLEND_DESC transparentDesc = { 0 };
 	transparentDesc.AlphaToCoverageEnable = false;
 	transparentDesc.IndependentBlendEnable = false;
 	transparentDesc.RenderTarget[0].BlendEnable = true;
@@ -120,16 +127,15 @@ int DxRender_D3D11::init(HWND hWnd, const wchar_t* effectFileName, bool isEnable
 	transparentDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
 	transparentDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
 	transparentDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	transparentDesc.RenderTarget[0].RenderTargetWriteMask =	D3D11_COLOR_WRITE_ENABLE_ALL;
-	if(FAILED(m_device->CreateBlendState(&transparentDesc, &m_TransparentBS)))
+	transparentDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	if (FAILED(m_device->CreateBlendState(&transparentDesc, &m_TransparentBS)))
 	{
-		TCHAR errmsg[512] = {0};
+		TCHAR errmsg[512] = { 0 };
 		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : create alpha blend state failed.");
 		log_e(LOG_TAG, errmsg);
-		return -14;
+		return false;
 	}
-	log_e(LOG_TAG, L"init success.");
-	return 0;
+	return true;
 }
 
 int zRender::DxRender_D3D11::init(HMONITOR hmonitor)
@@ -265,27 +271,32 @@ int checkMultiSampleLevel(DXGI_FORMAT fmt, int sampleCount)
 	return -1;
 }
 
-int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wchar_t* effectFileName, bool isEnable4XMSAA /*= false*/, bool isSDICompatible /*= false*/ )
+int zRender::DxRender_D3D11::init( int width, int height, int adapter/*=0*/, bool isSDICompatible /*= false*/ )
 {
+	if (isRenderTargetSetted())
+	{
+		//不可调用多次，除非先Deinit
+		return DXRENDER_RESULT_FUNC_REENTRY_INVALID;
+	}
 	//判断参数是否有效
 	std::vector<IDXGIAdapter*> adapterVec;
 	if(S_OK!=DXGI_getAdapters(adapterVec))
 	{
 		log_e(LOG_TAG, L"DXGI get adapter list failed.");
-		return -1;
+		return DXRENDER_RESULT_INTERNAL_ERR;
 	}
 	if(adapter>=(int)adapterVec.size())
 	{
 		log_e(LOG_TAG, L"Param invalid. adapter is too big");
 		DXGI_releaseAdaptersObjs(adapterVec);
-		return -2;
+		return DXRENDER_RESULT_PARAM_INVALID;
 	}
 
 	if(width<=0 || height<=0)
 	{
 		log_e(LOG_TAG, L"Param invalid. width height");
 		DXGI_releaseAdaptersObjs(adapterVec);
-		return -3;
+		return DXRENDER_RESULT_PARAM_INVALID;
 	}
 	UINT createDeviceFlags = 0;
 	//#if defined(DEBUG) || defined(_DEBUG)  
@@ -293,18 +304,15 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 	//#endif
 	D3D_FEATURE_LEVEL level = D3D_FEATURE_LEVEL_9_1;
 	int ret = createDeviceAndContext(adapterVec[adapter], createDeviceFlags, &m_device, &m_context, level);
+	DXGI_releaseAdaptersObjs(adapterVec);
 	if (0 != ret)
 	{
 		TCHAR errmsg[512] = { 0 };
 		swprintf_s(errmsg, 512, L"Error in createDeviceAndContext : ret=%d", ret);
-#ifdef _DEBUG
-		printf("Error in createDeviceAndContext : ret=%d", ret);
-#endif
 		log_e(LOG_TAG, errmsg);
-		return -4;
+		return DXRENDER_RESULT_FAILED;
 	}
-	DXGI_releaseAdaptersObjs(adapterVec);
-	// Check 4X MSAA quality support for our back buffer format.
+/*	// Check 4X MSAA quality support for our back buffer format.
 	// All Direct3D 11 capable devices support 4X MSAA for all render 
 	// target formats, so we only need to check quality support.
 	UINT i4xMsaaQuality = 0;
@@ -326,177 +334,21 @@ int zRender::DxRender_D3D11::init( int width, int height, int adapter, const wch
 		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : Need 4X MSAA, But the device is Not Support.");
 		log_e(LOG_TAG, errmsg);
 		return -6;
-	}
+	}*/
 
 	m_renderTargetTexture = new RenderTextureClass();
-	if (!m_renderTargetTexture->Initialize(m_device, width, height))
+	if (!m_renderTargetTexture->Initialize(m_device, width, height, DXGI_FORMAT_B8G8R8A8_UNORM))
 	{
-		return -7;
+		return DXRENDER_RESULT_FAILED;
 	}
-	/*
-	//创建RenderTarget buffer与Render Target View
-	D3D11_TEXTURE2D_DESC textureDesc;
-	HRESULT result;
-	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
-
-	// Initialize the render target texture description.
-	ZeroMemory(&textureDesc, sizeof(textureDesc));
-
-	// Setup the render target texture description.
-	textureDesc.Width = width;
-	textureDesc.Height = height;
-	textureDesc.MipLevels = 1;
-	textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = 0;
-
-	// Create the render target texture.
-	result = m_device->CreateTexture2D(&textureDesc, NULL, &m_renderTargetBuffer);
-	if(FAILED(result))
-	{
-		TCHAR errmsg[512] = {0};
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : create Texture2D for render target failed.");
-		return -7;
-	}
-
-	// Setup the description of the render target view.
-	renderTargetViewDesc.Format = textureDesc.Format;
-	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	renderTargetViewDesc.Texture2D.MipSlice = 0;
-
-	// Create the render target view.
-	result = m_device->CreateRenderTargetView(m_renderTargetBuffer, &renderTargetViewDesc, &m_renderTargetView);
-	if(FAILED(result))
-	{
-		TCHAR errmsg[512] = {0};
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : create Render Target view for offscreen Texture2D failed.");
-		return -8;
-	}
-	
-// 	// Setup the description of the shader resource view.
-// 	shaderResourceViewDesc.Format = textureDesc.Format;
-// 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-// 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-// 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
-// 
-// 	// Create the shader resource view.
-// 	result = m_device->CreateShaderResourceView(m_renderTargetBuffer, &shaderResourceViewDesc, &m_shaderResourceView);
-// 	if(FAILED(result))
-// 	{
-// 		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : create Render Target view for offscreen Texture2D failed.");
-// 		return false;
-// 	}
-//	m_width = textureWidth;
-//	m_height = textureHeight;
-
-	// Create the depth/stencil buffer and view.
-
-	D3D11_TEXTURE2D_DESC depthStencilDesc;
-
-	depthStencilDesc.Width = width;
-	depthStencilDesc.Height = height;;
-	depthStencilDesc.MipLevels = 1;
-	depthStencilDesc.ArraySize = 1;
-	depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-	// Use 4X MSAA? --must match swap chain MSAA values.
-	//if (isEnable4XMSAA)
-	//{
-	//	depthStencilDesc.SampleDesc.Count = 4;
-	//	depthStencilDesc.SampleDesc.Quality = i4xMsaaQuality - 1;
-	//}
-	// No MSAA
-	//else
-	{
-		depthStencilDesc.SampleDesc.Count = 1;
-		depthStencilDesc.SampleDesc.Quality = 0;
-	}
-	//m_bEnable4xMsaa = isEnable4XMSAA;
-
-	depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depthStencilDesc.CPUAccessFlags = 0;
-	depthStencilDesc.MiscFlags = 0;
-
-	if (S_OK != m_device->CreateTexture2D(&depthStencilDesc, 0, &m_depthBuffer))
-	{
-		TCHAR errmsg[512] = { 0 };
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : OffscreenRTT create depth buffer failed.");
-		log_e(LOG_TAG, errmsg);
-		return -9;
-	}
-	if (S_OK != m_device->CreateDepthStencilView(m_depthBuffer, 0, &m_depthView))
-	{
-		TCHAR errmsg[512] = { 0 };
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : OffscreenRTT create depth stencil view failed.");
-		log_e(LOG_TAG, errmsg);
-		return -10;
-	}
-	// Bind the render target view and depth/stencil view to the pipeline.
-	
-	m_context->OMSetRenderTargets(1, &m_renderTargetView, m_depthView);
-
-
-	// Set the viewport transform.
-
-	m_viewport.TopLeftX = 0;
-	m_viewport.TopLeftY = 0;
-	m_viewport.Width    = static_cast<float>(width);
-	m_viewport.Height   = static_cast<float>(height);
-	m_viewport.MinDepth = 0.0f;
-	m_viewport.MaxDepth = 1.0f;
-
-	m_context->RSSetViewports(1, &m_viewport);
-	
-	m_winWidth = width;
-	m_winHeight = height;
-	*/
-/*
- 	m_material.Ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
- 	m_material.Diffuse  = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
- 	m_material.Specular = XMFLOAT4(0.6f, 0.6f, 0.6f, 16.0f);
-
-	if(0!=createComputeShader(effectFileName))
-	{
-		TCHAR errmsg[1024] = {0};
-		swprintf_s(errmsg, 1024, L"Error in DxRender_D3D11::init : Create compute shader from file [%s] failed", effectFileName);
-		log_e(LOG_TAG, errmsg);
-		return -13;
-	}
-	initEffectPass();
-	createInputLayout();
-*/
 	if (0 != (ret=setRenderTargetTexture()))
 	{
 		TCHAR errmsg[1024] = { 0 };
 		swprintf_s(errmsg, 1024, L"Error in DxRender_D3D11::init : setRenderTargetTexture failed. ret=%d", ret);
 		log_e(LOG_TAG, errmsg);
-		return -13;
+		return DXRENDER_RESULT_FAILED;
 	}
-	//create transparent blend state
-	D3D11_BLEND_DESC transparentDesc = {0};
-	transparentDesc.AlphaToCoverageEnable = false;
-	transparentDesc.IndependentBlendEnable = false;
-	transparentDesc.RenderTarget[0].BlendEnable = true;
-	transparentDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-	transparentDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-	transparentDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-	transparentDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-	transparentDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-	transparentDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
-	transparentDesc.RenderTarget[0].RenderTargetWriteMask =	D3D11_COLOR_WRITE_ENABLE_ALL;
-	if(FAILED(m_device->CreateBlendState(&transparentDesc, &m_TransparentBS)))
-	{
-		TCHAR errmsg[512] = {0};
-		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : create alpha blend state failed.");
-		log_e(LOG_TAG, errmsg);
-		return -14;
-	}
+	CreateTransparentBlendState();
 	//	float blendFactors[] = {0.0f, 0.0f, 0.0f, 0.0f};
 	//	m_context->OMSetBlendState(	m_TransparentBS, blendFactors, 0xffffffff);
 	log_e(LOG_TAG, L"init success.");
@@ -524,12 +376,12 @@ int DxRender_D3D11::setVisibleRegion(const RECT_f& visibleReg)
 {
 	if(visibleReg.width()<=0 || visibleReg.height()<=0
 		|| visibleReg.left<0 || visibleReg.top<0)
-		return -1;
-	if (m_bkbufRT == NULL)
-		return -2;
+		return DXRENDER_RESULT_PARAM_INVALID;
+	if (!isRenderTargetSetted())
+		return DXRENDER_RESULT_NOT_INIT_YET;
 
 	//根据窗口的宽高比设置从物体坐标系到world坐标系的基本转换矩阵
-	float aspectRatio = m_bkbufRT->GetWidth() / (float)m_bkbufRT->GetHeight();
+	float aspectRatio = this->getWidth() / (float)this->getHeight();
 	XMMATRIX I = XMMatrixIdentity();
 	XMStoreFloat4x4(&m_worldBaseTransform, I);
 	m_worldBaseTransform._11 = aspectRatio;
@@ -843,7 +695,7 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
 	{
 		setRenderTargetTexture();
 	}
-	if(m_device==NULL || m_bkbufRT==NULL)
+	if(m_device==NULL || !isRenderTargetSetted())
 	{
 #ifdef _DEBUG
 		printf("DxRender_D3D11 Object have not be inited yet.\n");
@@ -868,18 +720,20 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
 
 int DxRender_D3D11::present(int type)
 {
-	if(nullptr==m_bkbufRT && nullptr==m_renderTargetTexture)	return -1;
-	if (m_renderTargetTexture && m_bkbufRT)
-	{
-		// 即创建的offscreen rendertarget，又创建了SwapChain渲染到Backbuffer
-		setRenderTargetBackbuffer();
-		clearBackbuffer(m_color);
-		drawOffscreenRenderTarget();
-	}
-	if (m_bkbufRT && nullptr != m_bkbufRT->getSwapchain())
+	// 只有绘制到Backbuffer中时才需要调用SwapChain的Present
+	// 如果绘制到Texture中，则无需调用该接口
+	if(!isRenderTargetSetted())	
+		return DXRENDER_RESULT_NOT_INIT_YET;
+	if (m_bkbufRT != NULL && nullptr != m_bkbufRT->getSwapchain())
 	{
 		m_bkbufRT->getSwapchain()->Present(type, 0);
 	}
+
+// 	if (m_renderTargetTexture != NULL)
+// 	{
+// 		drawOffscreenRenderTarget();
+// 	}
+	
 	//getSnapshot(NULL);
 	return 0;
 }
@@ -889,12 +743,7 @@ int DxRender_D3D11::clear(DWORD color)
 	m_color = color;
 	if (m_renderTargetTexture)
 	{
-		int a = (color & 0xff000000) >> 24;
-		int r = (color & 0x00ff0000) >> 16;
-		int g = (color & 0x0000ff00) >> 8;
-		int b = (color & 0x000000ff) >> 0;
-		m_renderTargetTexture->ClearRenderTarget(m_context, (float)r / 256, (float)g / 256, (float)b / 256, (float)a / 256);
-		return 0;
+		return clearRenderTargetTexture(color);
 	}
 	else
 	{
@@ -902,40 +751,36 @@ int DxRender_D3D11::clear(DWORD color)
 	}
 }
 
+int zRender::DxRender_D3D11::clearBackbuffer(DWORD color)
+{
+	if (m_bkbufRT == nullptr)
+		return -1;
+	int a = (color & 0xff000000) >> 24;
+	int r = (color & 0x00ff0000) >> 16;
+	int g = (color & 0x0000ff00) >> 8;
+	int b = (color & 0x000000ff) >> 0;
+	float colorBack[4] = { (float)r / 256, (float)g / 256, (float)b / 256, (float)a / 256 };
+	m_bkbufRT->ClearRenderTarget(m_context, (float)r / 256, (float)g / 256, (float)b / 256, (float)a / 256);
+	//m_context->ClearRenderTargetView(m_renderTargetView, reinterpret_cast<const float*>(colorBack));
+	//m_context->ClearDepthStencilView(m_depthView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	return 0;
+}
+
+
+int zRender::DxRender_D3D11::clearRenderTargetTexture(DWORD color)
+{
+	if (m_renderTargetTexture == nullptr)
+		return -1;
+	int a = (color & 0xff000000) >> 24;
+	int r = (color & 0x00ff0000) >> 16;
+	int g = (color & 0x0000ff00) >> 8;
+	int b = (color & 0x000000ff) >> 0;
+	m_renderTargetTexture->ClearRenderTarget(m_context, (float)r / 256, (float)g / 256, (float)b / 256, (float)a / 256);
+	return 0;
+}
+
 int zRender::DxRender_D3D11::lockBackbufferHDC( BOOL Discard, HDC* outHDC )
 {
-	/*if(m_device==NULL || m_bkbufRT==NULL)
-	{
-#ifdef _DEBUG
-		printf("DxRender_D3D11 Object have not be inited yet.\n");
-		assert(false);
-#endif
-		return -1;
-	}
-	if(m_bkbufDxgiSurface!=NULL)
-	{
-#ifdef _DEBUG
-		printf("DxRender_D3D11 lock already and do not unlock.\n");
-		assert(false);
-#endif
-		return -2;
-	}
-
-	HRESULT hr = m_swapChain->GetBuffer(0, __uuidof(IDXGISurface1), (void**)&m_bkbufDxgiSurface);
-
-	if (SUCCEEDED(hr))
-	{
-		hr = m_bkbufDxgiSurface->GetDC(FALSE, outHDC);
-		if(SUCCEEDED(hr))
-		{
-			return 0;
-		}
-		else
-		{
-			ReleaseCOM(m_bkbufDxgiSurface);
-		}
-	}
-	return -2;*/
 	if (m_bkbufRT != NULL)
 	{
 		return m_bkbufRT->LockBackbufferHDC(Discard, outHDC);
@@ -949,22 +794,6 @@ int zRender::DxRender_D3D11::lockBackbufferHDC( BOOL Discard, HDC* outHDC )
 
 int zRender::DxRender_D3D11::unlockBackbufferHDC( HDC hdc )
 {
-	/*if(m_device==NULL || m_bkbufRT==NULL)
-	{
-#ifdef _DEBUG
-		printf("DxRender_D3D11 Object have not be inited yet.\n");
-		assert(false);
-#endif
-		return -1;
-	}
-	if(m_bkbufDxgiSurface)
-	{
-		m_bkbufDxgiSurface->ReleaseDC(NULL);
-		m_bkbufRT->SetRenderTarget(m_context);
-		//m_context->OMSetRenderTargets(1, &m_renderTargetView, m_depthView);
-		ReleaseCOM(m_bkbufDxgiSurface);
-	}
-	return 0;*/
 	if (m_bkbufRT != NULL)
 	{
 		return m_bkbufRT->unlockBackbufferHDC(hdc);
@@ -983,32 +812,33 @@ void* zRender::DxRender_D3D11::getDevice() const
 
 int zRender::DxRender_D3D11::getWidth()
 {
-	return m_bkbufRT->GetWidth();
+	if (!isRenderTargetSetted())
+		return 0;
+	return m_bkbufRT ? m_bkbufRT->GetWidth() : m_renderTargetTexture->GetWidth();
 }
 
 int zRender::DxRender_D3D11::getHeight()
 {
-	return m_bkbufRT->GetHeight();
+	if (!isRenderTargetSetted())
+		return 0;
+	return m_bkbufRT ? m_bkbufRT->GetHeight() : m_renderTargetTexture->GetHeight();
 }
 
 #include "DxRender_D3D9.h"
 #include <D3DX11tex.h>
 int zRender::DxRender_D3D11::getSnapshot( unsigned char* pData, UINT& datalen, int& w, int& h, int& pixfmt, int& pitch )
 {
-	return 0;
+	if (pData == NULL || datalen <= 0)
+		return DXRENDER_RESULT_PARAM_INVALID;
 	//这个方法的实现性能并不是很高，所以当DxRender_D3D11对象渲染的目标分辨率>=1208*720时，以25fps的帧率调用此接口可能导致CPU上升2~4%（I5）
-	if(m_device==NULL || m_bkbufRT==NULL || NULL==m_context)
+	if(m_device==NULL || NULL==m_context  || !isRenderTargetSetted())
 	{
-#ifdef _DEBUG
-		printf("DxRender_D3D11 Object have not be inited yet.\n");
-		assert(false);
-#endif
-		return -1;
+		return DXRENDER_RESULT_NOT_INIT_YET;
 	}
 	ID3D11Texture2D* backBuffer = getRenderTargetTexture();
 	if(NULL==backBuffer)
 	{
-		return -6;
+		return DXRENDER_RESULT_NOT_INIT_YET;
 	}
 	
 	D3D11_TEXTURE2D_DESC backbufDesc;
@@ -1019,15 +849,15 @@ int zRender::DxRender_D3D11::getSnapshot( unsigned char* pData, UINT& datalen, i
 	backbufDesc.Usage = D3D11_USAGE_STAGING;		//staging mode is more faster
 	backbufDesc.BindFlags = 0;
 	backbufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-	backbufDesc.MiscFlags = D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX;
+	backbufDesc.MiscFlags = 0;
 	ID3D11Texture2D* outputTexture = NULL;
-	if(FAILED(m_device->CreateTexture2D( &backbufDesc, NULL, &outputTexture)))
+	HRESULT hr = m_device->CreateTexture2D(&backbufDesc, NULL, &outputTexture);
+	if(FAILED(hr))
 	{
-		ReleaseCOM(backBuffer);
-		return -3;
+		return DXRENDER_RESULT_INTERNAL_ERR;
 	}
 	m_context->CopyResource(outputTexture, backBuffer);
-	HRESULT hr = D3DX11SaveTextureToFile(m_context, outputTexture, D3DX11_IFF_JPG, L"11tex.jpg");
+	//hr = D3DX11SaveTextureToFile(m_context, outputTexture, D3DX11_IFF_JPG, L"11tex.jpg");
 
 	D3D11_MAPPED_SUBRESOURCE resource;
 	unsigned int subresource = D3D11CalcSubresource(0, 0, 0);
@@ -1036,8 +866,7 @@ int zRender::DxRender_D3D11::getSnapshot( unsigned char* pData, UINT& datalen, i
 	if (FAILED(hr))
 	{
 		ReleaseCOM(outputTexture);
-		ReleaseCOM(backBuffer);
-		return -4;
+		return DXRENDER_RESULT_INTERNAL_ERR;
 	}
 	//将数据从Texture中拷贝到调用者提供的内存中，并设置相关参数
 	D3D11_TEXTURE2D_DESC outbufDesc;
@@ -1045,12 +874,11 @@ int zRender::DxRender_D3D11::getSnapshot( unsigned char* pData, UINT& datalen, i
 	const int srcpitch = resource.RowPitch;
 	const unsigned char* source = static_cast< const unsigned char* >(resource.pData);
 
-	if(srcpitch*outbufDesc.Height > datalen || pData==NULL)
+	if(srcpitch*outbufDesc.Height > datalen)
 	{
 		m_context->Unmap(outputTexture, subresource);
 		ReleaseCOM(outputTexture);
-		ReleaseCOM(backBuffer);
-		return -5;
+		return DXRENDER_RESULT_PARAM_INVALID;
 	}
 
 // 		static unsigned int framecount = 0;
@@ -1078,7 +906,6 @@ int zRender::DxRender_D3D11::getSnapshot( unsigned char* pData, UINT& datalen, i
 	//释放相关对象
 	m_context->Unmap(outputTexture, subresource);
 	ReleaseCOM(outputTexture);
-	ReleaseCOM(backBuffer);
 	return 0;
 }
 
@@ -1144,7 +971,7 @@ int zRender::DxRender_D3D11::createOffscreenRenderTarget(int width, int height)
 		return -2;
 	if (m_renderTargetTexture)	return -3;
 	m_renderTargetTexture = new RenderTextureClass();
-	if (!m_renderTargetTexture->Initialize(m_device, width, height))
+	if (!m_renderTargetTexture->Initialize(m_device, width, height, DXGI_FORMAT_B8G8R8A8_UNORM))
 	{
 		return -4;
 	}
@@ -1218,21 +1045,6 @@ int zRender::DxRender_D3D11::drawOffscreenRenderTarget()
 	return m_offscreenRttRender->draw(m_renderTargetTexture->getRenderTargetTexture(), m_renderTargetTexture->GetShaderResourceView(), rect, 1, &m_renderTargetView);
 }
 
-int zRender::DxRender_D3D11::clearBackbuffer(DWORD color)
-{
-	if (m_bkbufRT == nullptr)
-		return -1;
-	int a = (color & 0xff000000) >> 24;
-	int r = (color & 0x00ff0000) >> 16;
-	int g = (color & 0x0000ff00) >> 8;
-	int b = (color & 0x000000ff) >> 0;
-	float colorBack[4] = { (float)r / 256, (float)g / 256, (float)b / 256, (float)a / 256 };
-	m_bkbufRT->ClearRenderTarget(m_context, (float)r / 256, (float)g / 256, (float)b / 256, (float)a / 256);
-	//m_context->ClearRenderTargetView(m_renderTargetView, reinterpret_cast<const float*>(colorBack));
-	//m_context->ClearDepthStencilView(m_depthView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-	return 0;
-}
-
 ID3D11Texture2D * zRender::DxRender_D3D11::getRenderTargetTexture()
 {
 	if (m_renderTargetTexture)
@@ -1250,16 +1062,21 @@ ID3D11Texture2D * zRender::DxRender_D3D11::getRenderTargetTexture()
 	}
 }
 
+bool zRender::DxRender_D3D11::isRenderTargetSetted()
+{
+	return m_bkbufRT != NULL || m_renderTargetTexture != NULL;
+}
+
 int zRender::DxRender_D3D11::resize( int new_width, int new_height )
 {
 	if(new_width<=0 || new_height<=0)
-		return -1;
+		return DXRENDER_RESULT_PARAM_INVALID;
 	assert(m_context);
 	assert(m_device);
-	assert(m_bkbufRT || m_renderTargetTexture || m_offscreenRttRender);
-	if(m_context==NULL || NULL==m_device || (NULL==m_bkbufRT && m_renderTargetTexture==nullptr))
+	assert(m_bkbufRT || m_renderTargetTexture);
+	if(m_context==NULL || NULL==m_device || !isRenderTargetSetted())
 	{
-		return -2;
+		return DXRENDER_RESULT_NOT_INIT_YET;
 	}
 	// Release the old views, as they hold references to the buffers we
 	// will be destroying.  Also release the old depth/stencil buffer.
