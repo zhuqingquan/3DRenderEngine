@@ -103,8 +103,6 @@ namespace zRender
 		virtual int update(const unsigned char* pData, int dataLen, int yPitch, int uPitch, int vPitch,  int width, int height,
 							const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex) = 0;
 
-		virtual int update(SharedTexture* pSharedTexture, const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex) = 0;
-
 		virtual int copyTexture(const IRawFrameTexture* srcTexture) = 0;
 
 		/**

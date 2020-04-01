@@ -5,7 +5,6 @@
 #include <assert.h>
 #include <Windows.h>
 #include "DXLogger.h"
-#include "SharedFrameTexture.h"
 
 using namespace std;
 using namespace zRender;
@@ -108,19 +107,6 @@ int YUVTexture_Planar::update(const unsigned char* pData, int dataLen, int yPitc
 	}
 	FrameTexture& ft = m_VideoFrame;
 	int ret = ft.update(pData, dataLen, yPitch, uPitch, vPitch, width, height, regionUpdated, d3dDevContex);
-	return ret;
-}
-
-int zRender::YUVTexture_Planar::update(SharedTexture* pSharedTexture, const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex)
-{
-	if(NULL==pSharedTexture)
-		return -1;
-	if(PIXFMT_UNKNOW==m_pixfmt)
-	{
-		return -2;
-	}
-	FrameTexture& ft = m_VideoFrame;
-	int ret = ft.update(m_device, d3dDevContex, pSharedTexture, regionUpdated);
 	return ret;
 }
 
@@ -272,176 +258,6 @@ int zRender::YUVTexture_Planar::FrameTexture::update( const unsigned char* pData
 	box.top = 0;
 	box.bottom = updatedHeight_uv;
 	d3dDevContex->CopySubresourceRegion(m_vTex, 0, 0, 0, 0, m_vTexStage, 0, &box);
-	return 0;
-}
-
-int zRender::YUVTexture_Planar::FrameTexture::update(ID3D11Device* d3dDevice, ID3D11DeviceContext* d3dDevContex, SharedTexture* pSharedTexture, const RECT& regionUpdated)
-{
-	if(m_yTex==NULL || NULL==m_uTex || NULL==m_vTex || NULL==m_ySRV || NULL==m_uSRV || NULL==m_vSRV)
-	{
-#ifdef _DEBUG
-		printf("Error in YUVTexture_Planar::update : Texture Not inite yet.(Tex_y=%d Tex_u=%d Tex_v=%d SRV_y=%d SRV_u=%d SRV_v=%d)\n", 
-			(int)m_yTex, (int)m_uTex, (int)m_vTex, (int)m_ySRV, (int)m_uSRV, (int)m_vSRV);
-#endif
-		return -1;
-	}
-	int regWidth = regionUpdated.right - regionUpdated.left;
-	int regHeight = regionUpdated.bottom - regionUpdated.top;
-	if(/*regionUpdated.left>=width || regionUpdated.top>=height || */regionUpdated.left<0 || regionUpdated.top<0
-		/*|| regionUpdated.right>width || regionUpdated.bottom>height*/ || regWidth<=0 || regHeight<=0)
-	{
-#ifdef _DEBUG
-		printf("Error in YUVTexture_Packed::update : Update region is invalid.(L=%d R=%d T=%d B=%d)\n",
-			regionUpdated.left, regionUpdated.right, regionUpdated.top, regionUpdated.bottom);
-#endif
-		return -3;
-	}
-	SharedResource* presList[3] = {0};
-	int resCount = 0;
-	if(0>=pSharedTexture->getSharedResource(presList, resCount))
-	{
-		return -4;
-	}
-	if(resCount!=3)
-	{
-		return -5;
-	}
-	SharedResource* ytex = presList[0];
-	SharedResource* utex = presList[1];
-	SharedResource* vtex = presList[2];
-	if(!ytex || !utex || !vtex)
-	{
-		return -6;
-	}
-	ID3D11Texture2D* yTex2D = NULL;
-	ID3D11Texture2D* uTex2D = NULL;
-	ID3D11Texture2D* vTex2D = NULL;
-	IDXGIKeyedMutex* yKeyMutex = NULL;
-	IDXGIKeyedMutex* uKeyMutex = NULL;
-	IDXGIKeyedMutex* vKeyMutex = NULL;
-	if(0!=ytex->open(d3dDevice, (void**)&yTex2D, &yKeyMutex))
-	{
-		return -7;
-	}
-	if(0!=utex->open(d3dDevice, (void**)&uTex2D, &uKeyMutex))
-	{
-		if(yTex2D)	yTex2D->Release();
-		return -9;
-	}
-	if(0!=vtex->open(d3dDevice, (void**)&vTex2D, &vKeyMutex))
-	{
-		if(yTex2D)	yTex2D->Release();
-		if(uTex2D)	uTex2D->Release();
-		return -10;
-	}
-	int updatedWidth = regWidth >= m_width ? m_width : regWidth;
-	int updatedHeight = regHeight >= m_height ? m_height : regHeight;
-	int startPosHrz = regionUpdated.left;
-	int startPosVtc = regionUpdated.top;
-	int startPosVtc_uv = (startPosVtc+1)/2;
-	int startPosHrz_uv = (startPosHrz+1) / 2;
-	int updatedHeight_uv = (updatedHeight+1)/2;
-	int updatedWidth_uv = (updatedWidth+1) / 2;
-
-	HRESULT rslt = S_FALSE;
-	D3D11_TEXTURE2D_DESC texDesc;
-	yTex2D->GetDesc(&texDesc);
-
-// 	static int v = 0;
-// 	D3D11_MAPPED_SUBRESOURCE mappedRes;
-// 	ZeroMemory(&mappedRes, sizeof(mappedRes));
-//	if(S_OK!=(rslt=d3dDevContex->Map(yTex2D, 0, D3D11_MAP_WRITE, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
-//	{
-// 		TCHAR errmsg[1024] = {0};
-// 		swprintf_s(errmsg, 1024, L"YUVTexture_Planar::update : ID3D11DeviceContext obj is Not match to this Y-Texture.this=[%d] result=[%d] errmsg=[%s]\n",
-// 			(unsigned int)this, rslt, L"");
-// 		OutputDebugString(errmsg);
-// 		log_e(LOG_TAG, errmsg, 20);
-//		return -6;
-//	}
-//	memset(mappedRes.pData, v, mappedRes.RowPitch * texDesc.Height);
-//	d3dDevContex->Unmap(yTex2D, 0);
-// 	if(S_OK!=(rslt=d3dDevContex->Map(uTex2D, 0, D3D11_MAP_WRITE, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
-// 	{
-// 		TCHAR errmsg[1024] = {0};
-// 		swprintf_s(errmsg, 1024, L"YUVTexture_Planar::update : ID3D11DeviceContext obj is Not match to this Y-Texture.this=[%d] result=[%d] errmsg=[%s]\n",
-// 			(unsigned int)this, rslt, L"");
-// 		OutputDebugString(errmsg);
-// 		log_e(LOG_TAG, errmsg, 20);
-// 		return -6;
-// 	}
-// 	memset(mappedRes.pData, v, mappedRes.RowPitch * (texDesc.Height / 2));
-// 	d3dDevContex->Unmap(uTex2D, 0);
-// 	if(S_OK!=(rslt=d3dDevContex->Map(vTex2D, 0, D3D11_MAP_WRITE, /*D3D11_MAP_FLAG_DO_NOT_WAIT*/0, &mappedRes)))
-// 	{
-// 		TCHAR errmsg[1024] = {0};
-// 		swprintf_s(errmsg, 1024, L"YUVTexture_Planar::update : ID3D11DeviceContext obj is Not match to this Y-Texture.this=[%d] result=[%d] errmsg=[%s]\n",
-// 			(unsigned int)this, rslt, L"");
-// 		OutputDebugString(errmsg);
-// 		log_e(LOG_TAG, errmsg, 20);
-// 		return -6;
-// 	}
-// 	memset(mappedRes.pData, 256 - v, mappedRes.RowPitch * (texDesc.Height / 2));
-// 	d3dDevContex->Unmap(vTex2D, 0);
-//	v++;
-//	v = v % 256;
-
-	int try_count = 1;
-	while(try_count--)
-	{
-
-	DWORD syncResult = yKeyMutex->AcquireSync(0, INFINITE);
-	if ( syncResult != WAIT_OBJECT_0 )
-	{
-		// Handle unable to acquire shared surface error.
-		return -4;
-	}
-	D3D11_BOX box;
-	box.front = 0;
-	box.back = 1;
-	box.left = 0;
-	box.right = updatedWidth;
-	box.top = 0;
-	box.bottom = updatedHeight;
-	d3dDevContex->CopySubresourceRegion(m_yTex, 0, 0, 0, 0, yTex2D, 0, &box);
-	yKeyMutex->ReleaseSync(0);
-
-	syncResult = uKeyMutex->AcquireSync(0, INFINITE);
-	if ( syncResult != WAIT_OBJECT_0 )
-	{
-		// Handle unable to acquire shared surface error.
-		return -4;
-	}
-	uTex2D->GetDesc(&texDesc);
-	box.front = 0;
-	box.back = 1;
-	box.left = 0;
-	box.right = updatedWidth_uv;
-	box.top = 0;
-	box.bottom = updatedHeight_uv;
-	d3dDevContex->CopySubresourceRegion(m_uTex, 0, 0, 0, 0, uTex2D, 0, &box);
-	uKeyMutex->ReleaseSync(0);
-
-	syncResult = vKeyMutex->AcquireSync(0, INFINITE);
-	if ( syncResult != WAIT_OBJECT_0 )
-	{
-		// Handle unable to acquire shared surface error.
-		return -4;
-	}
-	vTex2D->GetDesc(&texDesc);
-	box.front = 0;
-	box.back = 1;
-	box.left = 0;
-	box.right = updatedWidth_uv;
-	box.top = 0;
-	box.bottom = updatedHeight_uv;
-	d3dDevContex->CopySubresourceRegion(m_vTex, 0, 0, 0, 0, vTex2D, 0, &box);
-	vKeyMutex->ReleaseSync(0);
-
-	}
-	yTex2D->Release();
-	uTex2D->Release();
-	vTex2D->Release();
 	return 0;
 }
 

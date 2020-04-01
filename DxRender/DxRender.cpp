@@ -229,11 +229,6 @@ int zRender::DxRender::getSnapshot( unsigned char* pData, UINT& datalen, int& w,
 	return m_renderImp->getSnapshot(pData, datalen, w, h, pixfmt, pitch);
 }
 
-int zRender::DxRender::getSnapshot(SharedResource** outSharedTexture)
-{
-	return m_renderImp->getSnapshot(outSharedTexture);
-}
-
 int zRender::DxRender::resize( int new_width, int new_height )
 {
 	return m_renderImp->resize(new_width, new_height);
@@ -267,16 +262,6 @@ int zRender::DxRender::createOffscreenRenderTarget(int width, int height)
 void zRender::DxRender::releaseOffscreenRenderTarget()
 {
 	m_renderImp->releaseOffscreenRenderTarget();
-}
-
-int zRender::DxRender::createSharedTexture(SharedTexture** ppSharedTex, PIXFormat pixfmt)
-{
-	return m_renderImp->createSharedTexture(ppSharedTex, pixfmt);
-}
-
-int zRender::DxRender::releaseSharedTexture(SharedTexture** ppSharedTex)
-{
-	return m_renderImp->releaseSharedTexture(ppSharedTex);
 }
 
 int zRender::DxRender::createTextureResource(TextureResource ** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char * initData, int dataLen, int pitch)

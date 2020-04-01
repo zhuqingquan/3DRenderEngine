@@ -70,8 +70,6 @@ namespace zRender
 		int update(const unsigned char* pData, int dataLen, int yPitch, int uPitch, int vPitch, int width, int height,
 							const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex);
 
-		virtual int update(SharedTexture* pSharedTexture, const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex);
-
 		/**
 		 *	@name		getTexture
 		 *	@brief		参见基类接口 @ref IRawFrameTexture 的定义说明
@@ -116,7 +114,6 @@ namespace zRender
 
 			int update(const unsigned char* pData, int dataLen, int yPitch, int uPitch, int vPitch, int width, int height,
 				const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex);
-			virtual int update(ID3D11Device* d3dDevice, ID3D11DeviceContext* d3dDevContex, SharedTexture* pSharedTexture, const RECT& regionUpdated);
 			int getTexture(ID3D11Texture2D** outYUVTexs, int& texsCount) const;
 			int getShaderResourceView(ID3D11ShaderResourceView** outYUVSRVs, int& srvsCount) const;
 			bool valid() const;

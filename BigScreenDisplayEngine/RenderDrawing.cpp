@@ -134,8 +134,8 @@ int RenderDrawing::doRenderWork()
 	zRender::DxRender* render = new zRender::DxRender();
 	int ret = -1;
 	int width = 1920, height = 1080;
-	//ret = render->init(m_hwnd);   // 使用HWND进行创建，绘制到窗口中
-	ret = render->init(width, height);  // 使用Texture中，使用Texture的Width、Height进行创建
+	ret = render->init(m_hwnd);   // 使用HWND进行创建，绘制到窗口中
+	//ret = render->init(width, height);  // 使用Texture中，使用Texture的Width、Height进行创建
 	if( 0!=ret )
 	{
 #ifdef _DEBUG

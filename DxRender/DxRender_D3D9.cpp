@@ -65,16 +65,6 @@ int zRender::DxRender_D3D9::releaseDisplayElement(DisplayElement** displayElemen
 	return -1;
 }
 
-int zRender::DxRender_D3D9::createSharedTexture(SharedTexture** ppSharedTex, PIXFormat pixfmt)
-{
-	return -1;
-}
-
-int zRender::DxRender_D3D9::releaseSharedTexture(SharedTexture** ppSharedTex)
-{
-	return -1;
-}
-
 IRawFrameTexture* zRender::DxRender_D3D9::createTexture(PIXFormat pixFmt, int width, int height, unsigned char* initData /*= NULL*/, int initDataLen /*= 0*/, bool isShared /*= false*/)
 {
 	return NULL;

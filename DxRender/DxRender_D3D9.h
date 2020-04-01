@@ -109,10 +109,6 @@ namespace zRender
 		 */
 		int releaseDisplayElement(DisplayElement** displayElement);
 
-		int createSharedTexture(SharedTexture** ppSharedTex, PIXFormat pixfmt);
-
-		int releaseSharedTexture(SharedTexture** ppSharedTex);
-
 		/**
 		 *	@name		createTexture
 		 *	@brief		创建Texture对象

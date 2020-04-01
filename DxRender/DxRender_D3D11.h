@@ -127,26 +127,6 @@ namespace zRender
 		 */
 		int releaseDisplayElement(DisplayElement** displayElement);
 
-		/**
-		 *	@name		createSharedTexture
-		 *	@brief		根据像素格式pixfmt创建SharedTexture对象。
-		 *	@param[in]	SharedTexture** ppSharedTex 保存指向SharedTexture对象的指针
-		 *				该对象用DxRender创建，并使用releaseSharedTexture释放
-		 *	@param[in]	PIXFormat pixfmt Texture内存保存的像素格式
-		 *	@return		int 0--成功   <0--失败
-		 **/
-		int createSharedTexture(SharedTexture** ppSharedTex, PIXFormat pixfmt);
-
-		/**
-		*	@name		releaseSharedTexture
-		*	@brief		释放由createSharedTexture创建的SharedTexture对象
-		*	@param[in]	SharedTexture** ppSharedTex 保存指向SharedTexture对象的指针
-		*				该对象用DxRender创建，并使用releaseSharedTexture释放
-		*	@param[in]	PIXFormat pixfmt Texture内存保存的像素格式
-		*	@return		int 0--成功   <0--失败
-		**/
-		int releaseSharedTexture(SharedTexture** ppSharedTex);
-
 		int createTextureResource(TextureResource** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char* initData= NULL, int dataLen = 0, int pitch = 0);
 		int openSharedTextureResource(TextureResource** ppOutTexRes, HANDLE hSharedRes);
 		void releaseTextureResource(TextureResource** ppOutTexRes);
@@ -304,7 +284,6 @@ namespace zRender
 		 *	@return			bool 0--success other--failed
 		 **/
 		int getSnapshot(unsigned char* pData, UINT& datalen, int& w, int& h, int& pixfmt, int& pitch);
-		int getSnapshot(SharedResource** outSharedTexture);
 		/**
 		*	@name			getSnapshot
 		*	@brief			将RenderTarget中的内容拷贝出来

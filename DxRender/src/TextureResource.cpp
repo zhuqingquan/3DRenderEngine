@@ -35,6 +35,8 @@ int TextureResource::create(ID3D11Device* device, int width, int height, DXGI_FO
 	texDesc.Format = dxgifmt;
 	texDesc.SampleDesc.Quality = 0;
 	texDesc.SampleDesc.Count = 1;
+	// fixme 此处对于这些参数的设置还需要再分析
+	// 此时如果是Stage，则不可以是SHADER_RESOURCE。此处没有支持创建RENDER_TAGET、STREAM_OUTPUT
 	texDesc.BindFlags = usage == TEXTURE_USAGE_STAGE ? 0 : D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = usage==TEXTURE_USAGE_STAGE ? D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ : 0;
 	texDesc.MiscFlags = bShared ? D3D11_RESOURCE_MISC_SHARED_KEYEDMUTEX : 0;

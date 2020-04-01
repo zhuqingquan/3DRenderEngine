@@ -133,10 +133,6 @@ namespace zRender
 
 		void releaseTexture(IRawFrameTexture** rawFrameTexture);
 
-		int createSharedTexture(SharedTexture** ppSharedTex, PIXFormat pixfmt);
-
-		int releaseSharedTexture(SharedTexture** ppSharedTex);
-
 		int createTextureResource(TextureResource** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char* initData = NULL, int dataLen = 0, int pitch = 0);
 		int openSharedTextureResource(TextureResource** ppOutTexRes, HANDLE hSharedRes);
 		void releaseTextureResource(TextureResource** ppOutTexRes);
@@ -249,7 +245,6 @@ namespace zRender
 		 *	@return			bool 0--success other--failed
 		 **/
 		int getSnapshot(unsigned char* pData, UINT& datalen, int& w, int& h, int& pixfmt, int& pitch);
-		int getSnapshot(SharedResource** outSharedTexture);
 		/**
 		*	@name			getSnapshot
 		*	@brief			将RenderTarget中的内容拷贝出来

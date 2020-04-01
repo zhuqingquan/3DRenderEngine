@@ -9,7 +9,6 @@
 #include <DxErr.h>
 #include "DXLogger.h"
 #include "libtext.h"
-#include "SharedFrameTexture.h"
 #include "inc/TextureResource.h"
 #include "D3D11TextureRender.h"
 #include "BackbufferRT.h"
@@ -909,35 +908,6 @@ int zRender::DxRender_D3D11::getSnapshot( unsigned char* pData, UINT& datalen, i
 	return 0;
 }
 
-int zRender::DxRender_D3D11::getSnapshot(SharedResource** outSharedTexture)
-{
-	if (NULL == outSharedTexture)
-		return -1;
-	ID3D11Texture2D* backBuffer = m_bkbufRT->getBackbuffer();
-	if(nullptr==backBuffer)
-		return -2;
-	D3D11_TEXTURE2D_DESC backbufDesc;
-	backBuffer->GetDesc(&backbufDesc);
-	int ret = -1;
-	SharedResource* sharedRes = new SharedResource();
-	ret = sharedRes->create(m_device, m_context, backbufDesc.Format, backbufDesc.Width, backbufDesc.Height, (int)D3D11_USAGE_DEFAULT, NULL, 0);
-	if(0!=ret)
-	{
-		ReleaseCOM(backBuffer);
-		delete sharedRes;
-		return -3;
-	}
-	sharedRes->AcquireSync(INFINITE);
-	ID3D11Texture2D* dstSharedTex = sharedRes->getTextureRes();
-	m_context->CopyResource(dstSharedTex, backBuffer);
-	//HRESULT hr = D3DX11SaveTextureToFile(m_context, dstSharedTex, D3DX11_IFF_DDS, L"11tex.dds");
-	sharedRes->ReleaseSync();
-	ReleaseCOM(backBuffer);
-
-	*outSharedTexture = sharedRes;
-	return 0;
-}
-
 TextureResource * zRender::DxRender_D3D11::getSnapshot(TEXTURE_USAGE usage, bool bShared, bool fromOffscreenTexture)
 {
 	if (TEXTURE_USAGE_STAGE == usage && bShared) return NULL;
@@ -1152,48 +1122,6 @@ int zRender::DxRender_D3D11::resize( int new_width, int new_height )
 // 		}
 	}
 */
-}
-
-int zRender::DxRender_D3D11::createSharedTexture(SharedTexture** ppSharedTex, PIXFormat pixfmt)
-{
-	if(ppSharedTex==NULL)
-		return -1;
-	if(m_context==NULL || NULL==m_device)
-	{
-		return -2;
-	}
-	switch(pixfmt)
-	{
-	case PIXFMT_YUV420P:
-	case PIXFMT_YV12:
-		*ppSharedTex = new SharedTexture_I420P(m_device, m_context);
-		return 0;
-	case PIXFMT_A8R8G8B8:
-	case PIXFMT_R8G8B8:
-	case PIXFMT_X8R8G8B8:
-	case PIXFMT_R8G8B8A8:
-	case PIXFMT_B8G8R8A8:
-	case PIXFMT_B8G8R8X8:
-		*ppSharedTex = new SharedTexture_ARGB8(m_device, m_context);
-		return 0;
-	default:
-		*ppSharedTex = NULL;
-		return -3;
-	}
-	return -4;
-}
-
-int zRender::DxRender_D3D11::releaseSharedTexture(SharedTexture** ppSharedTex)
-{
-	if(ppSharedTex && *ppSharedTex)
-	{
-		SharedTexture* ptex = *ppSharedTex;
-		ptex->release();
-		delete ptex;
-		*ppSharedTex = NULL;
-		return 0;
-	}
-	return -1;
 }
 
 int zRender::DxRender_D3D11::createTextureResource(TextureResource ** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char * initData, int dataLen, int pitch)
