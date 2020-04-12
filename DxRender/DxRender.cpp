@@ -54,7 +54,7 @@ void DxRender::deinit()
 
 DisplayElement* DxRender::createDisplayElement(const RECT_f& displayReg, int zIndex)
 {
-	return m_renderImp->createDisplayElement(displayReg, zIndex);
+	return m_renderImp->createDisplayElement(displayReg, zIndex, this);
 }
 
 int DxRender::releaseDisplayElement(DisplayElement** displayElement)
@@ -65,6 +65,12 @@ int DxRender::releaseDisplayElement(DisplayElement** displayElement)
 IRawFrameTexture * DxRender::createTexture(PIXFormat pixfmt, int width, int height, TEXTURE_USAGE usage, bool bShared, unsigned char * initData, int dataLen, int pitch)
 {
 	return m_renderImp->createTexture(pixfmt, width, height, usage, bShared, initData, dataLen, pitch);
+}
+
+zRender::IRawFrameTexture* zRender::DxRender::createTexture(PIXFormat pixFmt, int width, int height, 
+	unsigned char* initData /*= NULL*/, int initDataLen /*= 0*/, bool isShared /*= false*/)
+{
+	return m_renderImp->createTexture(pixFmt, width, height, initData, initDataLen, isShared);
 }
 
 IRawFrameTexture * zRender::DxRender::openSharedTexture(IRawFrameTexture * sharedTexture)
@@ -107,29 +113,29 @@ int DxRender::setupBackground(IDisplayContentProvider* contentProvider, const RE
 		return -2;
 	}
 	TextureDataSource* texDataSrc = contentProvider->getTextureDataSource();
-	VertexVector* vvs[4] = {NULL};
-	int vvsCount = 4;
-	int vvIdt = 0;
-	int ret = contentProvider->getVertexs(vvs, vvsCount, vvIdt);
-	if(texDataSrc==NULL || ret!=0 || vvsCount==0)
+// 	VertexVector* vvs[4] = {NULL};
+// 	int vvsCount = 4;
+// 	int vvIdt = 0;
+// 	int ret = contentProvider->getVertexs(vvs, vvsCount, vvIdt);
+	if(texDataSrc==NULL/* || ret!=0 || vvsCount==0*/)
 	{
-		printf("Error in DxRender::setupBackground : Content Provider invalid.(TexData=%d ret=%d vvsCount=%d)\n",
-			(int)texDataSrc, ret, vvsCount);
+		printf("Error in DxRender::setupBackground : Content Provider invalid.(TexData=%d)\n",
+			(int)texDataSrc);
 		return -4;
 	}
 
-	DisplayElement* de = m_renderImp->createDisplayElement(displayReg, (int)(RANGE_OF_ZINDEX_MAX-180));
+	DisplayElement* de = m_renderImp->createDisplayElement(displayReg, (int)(RANGE_OF_ZINDEX_MAX-180), this);
 	assert(de);
 	if(NULL==de)
 	{
 		printf("Error in DxRender::setupBackground : failed to create display element.\n");
 		return -3;
 	}
-	de->setVertex(vvs[0]);
+	//de->setVertex(vvs[0]);
 	int texIdt = 0;
 	if(texDataSrc->isUpdated(texIdt))
 	{
-		ret = -1;
+		//ret = -1;
 		int dataLen = 0;
 		int ypitch = 0;
 		int upitch = 0;
@@ -138,7 +144,7 @@ int DxRender::setupBackground(IDisplayContentProvider* contentProvider, const RE
 		int height = 0;
 		PIXFormat pixelFmt = PIXFMT_UNKNOW;
 		RECT_f texEffectReg(0.0, 1.0, 0.0, 1.0);
-		ret = texDataSrc->getTextureProfile(texEffectReg, dataLen, ypitch, upitch, vpitch, width, height, pixelFmt);
+		int ret = texDataSrc->getTextureProfile(texEffectReg, dataLen, ypitch, upitch, vpitch, width, height, pixelFmt);
 		if(ret!=0 || dataLen==0 || pixelFmt==0 || width==0 || height==0)
 		{
 			m_renderImp->releaseDisplayElement(&de);
@@ -214,6 +220,11 @@ void* zRender::DxRender::getDevice() const
 	return m_renderImp->getDevice();
 }
 
+void* zRender::DxRender::getContext() const
+{
+	return m_renderImp->getContext();
+}
+
 int zRender::DxRender::getWidth()
 {
 	return m_renderImp->getWidth();
@@ -237,11 +248,6 @@ int zRender::DxRender::resize( int new_width, int new_height )
 float zRender::DxRender::getAspectRatio() const
 {
 	return m_renderImp->getAspectRatio();
-}
-
-const XMFLOAT4X4& zRender::DxRender::getWorldBaseTransformMatrix() const
-{
-	return m_renderImp->getWorldBaseTransformMatrix();
 }
 
 const XMFLOAT4X4& zRender::DxRender::getViewTransformMatrix() const
@@ -277,4 +283,19 @@ int zRender::DxRender::openSharedTextureResource(TextureResource ** ppOutTexRes,
 void zRender::DxRender::releaseTextureResource(TextureResource ** ppOutTexRes)
 {
 	m_renderImp->releaseTextureResource(ppOutTexRes);
+}
+
+ID3D11Buffer* zRender::DxRender::createVertexBuffer(int byteCount, const unsigned char* initData, int initDataLen)
+{
+	return m_renderImp->createVertexBuffer(byteCount, initData, initDataLen);
+}
+
+ID3D11Buffer* zRender::DxRender::createIndexBuffer(int byteCount, const unsigned char* initData, int initDataLen)
+{
+	return m_renderImp->createIndexBuffer(byteCount, initData, initDataLen);
+}
+
+int zRender::DxRender::releaseBuffer(ID3D11Buffer** buffer)
+{
+	return m_renderImp->releaseBuffer(buffer);
 }

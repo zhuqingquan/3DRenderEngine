@@ -99,23 +99,23 @@ int BigViewportPartition::update()
 
 void BigViewportPartition::updateVertex()
 {
-	VertexVector* vv = NULL;
-	int vvCount = 1;
-	if(m_cttProvider->isVertexUpdated(m_curDrawedVertexIdentify))
-	{
-		if(0!=m_cttProvider->getVertexs(&vv, vvCount, m_curDrawedVertexIdentify))
-		{
-			return;
-		}
-		if(vv==NULL || vvCount<=0)
-			return;
-		for (int i = 0; i < vvCount; i++)
-		{
-			VertexVector* curVV = vv + i;
-			m_attachedDE->setVertex(curVV);
-		}
-		//m_attachedDE->createRenderResource();
-	}
+	//VertexVector* vv = NULL;
+	//int vvCount = 1;
+	//if(m_cttProvider->isVertexUpdated(m_curDrawedVertexIdentify))
+	//{
+	//	if(0!=m_cttProvider->getVertexs(&vv, vvCount, m_curDrawedVertexIdentify))
+	//	{
+	//		return;
+	//	}
+	//	if(vv==NULL || vvCount<=0)
+	//		return;
+	//	for (int i = 0; i < vvCount; i++)
+	//	{
+	//		VertexVector* curVV = vv + i;
+	//		m_attachedDE->setVertex(curVV);
+	//	}
+	//	//m_attachedDE->createRenderResource();
+	//}
 }
 
 void BigViewportPartition::updateTexture()
@@ -173,6 +173,6 @@ void BigViewportPartition::setZIndex(int zIndex)
 	m_ZIndex = zIndex;
 	if (m_attachedDE != NULL)
 	{
-		m_attachedDE->setDisplayZIndex(zIndex);
+		m_attachedDE->setZIndex(zIndex);
 	}
 }

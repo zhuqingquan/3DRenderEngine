@@ -27,6 +27,9 @@ namespace zRender
 {
 	class DxRender_D3D11;
 	class BasicEffect;
+	class RectangleDataCtxInitializer;
+	class ElementDrawingContext;
+	class ElementMetaData;
 	//template<> class ElemDsplModel<BasicEffect>;
 
 	/**
@@ -43,7 +46,7 @@ namespace zRender
 		 *	@param[in]	ID3D11Device* d3dDevice D3DDevice对象指针
 		 *	@param[in]	ID3D11DeviceContext* contex 与d3dDevice参数对应的设备上下文
 		 **/
-		DisplayElement(DxRender_D3D11* dxRender, ID3D11Device* d3dDevice, ID3D11DeviceContext* contex);
+		DisplayElement(DxRender* dxRender, ID3D11Device* d3dDevice, ID3D11DeviceContext* contex);
 
 		/**
 		 *	@name		~DisplayElement
@@ -68,7 +71,7 @@ namespace zRender
 		 *	@param[in]	float zIndex 当前显示原始所在顶点的Z坐标偏移
 		 *	@return		int 0--成功 <0--失败	该参数不合法时失败
 		**/
-		int setDisplayZIndex(float zIndex);
+		int setZIndex(float zIndex);
 
 		float getZIndex() const;
 
@@ -96,22 +99,6 @@ namespace zRender
 		int setTextureDataSource(TextureDataSource* dataSrc, const RECT_f& textureReg);
 
 		/**
-		 *	@name		setVertex
-		 *	@brief		重新设置顶点相关信息
-		 *				存在两种情况，1-顶点信息全部更新，2-之前的顶点信息部分更新
-		 *	@param		VertexVector* vertexInfo	顶点信息，支持设置不同的顶点信息对象或者设置同一个对象
-		 *	@return		int 0--成功 <0--失败	该参数不合法时失败
-		 **/
-		int setVertex(VertexVector* vertexInfo);
-
-		/**
-		 *	@name		getVertex
-		 *	@brief		获取顶点相关信息对象
-		 *	@return		VertexVector* 返回顶点相关信息对象，NULL--失败
-		 **/
-		VertexVector* getVertex() const { return m_curVerVec; }
-
-		/**
 		 *	@name		createRenderResource
 		 *	@brief		创建Render渲染绘制所需要的系统资源
 		 *				创建的资源包括：顶点Buffer，Index Buffer，Texture，Shader
@@ -129,12 +116,10 @@ namespace zRender
 		 **/
 		int releaseRenderResource();
 
-		DxRender_D3D11* getParentDxRender() const { return m_dxRender; }
+		DxRender* getParentDxRender() const { return m_dxRender; }
 		IRawFrameTexture* getTexture() const { return m_texture; }
 		ID3D11Buffer* getVertexBuffer() const { return m_VertexBuf; }
 		ID3D11Buffer* getIndexBuffer() const { return m_IndexBuf; }
-		DXGI_FORMAT getIndexBufferFormat() const { return m_IndexFmt; }
-		XMFLOAT4X4 getWorldTransformMatrices() const	{return m_WorldTransformMat;}
 
 		/**
 		 *	@name		updateTexture
@@ -166,7 +151,7 @@ namespace zRender
 		 **/
 		float getAlpha() const;
 		void enableTransparent(bool enable);
-		bool isEnableTransparent() const { return m_isEnableTransparent;}
+		bool isEnableTransparent() const;
 
 		int createDsplModel(ElemDsplModel<BasicEffect>** ppModel)
 		{
@@ -187,17 +172,11 @@ namespace zRender
 			}
 		}
 
-		bool setDsplModel(ElemDsplModel<BasicEffect>* model)
-		{
-			if (NULL == model)	return false;
-			m_dsplModel = model;
-			return true;
-		}
-
-		ElemDsplModel<BasicEffect>* getDsplModel() const { return m_dsplModel; }
 		int draw();
 		//////////////////////////支持打开共享显存用于显示///////////////////////////////
 		int openSharedTexture(IRawFrameTexture* sharedTexture);
+
+		ElementMetaData* getMetaData() const { return m_MetaData; }
 	private:
 		DisplayElement(const DisplayElement& rObj);
 		DisplayElement& operator=(const DisplayElement& robj);
@@ -210,13 +189,10 @@ namespace zRender
 		int createIndexBuffer();
 		int releaseIndexBuffer();
 
-		DxRender_D3D11* m_dxRender;
+		DxRender* m_dxRender;
 		ID3D11Device*	m_device;
 		ID3D11DeviceContext* m_context;
 
-		ElemDsplModel<BasicEffect>* m_dsplModel;
-
-		VertexVector* m_curVerVec;
 		bool m_isVertexInfoUpdated;
 		PIXFormat m_TexFmt;
 		int	m_TexWidth;
@@ -228,10 +204,10 @@ namespace zRender
 		IRawFrameTexture*	m_texture;//std::shared_ptr<YUVTexture_Packed*>
 		ID3D11Buffer*		m_VertexBuf;//std::shared_ptr<ID3D11Buffer*>
 		ID3D11Buffer*		m_IndexBuf;//std::shared_ptr<ID3D11Buffer*>
-		DXGI_FORMAT			m_IndexFmt;//
-		XMFLOAT4X4			m_WorldTransformMat;
-		float				m_alpha;
-		bool				m_isEnableTransparent;
+
+		RectangleDataCtxInitializer* m_DataCtxInitializer;
+		ElementDrawingContext* m_DrawingContext;
+		ElementMetaData* m_MetaData;
 	};
 }
 #pragma warning(pop)

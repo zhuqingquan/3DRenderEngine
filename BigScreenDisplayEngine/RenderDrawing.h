@@ -138,7 +138,6 @@ namespace Render
 		BigScreenBackground* m_background;
 
 		std::list<BigViewportPartition*> m_vpPartitions;
-		zRender::ElemDsplModel<zRender::BasicEffect>* m_dsplModel;
 	};
 }
 }

@@ -32,7 +32,6 @@ DxRender_D3D11::DxRender_D3D11()
 	, m_offscreenRttRender(NULL)
 {
 	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&m_worldBaseTransform, I);
 	XMStoreFloat4x4(&m_viewTransform, I);
 	XMStoreFloat4x4(&m_projTransform, I);
 }
@@ -381,9 +380,6 @@ int DxRender_D3D11::setVisibleRegion(const RECT_f& visibleReg)
 
 	//根据窗口的宽高比设置从物体坐标系到world坐标系的基本转换矩阵
 	float aspectRatio = this->getWidth() / (float)this->getHeight();
-	XMMATRIX I = XMMatrixIdentity();
-	XMStoreFloat4x4(&m_worldBaseTransform, I);
-	m_worldBaseTransform._11 = aspectRatio;
 
 	//设置生成从world坐标系到人眼坐标系的转换矩阵
 	//XMVECTOR pos = XMVectorSet((visibleReg.left+visibleReg.right)*aspectRatio / 2, (visibleReg.top+visibleReg.bottom) / 2, -5, 1.0f);
@@ -409,7 +405,8 @@ RECT_f DxRender_D3D11::getVisibleRegion() const
 	return m_visibleReg;
 }
 
-DisplayElement* DxRender_D3D11::createDisplayElement(const RECT_f& displayReg, int zIndex)
+// fixme DxRender* dxRender 是不需要的，此处是临时为通过编译而这样的
+DisplayElement* DxRender_D3D11::createDisplayElement(const RECT_f& displayReg, int zIndex, DxRender* dxRender)
 {
 	if(m_device==NULL)
 	{
@@ -427,7 +424,7 @@ DisplayElement* DxRender_D3D11::createDisplayElement(const RECT_f& displayReg, i
 		return NULL;
 	}
 
-	DisplayElement* de = new DisplayElement(this, m_device, m_context);
+	DisplayElement* de = new DisplayElement(dxRender, m_device, m_context);
 	assert(de);
 	int ret = de->setDisplayRegion(displayReg, (float)zIndex);
 	assert(0==ret);
@@ -709,11 +706,11 @@ int DxRender_D3D11::draw(DisplayElement* displayElem)
 #endif
 		return -2;
 	}
-	if (displayElem->getParentDxRender() != this)
-	{
-		log_e(LOG_TAG, L"Error in DxRender_D3D11::draw : the display elemement is not created by this DxRender object.");
-		return -3;
-	}
+// 	if (displayElem->getParentDxRender() != this)
+// 	{
+// 		log_e(LOG_TAG, L"Error in DxRender_D3D11::draw : the display elemement is not created by this DxRender object.");
+// 		return -3;
+// 	}
 	return displayElem->draw();
 }
 

@@ -112,9 +112,11 @@ namespace zRender
 		UINT	getIndex(int index) const;
 
 		D3D11_PRIMITIVE_TOPOLOGY getPrimitiveTopology() const { return m_topology; }
+		DXGI_FORMAT getIndexBufferFormat() const { return m_IndexFmt; }
 
 	private:
 		D3D11_PRIMITIVE_TOPOLOGY m_topology;
+		DXGI_FORMAT			m_IndexFmt = DXGI_FORMAT_R32_UINT;//
 		std::vector<UINT>	m_Indexs;
 		std::vector<Vertex> m_Vertexs;
 	};

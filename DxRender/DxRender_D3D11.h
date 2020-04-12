@@ -116,7 +116,7 @@ namespace zRender
 		 *	@param[in]	int zIndex 当前显示原始所在顶点的Z坐标偏移
 		 *	@return		DisplayElement* 对象指针，失败时为NULL，但参数displayReg表示的位置不在本Render的可视区域内时创建失败
 		 */
-		DisplayElement* createDisplayElement(const RECT_f& displayReg, int zIndex);
+		DisplayElement* createDisplayElement(const RECT_f& displayReg, int zIndex, DxRender* dxRender);
 		
 		/**
 		 *	@name		releaseDisplayElement
@@ -300,12 +300,12 @@ namespace zRender
 		void releaseOffscreenRenderTarget();
 
 		void* getDevice() const;
+		void* getContext() const { return m_context; }
 		int getWidth();
 		int getHeight();
 		float getAspectRatio() const { return m_aspectRatio; }
 		int resize(int new_width, int new_height);
 
-		const XMFLOAT4X4& getWorldBaseTransformMatrix() const { return m_worldBaseTransform; }
 		const XMFLOAT4X4& getViewTransformMatrix() const { return m_viewTransform; }
 		const XMFLOAT4X4& getProjectionTransformMatrix() const { return m_projTransform; }
 	private:
@@ -333,14 +333,12 @@ namespace zRender
 		ID3D11Device* m_device;
 		ID3D11DeviceContext* m_context;
 		ID3D11RenderTargetView* m_renderTargetView;
-		D3D_FEATURE_LEVEL m_curFeatureLv;
 		D3D11_VIEWPORT m_viewport;
 
 		HWND m_hWnd;
 		RECT_f m_visibleReg;
 		float m_aspectRatio;
 
-		XMFLOAT4X4 m_worldBaseTransform;
 		XMFLOAT4X4 m_viewTransform;
 		XMFLOAT4X4 m_projTransform;
 		//Material m_material;
