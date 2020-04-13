@@ -238,10 +238,6 @@ int createDeviceAndContext(IDXGIAdapter* adapter, UINT createDeviceFlags,
 		TCHAR errmsg[512] = { 0 };
 		swprintf_s(errmsg, 512, L"Error in DxRender_D3D11::init : faile to Create device with param Adapter(%d) CreateFlag(%d) ErrorCode=%d",
 			(int)adapter, createDeviceFlags, (int)hr);
-#ifdef _DEBUG
-		printf("Error in DxRender_D3D11::init : faile to Create device with param Adapter(%d) CreateFlag(%d) ErrorCode=%d\n",
-			(int)dstAdapter, createDeviceFlags, (int)hr);
-#endif
 		log_e(LOG_TAG, errmsg);
 		return -4;
 	}

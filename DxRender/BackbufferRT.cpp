@@ -2,6 +2,7 @@
 #include "DxRenderCommon.h"
 #include "DXLogger.h"
 #include "ConstDefine.h"
+#include <tchar.h>
 
 #define LOG_TAG L"BackbufferRenderTarget"
 
@@ -351,10 +352,7 @@ namespace zRender
 	{
 		if (m_backbuffer == NULL)
 		{
-#ifdef _DEBUG
-			printf("DxRender_D3D11 Object have not be inited yet.\n");
-			assert(false);
-#endif
+			log_e(LOG_TAG, _T("DxRender_D3D11 Object have not be inited yet.\n"));
 			return DXRENDER_RESULT_NOT_INIT_YET;
 		}
 		if (m_bkbufDxgiSurface)
