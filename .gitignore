@@ -1,0 +1,12 @@
+﻿################################################################################
+# 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
+################################################################################
+
+/.vs/3DRenderEngine/v16
+/build/vs2015/.vs/3DRenderEngine/v16
+/build/vs2015/Debug
+/Effects11/Debug
+/libtext/Debug
+/Effects11/Effects11_2008.vcxproj.user
+*.user
+/.vs
