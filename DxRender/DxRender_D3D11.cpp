@@ -1130,6 +1130,11 @@ int zRender::DxRender_D3D11::createTextureResource(TextureResource ** ppOutTexRe
 	return 0;
 }
 
+int zRender::DxRender_D3D11::createTextureResource(const TextureSourceDesc& srcDesc, TextureResource** ppOutTexRes)
+{
+	return -1;
+}
+
 int zRender::DxRender_D3D11::openSharedTextureResource(TextureResource ** ppOutTexRes, HANDLE hSharedRes)
 {
 	if (ppOutTexRes == NULL)	return -1;

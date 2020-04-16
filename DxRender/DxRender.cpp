@@ -275,6 +275,11 @@ int zRender::DxRender::createTextureResource(TextureResource ** ppOutTexRes, int
 	return m_renderImp->createTextureResource(ppOutTexRes, width, height, dxgiFmt, usage, bShared, initData, dataLen, pitch);
 }
 
+int zRender::DxRender::createTextureResource(const TextureSourceDesc& srcDesc, TextureResource** ppOutTexRes)
+{
+	return m_renderImp->createTextureResource(srcDesc, ppOutTexRes);
+}
+
 int zRender::DxRender::openSharedTextureResource(TextureResource ** ppOutTexRes, HANDLE hSharedRes)
 {
 	return m_renderImp->openSharedTextureResource(ppOutTexRes, hSharedRes);

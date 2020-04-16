@@ -53,7 +53,17 @@ namespace zRender
 		 *	@brief		获取纹理数据对象
 		 *	@return		zRender::TextureDataSource*
 		 **/
-		TextureDataSource* getTextureDataSource();
+		TextureDataSource* getTextureDataSource() const { return m_textureDataSource; }
+
+		/**
+		 *	@name		setTextureDataSource
+		 *	@brief		设置纹理数据源对象
+		 *	@param[in]	zRender::TextureDataSource* 纹理数据源对象
+		 **/
+		void setTextureDataSource(TextureDataSource* textureDataSrc) 
+		{
+			m_textureDataSource = textureDataSrc;
+		}
 
 		/**
 		 *	@name		update

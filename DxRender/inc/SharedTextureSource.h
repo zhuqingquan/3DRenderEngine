@@ -4,6 +4,7 @@
 
 #include "IDisplayContentProvider.h"
 #include "DxZRenderDLLDefine.h"
+#include <ConstDefine.h>
 
 namespace zRender
 {
@@ -31,6 +32,40 @@ namespace zRender
 		void releaseTexture();
 
 		void cacheData(const RECT_f& textureReg, unsigned char* dstTextureData, int pitch, int width, int height);
+
+		/**
+		 *	@name		getTextureCount
+		 *	@brief		获取Element所需的TextureResource的个数
+		 *	@return		zRender::VertexVector*
+		 **/
+		virtual int getTextureCount() const { return 1; }
+
+		/**
+		 *	@name		getTextureSourceDesc
+		 *	@brief		获取下标为index的Texture对应的数据源的数据格式
+		 *	@param[in]	int index TextureResource的下标
+		 *	@param[out] TextureSourceDesc* srcDesc 保存数据源的数据格式
+		 **/
+		virtual int getTextureSourceDesc(int index, TextureSourceDesc* srcDesc) const
+		{
+			if (index > 0 || srcDesc == nullptr)
+				return DXRENDER_RESULT_PARAM_INVALID;
+			//fixme
+			return DXRENDER_RESULT_OK;
+		}
+
+		/**
+		 *	@name		updateTextures
+		 *	@brief		将TextureDataSource中的数据更新到TextureResource中
+		 *	@param[in]	TextureResource* textureArray TextureResource的数组
+		 *	@param[out] int count textureArray数组长度
+		 **/
+		virtual int updateTextures(TextureResource* textureArray, int count)
+		{
+			if (count < 1 || textureArray == nullptr)
+				return DXRENDER_RESULT_PARAM_INVALID;
+			return DXRENDER_RESULT_OK;
+		}
 	private:
 		virtual SharedTexture* getSharedTexture(RECT& effectReg, int& identify);
 		virtual unsigned char* getData(int& dataLen, int& yPitch, int& uPitch, int& vPitch, int& width, int& height, PIXFormat& pixelFmt, RECT& effectReg, int& identify);

@@ -106,6 +106,26 @@ namespace zRender
 		TEXTURE_USAGE_DEFAULT = 0,	//在物理显存中申请资源，不支持CPU读写，支持共享
 		TEXTURE_USAGE_STAGE,		//在内存中申请资源，支持CPU读写，不可共享
 	}TEXTURE_USAGE;
+
+	/**
+	 *	@name		TextureSourceDesc
+	 *	@brief		数据源中Texture源数据的描述信息
+	 **/
+	struct TextureSourceDesc
+	{
+		int width;				// 分辨率，宽
+		int height;				// 分辨率，高
+		PIXFormat pixelFmt;		// 像素格式，YUV or RGB等
+		int pitchs[4];			// 每个planel的一行数据的字节数
+		char* buffers[4];		// 每个planel数据的起始地址
+
+		TextureSourceDesc()
+			: width(0), height(0), pixelFmt(PIXFMT_UNKNOW)
+		{
+			pitchs[0] = pitchs[1] = pitchs[2] = pitchs[3] = 0;
+			buffers[0] = buffers[1] = buffers[2] = buffers[3] = nullptr;
+		}
+	};
 }
 
 #endif //_zRENDER_DXRENDER_COMMON_H_

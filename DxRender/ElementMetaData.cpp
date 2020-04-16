@@ -58,11 +58,6 @@ zRender::VertexVector* zRender::ElementMetaData::getVertexData()
 	return m_vertexVector;
 }
 
-zRender::TextureDataSource* zRender::ElementMetaData::getTextureDataSource()
-{
-	return m_textureDataSource;
-}
-
 int zRender::ElementMetaData::update()
 {
 	return -1;

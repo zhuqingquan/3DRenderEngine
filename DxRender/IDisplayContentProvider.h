@@ -17,6 +17,7 @@ namespace zRender
 {
 	class SharedTexture;
 	class IRawFrameTexture;
+	class TextureResource;
 
 	/**
 	 *	@name		TextureDataSource
@@ -78,6 +79,29 @@ namespace zRender
 		 **/
 		virtual unsigned char* getData(int& dataLen, int& yPitch, int& uPitch, int& vPitch, int& width, int& height, PIXFormat& pixelFmt, RECT& effectReg, int& identify) = 0;
 		
+		/**
+		 *	@name		getTextureCount
+		 *	@brief		获取Element所需的TextureResource的个数
+		 *	@return		zRender::VertexVector*
+		 **/
+		virtual int getTextureCount() const = 0;
+
+		/**
+		 *	@name		getTextureSourceDesc
+		 *	@brief		获取下标为index的Texture对应的数据源的数据格式
+		 *	@param[in]	int index TextureResource的下标
+		 *	@param[out] TextureSourceDesc* srcDesc 保存数据源的数据格式
+		 **/
+		virtual int getTextureSourceDesc(int index, TextureSourceDesc* srcDesc) const = 0;
+
+		/**
+		 *	@name		updateTextures
+		 *	@brief		将TextureDataSource中的数据更新到TextureResource中
+		 *	@param[in]	TextureResource* textureArray TextureResource的数组
+		 *	@param[out] int count textureArray数组长度
+		 **/
+		virtual int updateTextures(TextureResource* textureArray, int count) = 0;
+
 		/**
 		 *	@name		getSharedTexture
 		 *	@brief		获取共享显存对象

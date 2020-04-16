@@ -11,6 +11,7 @@
 #define _SOA_MIRROR_RENDER_VIDEO_CP_H_
 
 #include "IDisplayContentProvider.h"
+#include <ConstDefine.h>
 
 namespace zRender
 {
@@ -170,6 +171,40 @@ namespace Render
 		zRender::RECT_f getEffectiveReg() const
 		{
 			return m_effectiveReg;
+		}
+
+		/**
+		 *	@name		getTextureCount
+		 *	@brief		获取Element所需的TextureResource的个数
+		 *	@return		zRender::VertexVector*
+		 **/
+		virtual int getTextureCount() const { return 1; }
+
+		/**
+		 *	@name		getTextureSourceDesc
+		 *	@brief		获取下标为index的Texture对应的数据源的数据格式
+		 *	@param[in]	int index TextureResource的下标
+		 *	@param[out] TextureSourceDesc* srcDesc 保存数据源的数据格式
+		 **/
+		virtual int getTextureSourceDesc(int index, zRender::TextureSourceDesc* srcDesc) const
+		{
+			if (index > 0 || srcDesc == nullptr)
+				return DXRENDER_RESULT_PARAM_INVALID;
+			//fixme
+			return DXRENDER_RESULT_OK;
+		}
+
+		/**
+		 *	@name		updateTextures
+		 *	@brief		将TextureDataSource中的数据更新到TextureResource中
+		 *	@param[in]	TextureResource* textureArray TextureResource的数组
+		 *	@param[out] int count textureArray数组长度
+		 **/
+		virtual int updateTextures(zRender::TextureResource* textureArray, int count)
+		{
+			if (count < 1 || textureArray == nullptr)
+				return DXRENDER_RESULT_PARAM_INVALID;
+			return DXRENDER_RESULT_OK;
 		}
 	protected:
 		int m_isUpdatedIdentify;

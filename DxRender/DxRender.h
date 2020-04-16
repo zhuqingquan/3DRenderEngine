@@ -149,6 +149,17 @@ namespace zRender
 		void releaseTexture(IRawFrameTexture** rawFrameTexture);
 
 		int createTextureResource(TextureResource** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char* initData = NULL, int dataLen = 0, int pitch = 0);
+		
+		/**
+		 *	@name		createTextureResource
+		 *	@brief		创建Texture对象
+		 *				根据TextureSourceDesc中的信息进行创建（必要时初始化）
+		 *	@param[out]	TextureResource** ppOutTexRes 保存成功创建的TextureResource对象
+		 *	@param[in]	const TextureSourceDesc& srcDesc Texture数据源的描述信息
+		 *	@return		int 0--成功 其他--失败  具体原因可参考ConstDefine.h中的定义
+		 */
+		int createTextureResource(const TextureSourceDesc& srcDesc, TextureResource** ppOutTexRes);
+
 		int openSharedTextureResource(TextureResource** ppOutTexRes, HANDLE hSharedRes);
 		void releaseTextureResource(TextureResource** ppOutTexRes);
 		/**
