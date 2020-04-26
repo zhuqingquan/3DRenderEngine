@@ -160,7 +160,7 @@ namespace zRender
 		 */
 		int createTextureResource(const TextureSourceDesc& srcDesc, TextureResource** ppOutTexRes);
 
-		int openSharedTextureResource(TextureResource** ppOutTexRes, HANDLE hSharedRes);
+		//int openSharedTextureResource(TextureResource** ppOutTexRes, HANDLE hSharedRes);
 		void releaseTextureResource(TextureResource** ppOutTexRes);
 		/**
 		 *	@name		createTexture

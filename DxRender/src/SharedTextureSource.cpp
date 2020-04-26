@@ -38,7 +38,7 @@ int SharedTextureSource::getTextureProfile(const RECT_f & textureReg, int & data
 	case PIXFMT_B8G8R8A8:
 	case PIXFMT_B8G8R8X8:
 	case PIXFMT_R8G8B8A8:
-	case PIXFMT_X8R8G8B8:
+	case PIXFMT_R8G8B8X8:
 		yPitch = width * 4;
 		uPitch = 0;
 		vPitch = 0;
@@ -95,6 +95,13 @@ unsigned char * SharedTextureSource::getData(int & dataLen, int & yPitch, int & 
 	return m_cacheData;
 }
 
+bool zRender::SharedTextureSource::isTextureUpdated(int index, unsigned int identify)
+{
+	if (index < 0 || index>1)
+		return false;
+	return m_isUpdatedIdentify > identify;;
+}
+
 //no use
 SharedTexture * SharedTextureSource::getSharedTexture(RECT & effectReg, int & identify)
 {
@@ -147,6 +154,10 @@ int SharedTextureSource::createTexture(PIXFormat pixfmt, int w, int h)
 		return -3;
 	}
 	m_texStaging = stagingTex;
+
+	m_srcDesc.width = w;
+	m_srcDesc.height = h;
+	m_srcDesc.pixelFmt = pixfmt;
 	m_isUpdatedIdentify++;
 	return 0;
 }

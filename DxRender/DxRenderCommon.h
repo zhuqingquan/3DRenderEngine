@@ -79,7 +79,7 @@ namespace zRender
 		PIXFMT_A8R8G8B8,	//ARGB
 		PIXFMT_R8G8B8,
 		PIXFMT_NV12,		//4:2:0  Y-->UV
-		PIXFMT_X8R8G8B8,
+		PIXFMT_R8G8B8X8,
 		PIXFMT_YV12,		//4:2:0  Y-->V-->U
 		PIXFMT_R8G8B8A8,	//RGBA
 		PIXFMT_B8G8R8A8,	//BGRA
@@ -118,12 +118,33 @@ namespace zRender
 		PIXFormat pixelFmt;		// 像素格式，YUV or RGB等
 		int pitchs[4];			// 每个planel的一行数据的字节数
 		char* buffers[4];		// 每个planel数据的起始地址
+		bool isShared;			// 是否共享
+		unsigned int hShared;	// 用于打开共享显存的HANDLE
 
 		TextureSourceDesc()
 			: width(0), height(0), pixelFmt(PIXFMT_UNKNOW)
+			, isShared(false), hShared(0)
 		{
 			pitchs[0] = pitchs[1] = pitchs[2] = pitchs[3] = 0;
 			buffers[0] = buffers[1] = buffers[2] = buffers[3] = nullptr;
+		}
+
+		void set(const TextureSourceDesc& srcDesc)
+		{
+			width = srcDesc.width;
+			height = srcDesc.height;
+			pixelFmt = srcDesc.pixelFmt;
+			isShared = srcDesc.isShared;
+			hShared = srcDesc.hShared;
+			pitchs[0] = srcDesc.pitchs[0];
+			pitchs[1] = srcDesc.pitchs[1];
+			pitchs[2] = srcDesc.pitchs[2];
+			pitchs[3] = srcDesc.pitchs[3];
+			buffers[0] = srcDesc.buffers[0];
+			buffers[1] = srcDesc.buffers[1];
+			buffers[2] = srcDesc.buffers[2];
+			buffers[3] = srcDesc.buffers[3];
+
 		}
 	};
 }

@@ -72,7 +72,7 @@ bool ElemDsplModel::initEffectPass()
 	createEffectPass(PIXFMT_YV12);
 	createEffectPass(PIXFMT_NV12);
 	createEffectPass(PIXFMT_A8R8G8B8);
-	createEffectPass(PIXFMT_X8R8G8B8);
+	createEffectPass(PIXFMT_R8G8B8X8);
 	createEffectPass(PIXFMT_R8G8B8);
 	createEffectPass(PIXFMT_R8G8B8A8);
 	createEffectPass(PIXFMT_B8G8R8A8);

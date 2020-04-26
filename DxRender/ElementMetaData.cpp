@@ -2,6 +2,7 @@
 #include "Vertex.h"
 #include "Effects.h"
 #include "ConstDefine.h"
+#include "IDisplayContentProvider.h"
 
 using namespace zRender;
 
@@ -56,6 +57,13 @@ bool zRender::ElementMetaData::isValid() const
 zRender::VertexVector* zRender::ElementMetaData::getVertexData()
 {
 	return m_vertexVector;
+}
+
+bool zRender::ElementMetaData::isTextureNeedUpdate(int& identify)
+{
+	if(m_textureDataSource==nullptr)
+		return false;
+	return m_textureDataSource->isUpdated(identify);
 }
 
 int zRender::ElementMetaData::update()

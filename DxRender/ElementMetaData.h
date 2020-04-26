@@ -65,6 +65,8 @@ namespace zRender
 			m_textureDataSource = textureDataSrc;
 		}
 
+		bool isTextureNeedUpdate(int& identify);
+
 		/**
 		 *	@name		update
 		 *	@brief		将数据更新到显存中

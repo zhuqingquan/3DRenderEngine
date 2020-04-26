@@ -16,7 +16,7 @@ ARGBTexture_8::ARGBTexture_8(PIXFormat pixfmt)
 	//ARGBTexture_8类型的Texture只支持ARGB或者RGB内存布局的图片显示
 	if(pixfmt!=PIXFMT_A8R8G8B8 && pixfmt!=PIXFMT_R8G8B8 
 		&& pixfmt!=PIXFMT_B8G8R8A8 && pixfmt!=PIXFMT_R8G8B8A8 
-		&& pixfmt!=PIXFMT_X8R8G8B8 && pixfmt!=PIXFMT_B8G8R8X8)
+		&& pixfmt!=PIXFMT_R8G8B8X8 && pixfmt!=PIXFMT_B8G8R8X8)
 		m_pixfmt = PIXFMT_UNKNOW;
 }
 
@@ -75,7 +75,7 @@ int ARGBTexture_8::create(ID3D11Device * device, int width, int height, TEXTURE_
 	case PIXFMT_B8G8R8X8:
 		dstPixfmt = DXGI_FORMAT_B8G8R8X8_UNORM;
 		break;
-	case PIXFMT_X8R8G8B8:
+	case PIXFMT_R8G8B8X8:
 		dstPixfmt = DXGI_FORMAT_B8G8R8X8_UNORM;
 		break;
 	default:
@@ -124,24 +124,24 @@ int ARGBTexture_8::getShaderResourceView(ID3D11ShaderResourceView** outYUVSRVs, 
 	{
 		return m_VideoFrame.getShaderResourceView(outYUVSRVs, srvsCount);
 	}
-	else
-	{
-		ID3D11ShaderResourceView* srv = m_textureArray[0]->getResourceView();
-		if (srv == NULL)
-		{
-			if (0 == m_textureArray[0]->createResourceView())
-			{
-				srv = m_textureArray[0]->getResourceView();
-			}
-			else
-			{
-				return -2;
-			}
-		}
-		outYUVSRVs[0] = srv;
-		srvsCount = 1;
-		return 0;
-	}
+	//else
+	//{
+	//	ID3D11ShaderResourceView* srv = m_textureArray[0]->getResourceView();
+	//	if (srv == NULL)
+	//	{
+	//		if (0 == m_textureArray[0]->createResourceView())
+	//		{
+	//			srv = m_textureArray[0]->getResourceView();
+	//		}
+	//		else
+	//		{
+	//			return -2;
+	//		}
+	//	}
+	//	outYUVSRVs[0] = srv;
+	//	srvsCount = 1;
+	//	return 0;
+	//}
 }
 
 int ARGBTexture_8::update(const unsigned char* pData, int dataLen, int yPitch, int uPitch, int vPitch, int width, int height,
@@ -171,7 +171,7 @@ int ARGBTexture_8::update(const unsigned char* pData, int dataLen, int yPitch, i
 		case PIXFMT_A8R8G8B8:
 		case PIXFMT_R8G8B8A8:
 		case PIXFMT_B8G8R8A8:
-		case PIXFMT_X8R8G8B8:
+		case PIXFMT_R8G8B8X8:
 		case PIXFMT_B8G8R8X8:
 			return m_VideoFrame.update_A8R8G8B8(pData, dataLen, yPitch, width, height, regionUpdated, d3dDevContex);
 		case PIXFMT_R8G8B8:
@@ -180,10 +180,10 @@ int ARGBTexture_8::update(const unsigned char* pData, int dataLen, int yPitch, i
 			return -8;
 		}
 	}
-	else if(m_textureArray[0]!=NULL)
-	{
-		return m_rgb32TexRes->update(pData, dataLen, yPitch, width, height, regionUpdated);
-	}
+	//else if(m_textureArray[0]!=NULL)
+	//{
+	//	return m_rgb32TexRes->update(pData, dataLen, yPitch, width, height, regionUpdated);
+	//}
 	return -10;
 //	if(m_pixfmt==PIXFMT_A8R8G8B8)
 //		return m_VideoFrame.update_A8R8G8B8(pData, dataLen, yPitch, width, height, regionUpdated, d3dDevContex);
@@ -364,7 +364,7 @@ zRender::ARGBTexture_8::FrameTexture zRender::ARGBTexture_8::create_txframe( ID3
 	case PIXFMT_B8G8R8X8:
 		dstPixfmt = DXGI_FORMAT_B8G8R8X8_UNORM;
 		break;
-	case PIXFMT_X8R8G8B8:
+	case PIXFMT_R8G8B8X8:
 		dstPixfmt = DXGI_FORMAT_B8G8R8X8_UNORM;
 		break;
 	default:

@@ -155,6 +155,7 @@ ID3DX11EffectPass* BasicEffect::getEffectPass(PIXFormat pixfmt) const
 	case zRender::PIXFMT_R8G8B8A8:
 	case zRender::PIXFMT_B8G8R8A8:
 	case zRender::PIXFMT_B8G8R8X8:
+	case zRender::PIXFMT_R8G8B8X8:
 		pass = Light0TexARGBTech ? Light0TexARGBTech->GetPassByIndex(0) : NULL;
 		break;
 	case zRender::PIXFMT_NV12:
@@ -162,7 +163,6 @@ ID3DX11EffectPass* BasicEffect::getEffectPass(PIXFormat pixfmt) const
 		break;
 	//以下三种形式的像素暂时没有支持的Shader，所以使用默认没有Texture的Shader渲染
 	//当外部只需要渲染线条和点，没有Texture时，DxRender_D3D11::draw方法中将会判断这种情况而将PIXFormat设为PIXFMT_UNKNOW
-	case zRender::PIXFMT_X8R8G8B8:
 	case zRender::PIXFMT_UNKNOW:
 		pass = Light1TechNoTex ? Light1TechNoTex->GetPassByIndex(0) : NULL;
 		break;
@@ -209,7 +209,7 @@ void BasicEffect::createEffectPass(PIXFormat pixfmt)
 	createEffectPass(PIXFMT_YV12);
 	createEffectPass(PIXFMT_NV12);
 	createEffectPass(PIXFMT_A8R8G8B8);
-	createEffectPass(PIXFMT_X8R8G8B8);
+	createEffectPass(PIXFMT_R8G8B8X8);
 	createEffectPass(PIXFMT_R8G8B8);
 	createEffectPass(PIXFMT_R8G8B8A8);
 	createEffectPass(PIXFMT_B8G8R8A8);

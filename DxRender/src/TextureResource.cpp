@@ -1,9 +1,10 @@
 #include "inc/TextureResource.h"
+#include "ConstDefine.h"
 
 using namespace zRender;
 
 TextureResource::TextureResource()
-	: m_width(0), m_height(0)
+	: m_width(0), m_height(0), m_pixfmt(PIXFMT_UNKNOW)
 	, m_dxgifmt(DXGI_FORMAT_UNKNOWN), m_usage(TEXTURE_USAGE_DEFAULT)
 	, m_texture(NULL), m_rsv(NULL)
 	, m_device(NULL), m_context(NULL)
@@ -17,6 +18,45 @@ TextureResource::~TextureResource()
 {
 	releaseResourceView();
 	release();
+}
+
+int zRender::TextureResource::create(DxRender* render, const TextureSourceDesc& srcDesc, TEXTURE_USAGE usage)
+{
+	if (nullptr == render)
+		return DXRENDER_RESULT_PARAM_INVALID;
+	switch (srcDesc.pixelFmt)
+	{
+	case PIXFMT_NV12:
+	case PIXFMT_YUV420P:
+	case PIXFMT_YUY2:
+	case PIXFMT_YV12:
+	case PIXFMT_UNKNOW:
+		return DXRENDER_RESULT_OPT_NOT_SUPPORT;
+	}
+	DXGI_FORMAT dxgifmt = DXGI_FORMAT_UNKNOWN;
+	switch (srcDesc.pixelFmt)
+	{
+	case PIXFMT_B8G8R8A8:
+		dxgifmt = DXGI_FORMAT_B8G8R8A8_UNORM;
+		break;
+	case PIXFMT_B8G8R8X8:
+		dxgifmt = DXGI_FORMAT_B8G8R8X8_UNORM;
+		break;
+	case PIXFMT_R8G8B8:
+	case PIXFMT_R8G8B8X8:
+	case PIXFMT_R8G8B8A8:
+		dxgifmt = DXGI_FORMAT_R8G8B8A8_UNORM;
+		break;
+	default:
+		break;
+	}
+	if (DXGI_FORMAT_UNKNOWN == dxgifmt)
+		return DXRENDER_RESULT_OPT_NOT_SUPPORT;
+	int ret = create((ID3D11Device*)render->getDevice(), srcDesc.width, srcDesc.height,
+		dxgifmt, usage, srcDesc.isShared, srcDesc.buffers[0], srcDesc.pitchs[0] * srcDesc.height, srcDesc.pitchs[0]);
+	if (ret == DXRENDER_RESULT_OK)
+		m_pixfmt = srcDesc.pixelFmt;
+	return ret;
 }
 
 int TextureResource::create(ID3D11Device* device, int width, int height, DXGI_FORMAT dxgifmt, TEXTURE_USAGE usage, bool bShared, const char* initData, int dataLen, int pitch)
@@ -153,14 +193,42 @@ void TextureResource::releaseResourceView()
 	ReleaseCOM(m_rsv);
 }
 
-int TextureResource::copyResource(const TextureResource* res)
+int zRender::TextureResource::getTextures(ID3D11Texture2D** outTexs, int& texsCount) const
+{
+	if (texsCount <= 0 || outTexs == nullptr)
+		return DXRENDER_RESULT_PARAM_INVALID;
+	*outTexs = m_texture;
+	texsCount = 1;
+	return DXRENDER_RESULT_OK;
+}
+
+int zRender::TextureResource::getResourceView(ID3D11ShaderResourceView** outSRVs, int& srvsCount) const
+{
+	if (srvsCount <= 0 || outSRVs == nullptr)
+		return DXRENDER_RESULT_PARAM_INVALID;
+	*outSRVs = m_rsv;
+	srvsCount = 1;
+	return DXRENDER_RESULT_OK;
+}
+
+TextureResource* zRender::TextureResource::copy()
+{
+	return nullptr;
+}
+
+int TextureResource::copyResource(const ITextureResource* res)
 {
 	if (res == NULL || !res->valid() || !valid())
-		return -1;
+		return DXRENDER_RESULT_PARAM_INVALID;
 	if (isShared())
 	{
 		acquireSync(0, INFINITE);
 	}
+	ID3D11Texture2D* srcTexture = nullptr;
+	int srcTexCount = 1;
+	res->getTextures(&srcTexture, srcTexCount);
+	if (nullptr == srcTexture || srcTexCount < 1)
+		return DXRENDER_RESULT_PARAM_INVALID;
 	//copy full texture
 	D3D11_BOX box;
 	box.front = 0;
@@ -169,7 +237,7 @@ int TextureResource::copyResource(const TextureResource* res)
 	box.right = m_width;
 	box.top = 0;
 	box.bottom = m_height;
-	m_context->CopySubresourceRegion(m_texture, 0, 0, 0, 0, res->m_texture, 0, &box);
+	m_context->CopySubresourceRegion(m_texture, 0, 0, 0, 0, srcTexture, 0, &box);
 	if (isShared())
 	{
 		releaseSync(0);
@@ -244,6 +312,10 @@ int TextureResource::update(const unsigned char* pData, int dataLen, int dataPit
 		// 		OutputDebugString(errmsg);
 		// 		log_e(LOG_TAG, errmsg, 20);
 		//ReleaseSync();
+		if (m_resMutex)
+		{
+			m_resMutex->ReleaseSync(0);
+		}
 		return -5;
 	}
 	unsigned char* dst = (unsigned char*)mappedRes.pData;
@@ -261,6 +333,13 @@ int TextureResource::update(const unsigned char* pData, int dataLen, int dataPit
 		m_resMutex->ReleaseSync(0);
 	}
 	return 0;
+}
+
+int zRender::TextureResource::update(const TextureSourceDesc& srcDesc)
+{
+	RECT rectReg = { 0, 0, srcDesc.width, srcDesc.height };
+	return update((unsigned char*)srcDesc.buffers[0], srcDesc.pitchs[0]*srcDesc.height, srcDesc.pitchs[0],
+		srcDesc.width, srcDesc.height, rectReg);
 }
 
 int zRender::TextureResource::acquireSync(int key, unsigned int timeout)

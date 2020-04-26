@@ -48,22 +48,33 @@ namespace zRender
 		 **/
 		virtual int getTextureSourceDesc(int index, TextureSourceDesc* srcDesc) const
 		{
-			if (index > 0 || srcDesc == nullptr)
+			if (index > 0 || index<0 || srcDesc == nullptr)
 				return DXRENDER_RESULT_PARAM_INVALID;
-			//fixme
+			srcDesc->set(m_srcDesc);
 			return DXRENDER_RESULT_OK;
 		}
 
 		/**
+		 *	@name		isTextureUpdated
+		 *	@brief		获取下标为index的Texture对应的数据源的数据是否发生了改变
+		 *	@param[in]	int index TextureResource的下标
+		 *	@param[in,out] 外部持有的最新更新的TextureResource的计数版本，如果Texture 
+		 **/
+		virtual bool isTextureUpdated(int index, unsigned int identify);
+
+		/**
 		 *	@name		updateTextures
 		 *	@brief		将TextureDataSource中的数据更新到TextureResource中
-		 *	@param[in]	TextureResource* textureArray TextureResource的数组
-		 *	@param[out] int count textureArray数组长度
+		 *	@param[in]	TextureResource* textureArray TextureResource对象
+		 *	@param[in]  int index 需要更新的Texture数据的下标Index
+		 *	@param[out] unsigned int& newIdentify 成功更新后保存新的数据版本标识值，如果未更新则不更改
 		 **/
-		virtual int updateTextures(TextureResource* textureArray, int count)
+		virtual int updateTextures(TextureResource* textureArray, int index, unsigned int& newIdentify)
 		{
-			if (count < 1 || textureArray == nullptr)
+			if (index < 0 || index >= getTextureCount() || textureArray == nullptr)
 				return DXRENDER_RESULT_PARAM_INVALID;
+			newIdentify = m_isUpdatedIdentify;
+			//fixme
 			return DXRENDER_RESULT_OK;
 		}
 	private:
@@ -81,6 +92,8 @@ namespace zRender
 		int m_cache_width;
 		int m_cache_height;
 		RECT_f m_cache_textureReg;
+
+		TextureSourceDesc m_srcDesc;
 	};
 }
 

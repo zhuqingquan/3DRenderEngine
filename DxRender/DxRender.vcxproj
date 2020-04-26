@@ -117,6 +117,7 @@
     <ClCompile Include="ElementMetaData.cpp" />
     <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="LightHelper.cpp" />
+    <ClCompile Include="PackedYUVTextureResource.cpp" />
     <ClCompile Include="RectangleDataCtxInitializer.cpp" />
     <ClCompile Include="rendertextureclass.cpp" />
     <ClCompile Include="src\ElemDsplModel.cpp" />
@@ -124,6 +125,7 @@
     <ClCompile Include="src\SharedTextureSource.cpp" />
     <ClCompile Include="src\TextureResource.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="TextureResourceFactory.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="VideoContentProvider.cpp" />
     <ClCompile Include="YUVTexture_NV12.cpp" />
@@ -161,10 +163,12 @@
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="IRawFrameTexture.h" />
     <ClInclude Include="LightHelper.h" />
+    <ClInclude Include="PackedYUVTextureResource.h" />
     <ClInclude Include="RectangleDataCtxInitializer.h" />
     <ClInclude Include="rendertextureclass.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TextureResourceFactory.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VideoContentProvider.h" />
     <ClInclude Include="YUVTexture_NV12.h" />

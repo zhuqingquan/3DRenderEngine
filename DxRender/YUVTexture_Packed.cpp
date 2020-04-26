@@ -129,37 +129,37 @@ int YUVTexture_Packed::getShaderResourceView(ID3D11ShaderResourceView** outYUVSR
 	{
 		return m_VideoFrame.getShaderResourceView(outYUVSRVs, srvsCount);
 	}
-	else
-	{
-		ID3D11ShaderResourceView* srv = m_textureArray[0]->getResourceView();
-		if (srv == NULL)
-		{
-			if (0 == m_textureArray[0]->createResourceView())
-			{
-				srv = m_textureArray[0]->getResourceView();
-			}
-			else
-			{
-				return -2;
-			}
-		}
-		outYUVSRVs[0] = srv;
-		srv = m_textureArray[1]->getResourceView();
-		if (srv == NULL)
-		{
-			if (0 == m_textureArray[1]->createResourceView())
-			{
-				srv = m_textureArray[1]->getResourceView();
-			}
-			else
-			{
-				return -3;
-			}
-		}
-		outYUVSRVs[1] = srv;
-		srvsCount = 2;
-		return 0;
-	}
+	//else
+	//{
+	//	ID3D11ShaderResourceView* srv = m_textureArray[0]->getResourceView();
+	//	if (srv == NULL)
+	//	{
+	//		if (0 == m_textureArray[0]->createResourceView())
+	//		{
+	//			srv = m_textureArray[0]->getResourceView();
+	//		}
+	//		else
+	//		{
+	//			return -2;
+	//		}
+	//	}
+	//	outYUVSRVs[0] = srv;
+	//	srv = m_textureArray[1]->getResourceView();
+	//	if (srv == NULL)
+	//	{
+	//		if (0 == m_textureArray[1]->createResourceView())
+	//		{
+	//			srv = m_textureArray[1]->getResourceView();
+	//		}
+	//		else
+	//		{
+	//			return -3;
+	//		}
+	//	}
+	//	outYUVSRVs[1] = srv;
+	//	srvsCount = 2;
+	//	return 0;
+	//}
 }
 
 int YUVTexture_Packed::update(const unsigned char* pData, int dataLen, int yPitch, int uPitch, int vPitch, int width, int height,
@@ -175,10 +175,10 @@ int YUVTexture_Packed::update(const unsigned char* pData, int dataLen, int yPitc
 		int ret = ft.update(pData, dataLen, yPitch, uPitch, vPitch, width, height, regionUpdated, d3dDevContex);
 		return ret;
 	}
-	else if (m_textureArray[0] && m_textureArray[1])
-	{
-		m_textureArray[0]->update(pData, dataLen, yPitch, width, height, regionUpdated);
-	}
+	//else if (m_textureArray[0] && m_textureArray[1])
+	//{
+	//	m_textureArray[0]->update(pData, dataLen, yPitch, width, height, regionUpdated);
+	//}
 }
 
 int zRender::YUVTexture_Packed::update(SharedTexture* pSharedTexture, const RECT& regionUpdated, ID3D11DeviceContext* d3dDevContex)

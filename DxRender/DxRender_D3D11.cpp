@@ -478,7 +478,7 @@ IRawFrameTexture* DxRender_D3D11::createTexture(PIXFormat pixFmt, int width, int
 	case PIXFMT_R8G8B8A8:
 	case PIXFMT_B8G8R8A8:
 	case PIXFMT_B8G8R8X8:
-	case PIXFMT_X8R8G8B8:
+	case PIXFMT_R8G8B8X8:
 		tex = new ARGBTexture_8(pixFmt);
 		break;
 	case PIXFMT_YUY2:
@@ -529,7 +529,7 @@ IRawFrameTexture * DxRender_D3D11::createTexture(PIXFormat pixfmt, int width, in
 	case PIXFMT_R8G8B8A8:
 	case PIXFMT_B8G8R8A8:
 	case PIXFMT_B8G8R8X8:
-	case PIXFMT_X8R8G8B8:
+	case PIXFMT_R8G8B8X8:
 		tex = new ARGBTexture_8(pixfmt);
 		break;
 	case PIXFMT_YUY2:
@@ -577,7 +577,7 @@ IRawFrameTexture * zRender::DxRender_D3D11::openSharedTexture(IRawFrameTexture *
 	case PIXFMT_R8G8B8A8:
 	case PIXFMT_B8G8R8A8:
 	case PIXFMT_B8G8R8X8:
-	case PIXFMT_X8R8G8B8:
+	case PIXFMT_R8G8B8X8:
 		tex = new ARGBTexture_8(pixfmt);
 		break;
 	case PIXFMT_YUY2:
@@ -1132,20 +1132,42 @@ int zRender::DxRender_D3D11::createTextureResource(TextureResource ** ppOutTexRe
 
 int zRender::DxRender_D3D11::createTextureResource(const TextureSourceDesc& srcDesc, TextureResource** ppOutTexRes)
 {
-	return -1;
-}
-
-int zRender::DxRender_D3D11::openSharedTextureResource(TextureResource ** ppOutTexRes, HANDLE hSharedRes)
-{
-	if (ppOutTexRes == NULL)	return -1;
+	if (ppOutTexRes == NULL)	return DXRENDER_RESULT_PARAM_INVALID;
 	TextureResource* frameTexture = new TextureResource();
-	if (0 != frameTexture->open(m_device, hSharedRes))
+	DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+	switch (srcDesc.pixelFmt)
+	{
+	case PIXFMT_A8R8G8B8:
+		format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		break;
+	case PIXFMT_B8G8R8A8:
+		format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		break;
+	default:
+		break;
+	}
+	if (0 != frameTexture->create(m_device, srcDesc.width, srcDesc.height, format, TEXTURE_USAGE_STAGE, 
+									srcDesc.isShared, srcDesc.buffers[0], srcDesc.pitchs[0]*srcDesc.height, srcDesc.pitchs[0]))
 	{
 		delete frameTexture;
+		return DXRENDER_RESULT_CREATE_BUF_FAILED;
 	}
 	*ppOutTexRes = frameTexture;
-	return 0;
+
+	return DXRENDER_RESULT_OK;
 }
+
+//int zRender::DxRender_D3D11::openSharedTextureResource(TextureResource ** ppOutTexRes, HANDLE hSharedRes)
+//{
+//	if (ppOutTexRes == NULL)	return -1;
+//	TextureResource* frameTexture = new TextureResource();
+//	if (0 != frameTexture->open(m_device, hSharedRes))
+//	{
+//		delete frameTexture;
+//	}
+//	*ppOutTexRes = frameTexture;
+//	return 0;
+//}
 
 void zRender::DxRender_D3D11::releaseTextureResource(TextureResource ** ppOutTexRes)
 {

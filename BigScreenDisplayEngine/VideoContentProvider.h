@@ -197,14 +197,30 @@ namespace Render
 		/**
 		 *	@name		updateTextures
 		 *	@brief		将TextureDataSource中的数据更新到TextureResource中
-		 *	@param[in]	TextureResource* textureArray TextureResource的数组
-		 *	@param[out] int count textureArray数组长度
+		 *	@param[in]	TextureResource* textureArray TextureResource对象
+		 *	@param[in]  int index 需要更新的Texture数据的下标Index
+		 *	@param[out] unsigned int& newIdentify 成功更新后保存新的数据版本标识值，如果未更新则不更改
 		 **/
-		virtual int updateTextures(zRender::TextureResource* textureArray, int count)
+		virtual int updateTextures(zRender::TextureResource* textureArray, int index, unsigned int& newIdentify)
 		{
-			if (count < 1 || textureArray == nullptr)
+			if (index < 0 || index>=getTextureCount() || textureArray == nullptr)
 				return DXRENDER_RESULT_PARAM_INVALID;
 			return DXRENDER_RESULT_OK;
+		}
+
+		/**
+		 *	@name		isTextureUpdated
+		 *	@brief		获取下标为index的Texture对应的数据源的数据是否发生了改变
+		 *	@param[in]	int index TextureResource的下标
+		 *	@param[in]  外部持有的最新更新的TextureResource的计数版本，如果Texture
+		 *	@return		true--Texture数据源发生了更新 false--未更新
+		 **/
+		virtual bool isTextureUpdated(int index, unsigned int identify)
+		{
+			if (index < 0 || index>1)
+				return false;
+			return m_isUpdatedIdentify > identify;;
+
 		}
 	protected:
 		int m_isUpdatedIdentify;

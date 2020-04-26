@@ -85,7 +85,7 @@ namespace zRender
 		 *	@param[in]	TextureDataSource* dataSrc 数据来源，来源的改变不会导致资源重新创建
 		 *	@return		int 0--成功 <0--失败	该参数不合法时失败
 		 **/
-		int setTexture(PIXFormat pixfmt, int width, int height);
+		//int setTexture(PIXFormat pixfmt, int width, int height);
 
 		/**
 		 *	@name		setTextureDataSource
@@ -124,12 +124,14 @@ namespace zRender
 		/**
 		 *	@name		updateTexture
 		 *	@brief		更新Texture的内容
-		 *				必须在调用了createRenderResource成功后调用该接口才有意义，如果为设置Texture，该接口什么都不做
+		 *				必须在调用了createRenderResource成功后调用该接口才有意义，如果未设置Texture，该接口什么都不做
 		 *				该接口从TextureDataSource对象中将内存拷贝到Texture的显存中，如果TextureDataSource内容未更新，则不做任何拷贝
 		 *	@param[in,out]	int& identify	当前已经绘制的Texture的标识符，如果Texture的内容更新成功，则该参数将被修改
 		 *	@return		int 0--成功  <0--失败
 		 **/
 		int updateTexture(int& identify);
+
+		int updateTexture();
 
 		/**
 		 *	@name		isValid
@@ -153,25 +155,6 @@ namespace zRender
 		void enableTransparent(bool enable);
 		bool isEnableTransparent() const;
 
-		int createDsplModel(ElemDsplModel<BasicEffect>** ppModel)
-		{
-			if (ppModel == NULL)	return -1;
-			ElemDsplModel<BasicEffect>* model = new ElemDsplModel<BasicEffect>();
-			if (NULL == model)	return -2;
-			*ppModel = model;
-			return 0;
-		}
-
-		void ReleaseDsplModel(ElemDsplModel<BasicEffect>** ppModel)
-		{
-			if (ppModel && *ppModel)
-			{
-				ElemDsplModel<BasicEffect>* model = *ppModel;
-				delete model;
-				*ppModel = NULL;
-			}
-		}
-
 		int draw();
 		//////////////////////////支持打开共享显存用于显示///////////////////////////////
 		int openSharedTexture(IRawFrameTexture* sharedTexture);
@@ -183,7 +166,8 @@ namespace zRender
 
 		//创建与释放资源
 		int createTextureResource();
-		int releaseTexTureResource();
+		int createTextureResource(TextureDataSource* dataSrc);
+		void releaseTextureResource();
 		int createVertexBuffer();
 		int releaseVertexBuffer();
 		int createIndexBuffer();
@@ -201,7 +185,27 @@ namespace zRender
 		RECT_f	m_TexEffectiveReg;
 		bool m_isTextureUpdated;
 
+		struct TextureResContext
+		{
+			TextureResContext(TextureResource* tex)
+				: texture(tex), identifyForData(0), identifyForFormat(0)
+			{
+
+			}
+
+			TextureResContext()
+				: texture(nullptr), identifyForData(0), identifyForFormat(0)
+			{
+
+			}
+
+			TextureResource* texture;
+			unsigned int identifyForData;
+			unsigned int identifyForFormat;
+		};
+
 		IRawFrameTexture*	m_texture;//std::shared_ptr<YUVTexture_Packed*>
+		std::vector<TextureResContext> m_textureRes;
 		ID3D11Buffer*		m_VertexBuf;//std::shared_ptr<ID3D11Buffer*>
 		ID3D11Buffer*		m_IndexBuf;//std::shared_ptr<ID3D11Buffer*>
 

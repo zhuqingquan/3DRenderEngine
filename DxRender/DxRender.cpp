@@ -151,7 +151,6 @@ int DxRender::setupBackground(IDisplayContentProvider* contentProvider, const RE
 			printf("Error in DxRender::setupBackground : get texture's profile failed.\n");			
 			return -5;
 		}
-		de->setTexture(pixelFmt, width, height);
 		de->setTextureDataSource(texDataSrc, texEffectReg);
 		de->createRenderResource();
 		int texUpdateIdt = 0;
@@ -280,10 +279,10 @@ int zRender::DxRender::createTextureResource(const TextureSourceDesc& srcDesc, T
 	return m_renderImp->createTextureResource(srcDesc, ppOutTexRes);
 }
 
-int zRender::DxRender::openSharedTextureResource(TextureResource ** ppOutTexRes, HANDLE hSharedRes)
-{
-	return m_renderImp->openSharedTextureResource(ppOutTexRes, hSharedRes);
-}
+//int zRender::DxRender::openSharedTextureResource(TextureResource ** ppOutTexRes, HANDLE hSharedRes)
+//{
+//	return m_renderImp->openSharedTextureResource(ppOutTexRes, hSharedRes);
+//}
 
 void zRender::DxRender::releaseTextureResource(TextureResource ** ppOutTexRes)
 {

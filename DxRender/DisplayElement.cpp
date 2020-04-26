@@ -67,35 +67,43 @@ float zRender::DisplayElement::getZIndex() const
 	return m_DrawingContext->getZIndex();
 }
 
-int DisplayElement::setTexture(PIXFormat pixfmt, int width, int height)
-{
-	if(NULL==m_device || NULL==m_dxRender)
-	{
-#ifdef _DEBUG
-		printf("DisplayElement obj have not be inited yet.\n");
-#endif
-		return -1;
-	}
-	if(pixfmt==PIXFMT_UNKNOW || width<=0 || height<=0/* || dataSrc==NULL*/)//fix me
-	{
-#ifdef _DEBUG
-		printf("Error in DisplayElement::setTexture : param invalid.(FMT=%d, W=%d, H=%d)\n",
-			pixfmt, width, height);
-#endif
-		return -2;
-	}
-	
-	if(PixelByteCount[pixfmt]!=PixelByteCount[m_TexFmt] ||
-		width!=m_TexWidth || height!=m_TexHeight)
-		m_isTextureUpdated = true;
-	m_TexFmt = pixfmt;
-	m_TexHeight = height;
-	m_TexWidth = width;
-	return 0;
-}
+//int DisplayElement::setTexture(PIXFormat pixfmt, int width, int height)
+//{
+//	if(NULL==m_device || NULL==m_dxRender)
+//	{
+//#ifdef _DEBUG
+//		printf("DisplayElement obj have not be inited yet.\n");
+//#endif
+//		return -1;
+//	}
+//	if(pixfmt==PIXFMT_UNKNOW || width<=0 || height<=0/* || dataSrc==NULL*/)//fix me
+//	{
+//#ifdef _DEBUG
+//		printf("Error in DisplayElement::setTexture : param invalid.(FMT=%d, W=%d, H=%d)\n",
+//			pixfmt, width, height);
+//#endif
+//		return -2;
+//	}
+//	
+//	if(PixelByteCount[pixfmt]!=PixelByteCount[m_TexFmt] ||
+//		width!=m_TexWidth || height!=m_TexHeight)
+//		m_isTextureUpdated = true;
+//	m_TexFmt = pixfmt;
+//	m_TexHeight = height;
+//	m_TexWidth = width;
+//	return 0;
+//}
 
 int DisplayElement::setTextureDataSource(TextureDataSource* dataSrc, const RECT_f& textureReg)
 {
+	if (m_MetaData == nullptr)
+		return DXRENDER_RESULT_NOT_INIT_YET;
+	if (dataSrc == m_MetaData->getTextureDataSource())
+		return DXRENDER_RESULT_OK;
+	m_MetaData->setTextureDataSource(dataSrc);
+	m_isTextureUpdated = true;
+	return DXRENDER_RESULT_OK;
+	/*
 	if(dataSrc==NULL)//如果dataSrc为NULL，则忽略对textureReg参数的检查
 	{
 		m_TexDataSrc = dataSrc;
@@ -112,7 +120,7 @@ int DisplayElement::setTextureDataSource(TextureDataSource* dataSrc, const RECT_
 	}
 	m_TexDataSrc = dataSrc;
 	m_TexEffectiveReg = textureReg;
-	return 0;
+	return 0;*/
 }
 
 int DisplayElement::createRenderResource()
@@ -124,10 +132,8 @@ int DisplayElement::createRenderResource()
 	}
 	if(m_isTextureUpdated)		//创建Texture
 	{
-		int ret = releaseTexTureResource();
-		if(0!=ret)
-			return -2;
-		ret = createTextureResource();
+		releaseTextureResource();
+		int ret = createTextureResource();
 		if(0!=ret)
 			return -3;
 		m_isTextureUpdated = false;
@@ -155,31 +161,65 @@ int DisplayElement::releaseRenderResource()
 {
 	releaseVertexBuffer();
 	releaseIndexBuffer();
-	releaseTexTureResource();
+	releaseTextureResource();
 	return 0;
 }
 
 int DisplayElement::createTextureResource()
 {
-	if(m_texture!=NULL)	return -1;
+/*	if(m_texture!=NULL)	return -1;
 	IRawFrameTexture* texTmp = m_dxRender->createTexture(m_TexFmt, m_TexWidth, m_TexHeight);
 	if(texTmp==NULL)
 		return -2;
-	m_texture = texTmp;
-	return 0;
+	m_texture = texTmp;*/
+	if (nullptr == m_MetaData)
+		return DXRENDER_RESULT_NOT_INIT_YET;
+
+	TextureDataSource* dataSrc = m_MetaData->getTextureDataSource();
+	if (dataSrc != nullptr)
+	{
+		return createTextureResource(dataSrc);
+	}
+	return DXRENDER_RESULT_OK;
 }
 
-int DisplayElement::releaseTexTureResource()
+int DisplayElement::createTextureResource(TextureDataSource* dataSrc)
+{
+	int count = dataSrc->getTextureCount();
+	if (count <= 0)  // 无需Texture资源
+		return 0;
+	TextureSourceDesc desc;
+	for (int i = 0; i < count; i++)
+	{
+		if (DXRENDER_RESULT_OK == dataSrc->getTextureSourceDesc(i, &desc))
+		{
+			TextureResource* texRes = nullptr;
+			int ret = m_dxRender->createTextureResource(desc, &texRes);
+			if (DXRENDER_RESULT_OK != ret || nullptr == texRes)
+			{
+				log_e(_T("DisplayElement"), _T("Create TextureResource failed"));
+				continue;
+			}
+			m_textureRes.push_back(TextureResContext(texRes));
+		}
+	}
+
+	return m_textureRes.size()==count ? DXRENDER_RESULT_OK : DXRENDER_RESULT_CREATE_BUF_FAILED;
+}
+
+void DisplayElement::releaseTextureResource()
 {
 	if(m_texture)
 	{
-		int ret = m_texture->destroy();
-		if(0!=ret)
-			return ret;
+		m_texture->destroy();
 		delete m_texture;
 		m_texture = NULL;
 	}
-	return 0;
+	for (size_t i = 0; i < m_textureRes.size(); i++)
+	{
+		m_dxRender->releaseTextureResource(&m_textureRes[i].texture);
+	}
+	m_textureRes.clear();
 }
 
 int DisplayElement::createVertexBuffer()
@@ -294,6 +334,28 @@ int DisplayElement::updateTexture(int& identify)
 // 	m_TexDataSrc->copyDataToTexture(m_TexEffectiveReg, pDes, mappedRes.RowPitch, m_TexHeight, identify);
 // 	m_context->Unmap(tex2d[0], 0);
 // 	return 0;
+}
+
+int zRender::DisplayElement::updateTexture()
+{
+	if (m_context == nullptr || !isValid())
+		return DXRENDER_RESULT_NOT_INIT_YET;
+	if(m_textureRes.size()<=0)
+		return DXRENDER_RESULT_OK;
+	TextureDataSource* textureDataSrc = m_MetaData->getTextureDataSource();
+	if (textureDataSrc==nullptr || m_textureRes.size() != textureDataSrc->getTextureCount())
+		return DXRENDER_RESULT_CREATE_BUF_FAILED;
+	for (size_t i = 0; i < m_textureRes.size(); i++)
+	{
+		TextureResContext& textureCtx = m_textureRes[i];
+		if (textureCtx.texture == nullptr)
+			continue;
+		if (textureDataSrc->isTextureUpdated(i, textureCtx.identifyForData))
+		{
+			textureDataSrc->updateTextures(textureCtx.texture, i, textureCtx.identifyForData);
+		}
+	}
+	return DXRENDER_RESULT_OK;
 }
 
 void zRender::DisplayElement::setAlpha( float alpha )

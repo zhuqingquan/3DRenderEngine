@@ -117,7 +117,6 @@ void zRender::RawFileSource::doReadFileAndUpdateToTexture()
 		frameLen = pitch * m_height + pitch * (m_height >> 1);
 		break;
 	case zRender::PIXFMT_A8R8G8B8:
-	case zRender::PIXFMT_X8R8G8B8:
 	case zRender::PIXFMT_R8G8B8A8:
 	case zRender::PIXFMT_B8G8R8A8:
 	case zRender::PIXFMT_B8G8R8X8:
