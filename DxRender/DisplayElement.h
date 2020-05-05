@@ -30,6 +30,8 @@ namespace zRender
 	class RectangleDataCtxInitializer;
 	class ElementDrawingContext;
 	class ElementMetaData;
+	class TextureFasterCopyHelper;
+
 	//template<> class ElemDsplModel<BasicEffect>;
 
 	/**
@@ -187,8 +189,9 @@ namespace zRender
 
 		struct TextureResContext
 		{
-			TextureResContext(TextureResource* tex)
-				: texture(tex), identifyForData(0), identifyForFormat(0)
+			TextureResContext(ITextureResource* tex, TextureFasterCopyHelper* texHelper)
+				: texture(tex), textureHelper(texHelper)
+				, identifyForData(0), identifyForFormat(0)
 			{
 
 			}
@@ -199,12 +202,14 @@ namespace zRender
 
 			}
 
-			TextureResource* texture;
+			ITextureResource* texture;
+			TextureFasterCopyHelper* textureHelper;
 			unsigned int identifyForData;
 			unsigned int identifyForFormat;
 		};
 
 		IRawFrameTexture*	m_texture;//std::shared_ptr<YUVTexture_Packed*>
+		std::vector<ITextureResource*> m_applyingTexture;
 		std::vector<TextureResContext> m_textureRes;
 		ID3D11Buffer*		m_VertexBuf;//std::shared_ptr<ID3D11Buffer*>
 		ID3D11Buffer*		m_IndexBuf;//std::shared_ptr<ID3D11Buffer*>

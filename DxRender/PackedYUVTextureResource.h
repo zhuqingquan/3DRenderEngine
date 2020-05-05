@@ -26,6 +26,8 @@ namespace zRender
 		virtual int acquireSync(int key, unsigned int timeout);
 		virtual int releaseSync(int key);
 
+		virtual int width() const { return m_textureRes!=nullptr ? m_textureRes->width() : 0; }
+		virtual int height() const { return m_textureRes != nullptr ? m_textureRes->height() : 0; }
 		virtual PIXFormat getSrcPixelFormat() const { return m_originPixfmt; }
 		virtual bool valid() const;
 

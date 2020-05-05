@@ -11,6 +11,7 @@ namespace zRender
 	class BasicEffect;
 	class DxRender;
 	class ElementMetaData;
+	class ITextureResource;
 
 	class ElementDrawingContext
 	{
@@ -31,6 +32,9 @@ namespace zRender
 		void setMaterial(const Material& material);
 
 		int apply(DxRender* render, IRawFrameTexture* texture, ID3D11Buffer* vtBuf, ID3D11Buffer* indexBuffer, ElementMetaData* metadata);
+
+		int apply(DxRender* render, ITextureResource* textures[], int textureCount,
+			ID3D11Buffer* vtBuf, ID3D11Buffer* indexBuffer, ElementMetaData* metadata);
 
 
 		/**

@@ -2,33 +2,14 @@
 #ifndef _Z_RENDER_TEXTURE_RESOURCE_H_
 #define _Z_RENDER_TEXTURE_RESOURCE_H_
 
-#include "DxRenderCommon.h"
-#include "DxZRenderDLLDefine.h"
-#include <D3D11.h>
-#include "DxRender.h"
+#include "inc/ITextureResource.h"
 
 namespace zRender
 {
-	struct DX_ZRENDER_EXPORT_IMPORT ITextureResource
-	{
-		virtual ~ITextureResource() = 0 {}
-
-		virtual int create(DxRender* render, const TextureSourceDesc& srcDesc, TEXTURE_USAGE usage) = 0;
-		virtual void release() = 0;
-		virtual int createResourceView() = 0;
-		virtual void releaseResourceView() = 0;
-		virtual int update(const TextureSourceDesc& srcDesc) = 0;
-		virtual int getTextures(ID3D11Texture2D** outTexs, int& texsCount) const = 0;
-		virtual int getResourceView(ID3D11ShaderResourceView** outSRVs, int& srvsCount) const = 0;
-		virtual int copyResource(const ITextureResource* res) = 0;
-		virtual ITextureResource* copy() = 0;
-		virtual int acquireSync(int key, unsigned int timeout) = 0;
-		virtual int releaseSync(int key) = 0;
-
-		virtual PIXFormat getSrcPixelFormat() const = 0;
-		virtual bool valid() const = 0;
-	};
-
+	/**
+	 *	@name		TextureResource
+	 *	@brief		通用类型的Texture资源的封装，内部封装了ID3D11Texture2D资源以及对应的ResourceView对象
+	 **/
 	class DX_ZRENDER_EXPORT_IMPORT TextureResource : public ITextureResource
 	{
 	public:
@@ -40,8 +21,8 @@ namespace zRender
 		virtual void release();
 		virtual int update(const TextureSourceDesc& srcDesc);
 		
-		int width() const { return m_width; }
-		int height() const { return m_height; }
+		virtual int width() const { return m_width; }
+		virtual int height() const { return m_height; }
 		DXGI_FORMAT pixfmt() const { return m_dxgifmt; }
 		TEXTURE_USAGE usage() const { return m_usage; }
 		virtual PIXFormat getSrcPixelFormat() const { return m_pixfmt; }

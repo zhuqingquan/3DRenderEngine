@@ -8,6 +8,9 @@
 #include "RectangleDataCtxInitializer.h"
 #include "ElementDrawingContext.h"
 #include "ElementMetaData.h"
+#include "inc/TextureResource.h"
+#include <TextureResourceFactory.h>
+#include <TextureFasterCopyHelper.h>
 
 using namespace zRender;
 #define LOG_TAG L"DxRender_DisplayElement"
@@ -42,6 +45,7 @@ DisplayElement::~DisplayElement()
 		m_DataCtxInitializer = nullptr;
 	}
 	releaseRenderResource();
+	m_applyingTexture.clear();
 }
 
 int DisplayElement::setDisplayRegion(const RECT_f& displayReg, float zIndex)
@@ -193,15 +197,30 @@ int DisplayElement::createTextureResource(TextureDataSource* dataSrc)
 	{
 		if (DXRENDER_RESULT_OK == dataSrc->getTextureSourceDesc(i, &desc))
 		{
-			TextureResource* texRes = nullptr;
-			int ret = m_dxRender->createTextureResource(desc, &texRes);
-			if (DXRENDER_RESULT_OK != ret || nullptr == texRes)
+			TextureFasterCopyHelper* textureHelper = new TextureFasterCopyHelper();
+			int ret = textureHelper->create(m_dxRender, desc);
+			if (DXRENDER_RESULT_OK != ret)
 			{
 				log_e(_T("DisplayElement"), _T("Create TextureResource failed"));
 				continue;
 			}
-			m_textureRes.push_back(TextureResContext(texRes));
+			ret = textureHelper->getTextureForDraw()->createResourceView();
+			if (DXRENDER_RESULT_OK != ret)
+			{
+				log_e(_T("DisplayElement"), _T("Create Texture View failed."));
+				continue;
+			}
+			m_textureRes.push_back(TextureResContext(textureHelper->getTextureForDraw(), textureHelper));
 		}
+	}
+
+	m_applyingTexture.clear();
+	for (size_t i = 0; i < m_textureRes.size(); i++)
+	{
+		TextureResContext& textureCtx = m_textureRes[i];
+		if (textureCtx.texture == nullptr)
+			continue;
+		m_applyingTexture.push_back(textureCtx.texture);
 	}
 
 	return m_textureRes.size()==count ? DXRENDER_RESULT_OK : DXRENDER_RESULT_CREATE_BUF_FAILED;
@@ -217,7 +236,9 @@ void DisplayElement::releaseTextureResource()
 	}
 	for (size_t i = 0; i < m_textureRes.size(); i++)
 	{
-		m_dxRender->releaseTextureResource(&m_textureRes[i].texture);
+		m_textureRes[i].texture->releaseResourceView();
+		m_textureRes[i].textureHelper->release();
+		delete m_textureRes[i].textureHelper;
 	}
 	m_textureRes.clear();
 }
@@ -352,7 +373,10 @@ int zRender::DisplayElement::updateTexture()
 			continue;
 		if (textureDataSrc->isTextureUpdated(i, textureCtx.identifyForData))
 		{
-			textureDataSrc->updateTextures(textureCtx.texture, i, textureCtx.identifyForData);
+			int ret = textureDataSrc->updateTextures(textureCtx.textureHelper->getTextureForUpdate(), i, textureCtx.identifyForData);
+			if (ret != DXRENDER_RESULT_OK)
+				continue;
+			textureCtx.textureHelper->getTextureForDraw()->copyResource(textureCtx.textureHelper->getTextureForUpdate());
 		}
 	}
 	return DXRENDER_RESULT_OK;
@@ -407,5 +431,7 @@ int zRender::DisplayElement::draw()
 		log_e(LOG_TAG, errmsg);
 		return -4;
 	}
-	return m_DrawingContext->apply(m_dxRender, this->getTexture(), this->getVertexBuffer(), this->getIndexBuffer(), m_MetaData);
+
+	return m_DrawingContext->apply(m_dxRender, m_applyingTexture.size()<=0 ? nullptr : &m_applyingTexture[0], m_applyingTexture.size(), 
+		this->getVertexBuffer(), this->getIndexBuffer(), m_MetaData);
 }

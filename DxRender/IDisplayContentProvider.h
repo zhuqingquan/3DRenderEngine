@@ -17,7 +17,7 @@ namespace zRender
 {
 	class SharedTexture;
 	class IRawFrameTexture;
-	class TextureResource;
+	class ITextureResource;
 
 	/**
 	 *	@name		TextureDataSource
@@ -101,7 +101,7 @@ namespace zRender
 		 *	@param[in]  int index 需要更新的Texture数据的下标Index
 		 *	@param[out] unsigned int& newIdentify 成功更新后保存新的数据版本标识值，如果未更新则不更改
 		 **/
-		virtual int updateTextures(TextureResource* textureArray, int index, unsigned int& newIdentify) = 0;
+		virtual int updateTextures(ITextureResource* textureArray, int index, unsigned int& newIdentify) = 0;
 
 		/**
 		 *	@name		isTextureUpdated

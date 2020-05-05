@@ -183,5 +183,9 @@ void zRender::SharedTextureSource::cacheData(const RECT_f & textureReg, unsigned
 	m_cache_height = height;
 	m_cache_pitch = pitch;
 	m_cache_textureReg = textureReg;
+	m_srcDesc.buffers[0] = (char*)dstTextureData;
+	m_srcDesc.pitchs[0] = pitch;
+	m_srcDesc.width = width;
+	m_srcDesc.height = height;
 	m_isUpdatedIdentify++;
 }

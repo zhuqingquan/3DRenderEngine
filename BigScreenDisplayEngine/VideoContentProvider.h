@@ -201,7 +201,7 @@ namespace Render
 		 *	@param[in]  int index 需要更新的Texture数据的下标Index
 		 *	@param[out] unsigned int& newIdentify 成功更新后保存新的数据版本标识值，如果未更新则不更改
 		 **/
-		virtual int updateTextures(zRender::TextureResource* textureArray, int index, unsigned int& newIdentify)
+		virtual int updateTextures(zRender::ITextureResource* textureArray, int index, unsigned int& newIdentify)
 		{
 			if (index < 0 || index>=getTextureCount() || textureArray == nullptr)
 				return DXRENDER_RESULT_PARAM_INVALID;

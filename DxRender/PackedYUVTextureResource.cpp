@@ -142,7 +142,14 @@ int zRender::PackedYUVTextureResource::getResourceView(ID3D11ShaderResourceView*
 
 int zRender::PackedYUVTextureResource::copyResource(const ITextureResource* res)
 {
-	return DXRENDER_RESULT_NOT_IMPLETE;
+	const PackedYUVTextureResource* srcRes = dynamic_cast<const PackedYUVTextureResource*>(res);
+	if (srcRes == nullptr)
+		return DXRENDER_RESULT_PARAM_INVALID;
+	//Pixel Format不同时拷贝不支持
+	if (res->getSrcPixelFormat() != this->getSrcPixelFormat())
+		return DXRENDER_RESULT_OPT_NOT_SUPPORT;
+	int ret = this->m_textureRes->copyResource(srcRes->m_textureRes);
+	return ret;
 }
 
 ITextureResource* zRender::PackedYUVTextureResource::copy()
