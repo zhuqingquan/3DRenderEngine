@@ -21,9 +21,6 @@
     <ClCompile Include="AdapterOutputHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ARGBTexture_8.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="d3dAdapterOutputEnumerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -63,19 +60,7 @@
     <ClCompile Include="VideoContentProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="YUVTexture_NV12.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="YUVTexture_Packed.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="YUVTexture_Planar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\TextureResource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RawFrameTextureBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\SharedTextureSource.cpp">
@@ -125,9 +110,6 @@
     <ClInclude Include="AdapterOutputHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ARGBTexture_8.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BackgroundDisplayComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -164,9 +146,6 @@
     <ClInclude Include="IDisplayContentProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IRawFrameTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LightHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -182,19 +161,7 @@
     <ClInclude Include="VideoContentProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="YUVTexture_NV12.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="YUVTexture_Packed.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="YUVTexture_Planar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="inc\TextureResource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\RawFrameTextureBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\SharedTextureSource.h">

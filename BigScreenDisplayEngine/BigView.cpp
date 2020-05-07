@@ -2,7 +2,6 @@
 #include "BigViewportPartition.h"
 #include <fstream>
 #include <assert.h>
-#include "YUVTexture_Packed.h"
 #include "VideoTextureDataSource.h"
 
 using namespace SOA::Mirror::Render;

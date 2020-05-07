@@ -134,35 +134,6 @@ namespace zRender
 		void releaseTextureResource(TextureResource** ppOutTexRes);
 
 		/**
-		 *	@name		createTexture
-		 *	@brief		创建Texture对象
-		 *				Texture对象可能是一张完整的图片或者图片的一部分，Texture会申请ID3D11Texture2D资源
-		 *				DxRender对象正确初始化之后才能调用创建接口创建各种资源对象
-		 *	@param[in]	YUVFormat_Packed pixFmt Texture中的像素格式
-		 *	@param[in]	int width Texture的像素宽
-		 *	@param[in]	int height Texture的像素高
-		 *	@param[in]	unsigned char* initData 初始化Texture的数据，默认为NULL
-		 *	@param[in]	int initDataLen 初始化Texture的数据的长度，默认为0
-		 *	@param[in]	bool isShared 标示创建的Texture是否可在多个ID3D11Device对象中共享
-		 *	@return		YUVTexture_Packed* Texture对象的指针，失败为NULL，当参数不合法或者显卡资源不足时将导致失败
-		 */
-		IRawFrameTexture* createTexture(PIXFormat pixFmt, int width, int height, 
-							unsigned char* initData = NULL, int initDataLen = 0, bool isShared = false);
-
-		IRawFrameTexture* createTexture(PIXFormat pixfmt, int width, int height, TEXTURE_USAGE usage, bool bShared, unsigned char* initData, int dataLen, int pitch);
-
-		IRawFrameTexture* openSharedTexture(IRawFrameTexture* sharedTexture);
-
-		/**
-		 *	@name		releaseTexture
-		 *	@brief		释放Texture对象
-		 *				释放Texture对象中的资源，并删除对象。对象释放将不能再用于显示，否则导致程序出错
-		 *	@param[in]	YUVTexture_Packed** texture 指向Texture对象指针的指针，Texture对象释放成功的则该指针被置NULL
-		 *	@return		int 0--成功   <0--失败
-		 **/
-		int releaseTexture(IRawFrameTexture** texture);
-
-		/**
 		 *	@name		createVertexBuffer
 		 *	@brief		创建顶点信息的ID3D11Buffer资源，该资源在显卡内申请显存
 		 *				创建的资源为D3D11_USAGE_IMMUTABLE类型的，不可修改

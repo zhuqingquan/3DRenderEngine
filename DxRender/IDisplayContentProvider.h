@@ -119,7 +119,6 @@ namespace zRender
 		 **/
 		virtual SharedTexture* getSharedTexture(RECT& effectReg, int& identify) = 0;
 
-		virtual IRawFrameTexture* getTexture() = 0;
 
 		/**
 		 *	@name		copyDataToTexture

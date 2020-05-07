@@ -99,7 +99,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AdapterOutputHelper.cpp" />
-    <ClCompile Include="ARGBTexture_8.cpp" />
     <ClCompile Include="BackbufferRT.cpp" />
     <ClCompile Include="d3d11StateHelper.cpp" />
     <ClCompile Include="D3D11TextureRender.cpp" />
@@ -121,7 +120,6 @@
     <ClCompile Include="RectangleDataCtxInitializer.cpp" />
     <ClCompile Include="rendertextureclass.cpp" />
     <ClCompile Include="src\ElemDsplModel.cpp" />
-    <ClCompile Include="src\RawFrameTextureBase.cpp" />
     <ClCompile Include="src\SharedTextureSource.cpp" />
     <ClCompile Include="src\TextureResource.cpp" />
     <ClCompile Include="stdafx.cpp" />
@@ -129,13 +127,9 @@
     <ClCompile Include="TextureResourceFactory.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="VideoContentProvider.cpp" />
-    <ClCompile Include="YUVTexture_NV12.cpp" />
-    <ClCompile Include="YUVTexture_Packed.cpp" />
-    <ClCompile Include="YUVTexture_Planar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdapterOutputHelper.h" />
-    <ClInclude Include="ARGBTexture_8.h" />
     <ClInclude Include="BackbufferRT.h" />
     <ClInclude Include="BackgroundDisplayComponent.h" />
     <ClInclude Include="ConstDefine.h" />
@@ -159,11 +153,9 @@
     <ClInclude Include="ElementMetaData.h" />
     <ClInclude Include="IDisplayContentProvider.h" />
     <ClInclude Include="inc\ITextureResource.h" />
-    <ClInclude Include="inc\RawFrameTextureBase.h" />
     <ClInclude Include="inc\SharedTextureSource.h" />
     <ClInclude Include="inc\TextureResource.h" />
     <ClInclude Include="InputLayout.h" />
-    <ClInclude Include="IRawFrameTexture.h" />
     <ClInclude Include="LightHelper.h" />
     <ClInclude Include="PackedYUVTextureResource.h" />
     <ClInclude Include="RectangleDataCtxInitializer.h" />
@@ -174,9 +166,6 @@
     <ClInclude Include="TextureResourceFactory.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VideoContentProvider.h" />
-    <ClInclude Include="YUVTexture_NV12.h" />
-    <ClInclude Include="YUVTexture_Packed.h" />
-    <ClInclude Include="YUVTexture_Planar.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\DefaultVideo.fx">

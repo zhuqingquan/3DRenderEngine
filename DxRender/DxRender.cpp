@@ -62,27 +62,6 @@ int DxRender::releaseDisplayElement(DisplayElement** displayElement)
 	return m_renderImp->releaseDisplayElement(displayElement);
 }
 
-IRawFrameTexture * DxRender::createTexture(PIXFormat pixfmt, int width, int height, TEXTURE_USAGE usage, bool bShared, unsigned char * initData, int dataLen, int pitch)
-{
-	return m_renderImp->createTexture(pixfmt, width, height, usage, bShared, initData, dataLen, pitch);
-}
-
-zRender::IRawFrameTexture* zRender::DxRender::createTexture(PIXFormat pixFmt, int width, int height, 
-	unsigned char* initData /*= NULL*/, int initDataLen /*= 0*/, bool isShared /*= false*/)
-{
-	return m_renderImp->createTexture(pixFmt, width, height, initData, initDataLen, isShared);
-}
-
-IRawFrameTexture * zRender::DxRender::openSharedTexture(IRawFrameTexture * sharedTexture)
-{
-	return m_renderImp->openSharedTexture(sharedTexture);
-}
-
-void DxRender::releaseTexture(IRawFrameTexture ** rawFrameTexture)
-{
-	m_renderImp->releaseTexture(rawFrameTexture);
-}
-
 int DxRender::draw(DisplayElement* displayElem)
 {
 	return m_renderImp->draw(displayElem);
@@ -153,8 +132,7 @@ int DxRender::setupBackground(IDisplayContentProvider* contentProvider, const RE
 		}
 		de->setTextureDataSource(texDataSrc, texEffectReg);
 		de->createRenderResource();
-		int texUpdateIdt = 0;
-		de->updateTexture(texUpdateIdt);
+		de->updateTexture();
 	}
 
 	BackgroundComponent* bgCom = new BackgroundComponent(contentProvider, de);

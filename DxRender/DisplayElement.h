@@ -15,7 +15,6 @@
 
 #include "IDisplayContentProvider.h"
 #include "Vertex.h"
-#include "IRawFrameTexture.h"
 #include "DxRenderCommon.h"
 #include "Effects.h"
 #include "ElemDsplModel.h"
@@ -78,18 +77,6 @@ namespace zRender
 		float getZIndex() const;
 
 		/**
-		 *	@name		setTexture
-		 *	@brief		重新设置Texture的相关参数信息
-		 *				在此不会创建释放资源，在createRenderResource会检查释放需要释放并重新创建Texture资源
-		 *	@param[in]	YUVFormat_Packed pixfmt	Texture像素格式，像素格式改变不一定会导致资源重新创建，如YUYV->UYVY
-		 *	@param[in]	int width	Texture的宽，width值的改变将导致资源重新创建，值域为>0
-		 *	@param[in]	int height	Texture的高，height值的改变将导致资源重新创建，值域为>0
-		 *	@param[in]	TextureDataSource* dataSrc 数据来源，来源的改变不会导致资源重新创建
-		 *	@return		int 0--成功 <0--失败	该参数不合法时失败
-		 **/
-		//int setTexture(PIXFormat pixfmt, int width, int height);
-
-		/**
 		 *	@name		setTextureDataSource
 		 *	@brief		重新设置Texture的纹理数据提供对象
 		 *				在draw时如果该对象已设置，则从该对象中拷贝纹理数据到D3D11的Texture显存中
@@ -119,20 +106,16 @@ namespace zRender
 		int releaseRenderResource();
 
 		DxRender* getParentDxRender() const { return m_dxRender; }
-		IRawFrameTexture* getTexture() const { return m_texture; }
 		ID3D11Buffer* getVertexBuffer() const { return m_VertexBuf; }
 		ID3D11Buffer* getIndexBuffer() const { return m_IndexBuf; }
 
 		/**
 		 *	@name		updateTexture
-		 *	@brief		更新Texture的内容
+		 *	@brief		将TextureDataSource中的数据更新到Texture内，需要先调用setTextureDataSource。
 		 *				必须在调用了createRenderResource成功后调用该接口才有意义，如果未设置Texture，该接口什么都不做
 		 *				该接口从TextureDataSource对象中将内存拷贝到Texture的显存中，如果TextureDataSource内容未更新，则不做任何拷贝
-		 *	@param[in,out]	int& identify	当前已经绘制的Texture的标识符，如果Texture的内容更新成功，则该参数将被修改
 		 *	@return		int 0--成功  <0--失败
 		 **/
-		int updateTexture(int& identify);
-
 		int updateTexture();
 
 		/**
@@ -158,8 +141,6 @@ namespace zRender
 		bool isEnableTransparent() const;
 
 		int draw();
-		//////////////////////////支持打开共享显存用于显示///////////////////////////////
-		int openSharedTexture(IRawFrameTexture* sharedTexture);
 
 		ElementMetaData* getMetaData() const { return m_MetaData; }
 	private:
@@ -174,6 +155,7 @@ namespace zRender
 		int releaseVertexBuffer();
 		int createIndexBuffer();
 		int releaseIndexBuffer();
+		void setupApplyingTextureList();
 
 		DxRender* m_dxRender;
 		ID3D11Device*	m_device;
@@ -208,7 +190,6 @@ namespace zRender
 			unsigned int identifyForFormat;
 		};
 
-		IRawFrameTexture*	m_texture;//std::shared_ptr<YUVTexture_Packed*>
 		std::vector<ITextureResource*> m_applyingTexture;
 		std::vector<TextureResContext> m_textureRes;
 		ID3D11Buffer*		m_VertexBuf;//std::shared_ptr<ID3D11Buffer*>

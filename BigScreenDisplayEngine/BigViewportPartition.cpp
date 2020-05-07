@@ -125,21 +125,24 @@ void BigViewportPartition::updateTexture()
 		return;
 	if(tds->isUpdated(m_curDrawedTextureIdentify))
 	{
-		int ret = -1;
-		int dataLen = 0;
-		int pitch = 0;
-		int uPitch = 0;
-		int vPitch = 0;
-		int width = 0;
-		int height = 0;
+		//int ret = -1;
+		//int dataLen = 0;
+		//int pitch = 0;
+		//int uPitch = 0;
+		//int vPitch = 0;
+		//int width = 0;
+		//int height = 0;
 		PIXFormat pixelFmt = PIXFMT_UNKNOW;
-		ret = tds->getTextureProfile(m_regOfBigViewport, dataLen, pitch, uPitch, vPitch, width, height, pixelFmt);
-		if(ret!=0 || dataLen==0 || pixelFmt==0 || width==0 || height==0)
-			return;
+		//ret = tds->getTextureProfile(m_regOfBigViewport, dataLen, pitch, uPitch, vPitch, width, height, pixelFmt);
+		//if(ret!=0 || dataLen==0 || pixelFmt==0 || width==0 || height==0)
+		//	return;
 		//m_attachedDE->setTexture(pixelFmt, width, height);
-		zRender::TextureDataSource* texDataSrc = m_cttProvider->getTextureDataSource();
-		zRender::IRawFrameTexture* rawTexture = texDataSrc->getTexture();
-		m_attachedDE->openSharedTexture(rawTexture);
+		//zRender::TextureDataSource* texDataSrc = m_cttProvider->getTextureDataSource();
+		//zRender::IRawFrameTexture* rawTexture = texDataSrc->getTexture();
+		//m_attachedDE->openSharedTexture(rawTexture);
+		TextureSourceDesc desc;
+		tds->getTextureSourceDesc(0, &desc);
+		pixelFmt = desc.pixelFmt;
 		if (pixelFmt == PIXFMT_A8R8G8B8 || PIXFMT_R8G8B8A8 == pixelFmt || PIXFMT_B8G8R8A8 == pixelFmt)
 		{
 			m_attachedDE->enableTransparent(true);

@@ -31,8 +31,6 @@ namespace zRender
 		const Material& getMaterial() const;
 		void setMaterial(const Material& material);
 
-		int apply(DxRender* render, IRawFrameTexture* texture, ID3D11Buffer* vtBuf, ID3D11Buffer* indexBuffer, ElementMetaData* metadata);
-
 		int apply(DxRender* render, ITextureResource* textures[], int textureCount,
 			ID3D11Buffer* vtBuf, ID3D11Buffer* indexBuffer, ElementMetaData* metadata);
 

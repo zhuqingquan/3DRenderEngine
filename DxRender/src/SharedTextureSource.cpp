@@ -1,12 +1,11 @@
 #include "inc/SharedTextureSource.h"
 #include "DxRender.h"
-#include "IRawFrameTexture.h"
 
 using namespace zRender;
 
 SharedTextureSource::SharedTextureSource(DxRender * render)
 	: m_dxrender(render)
-	, m_texShared(NULL), m_texStaging(NULL)
+//	, m_texShared(NULL), m_texStaging(NULL)
 	, m_isUpdatedIdentify(0)
 	, m_cacheData(NULL)
 {
@@ -23,7 +22,7 @@ bool SharedTextureSource::isUpdated(int identify) const
 
 int SharedTextureSource::getTextureProfile(const RECT_f & textureReg, int & dataLen, int & yPitch, int & uPitch, int & vPitch, int & width, int & height, PIXFormat & pixelFmt)
 {
-	if (NULL == m_texStaging)
+/*	if (NULL == m_texStaging)
 		return -1;
 	int w_full = m_texStaging->getWidth();
 	int h_full = m_texStaging->getHeight();
@@ -72,7 +71,7 @@ int SharedTextureSource::getTextureProfile(const RECT_f & textureReg, int & data
 	case PIXFMT_UNKNOW:
 	default:
 		return -3;
-	}
+	}*/
 	return 0;
 }
 
@@ -80,7 +79,7 @@ int SharedTextureSource::getTextureProfile(const RECT_f & textureReg, int & data
 unsigned char * SharedTextureSource::getData(int & dataLen, int & yPitch, int & uPitch, int & vPitch, int & width, int & height, PIXFormat & pixelFmt, RECT & effectReg, int & identify)
 {
 	if (m_cacheData == NULL)
-		return NULL;
+		return NULL;/*
 	dataLen = m_cache_pitch * m_cache_height;
 	yPitch = m_cache_pitch;
 	uPitch = 0;
@@ -91,7 +90,7 @@ unsigned char * SharedTextureSource::getData(int & dataLen, int & yPitch, int & 
 	effectReg.left = 0;
 	effectReg.top = 0;
 	effectReg.right = width;
-	effectReg.bottom = height;
+	effectReg.bottom = height;*/
 	return m_cacheData;
 }
 
@@ -108,14 +107,9 @@ SharedTexture * SharedTextureSource::getSharedTexture(RECT & effectReg, int & id
 	return NULL;
 }
 
-IRawFrameTexture * SharedTextureSource::getTexture()
-{
-	return m_texShared;
-}
-
 int SharedTextureSource::copyDataToTexture(const RECT_f & textureReg, unsigned char * dstTextureData, int pitch, int height, int & identify)
 {
-	if (NULL == m_texStaging)
+	/*if (NULL == m_texStaging)
 	{
 		return -1;
 	}
@@ -135,12 +129,12 @@ int SharedTextureSource::copyDataToTexture(const RECT_f & textureReg, unsigned c
 		return -3;
 	}
 	m_isUpdatedIdentify++;
-	identify = m_isUpdatedIdentify;
+	identify = m_isUpdatedIdentify;*/
 	return 0;
 }
 
 int SharedTextureSource::createTexture(PIXFormat pixfmt, int w, int h)
-{
+{/*
 	if (m_dxrender == NULL)	return -1;
 	IRawFrameTexture* sharedTex = m_dxrender->createTexture(pixfmt, w, h, TEXTURE_USAGE_DEFAULT, true, NULL, 0, 0);
 	if (NULL == sharedTex)
@@ -154,7 +148,7 @@ int SharedTextureSource::createTexture(PIXFormat pixfmt, int w, int h)
 		return -3;
 	}
 	m_texStaging = stagingTex;
-
+*/
 	m_srcDesc.width = w;
 	m_srcDesc.height = h;
 	m_srcDesc.pixelFmt = pixfmt;
@@ -163,7 +157,7 @@ int SharedTextureSource::createTexture(PIXFormat pixfmt, int w, int h)
 }
 
 void SharedTextureSource::releaseTexture()
-{
+{/*
 	if (NULL == m_dxrender)
 		return;
 	if (m_texStaging)
@@ -173,7 +167,7 @@ void SharedTextureSource::releaseTexture()
 	if (m_texShared)
 	{
 		m_dxrender->releaseTexture(&m_texShared);
-	}
+	}*/
 }
 
 void zRender::SharedTextureSource::cacheData(const RECT_f & textureReg, unsigned char * dstTextureData, int pitch, int width, int height)

@@ -26,7 +26,6 @@ namespace zRender
 		~SharedTextureSource();
 		virtual bool isUpdated(int identify) const;
 		virtual int getTextureProfile(const RECT_f& textureReg, int& dataLen, int& yPitch, int& uPitch, int& vPitch, int& width, int& height, PIXFormat& pixelFmt);
-		virtual IRawFrameTexture* getTexture();
 		virtual int copyDataToTexture(const RECT_f& textureReg, unsigned char* dstTextureData, int pitch, int height, int& identify);
 
 		int createTexture(PIXFormat pixfmt, int w, int h);
@@ -81,8 +80,6 @@ namespace zRender
 		virtual SharedTexture* getSharedTexture(RECT& effectReg, int& identify);
 		virtual unsigned char* getData(int& dataLen, int& yPitch, int& uPitch, int& vPitch, int& width, int& height, PIXFormat& pixelFmt, RECT& effectReg, int& identify);
 	private:
-		IRawFrameTexture* m_texStaging;
-		IRawFrameTexture* m_texShared;
 		DxRender* m_dxrender;
 
 		int m_isUpdatedIdentify;

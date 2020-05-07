@@ -126,27 +126,6 @@ namespace zRender
 		 *	@return		int 0--成功   <0--失败
 		 */
 		int releaseDisplayElement(DisplayElement** displayElement);
-		/**
-		 *	@name		createTexture
-		 *	@brief		创建Texture对象
-		 *				Texture对象可能是一张完整的图片或者图片的一部分，Texture会申请ID3D11Texture2D资源
-		 *				DxRender对象正确初始化之后才能调用创建接口创建各种资源对象
-		 *	@param[in]	YUVFormat_Packed pixFmt Texture中的像素格式
-		 *	@param[in]	int width Texture的像素宽
-		 *	@param[in]	int height Texture的像素高
-		 *	@param[in]	unsigned char* initData 初始化Texture的数据，默认为NULL
-		 *	@param[in]	int initDataLen 初始化Texture的数据的长度，默认为0
-		 *	@param[in]	bool isShared 标示创建的Texture是否可在多个ID3D11Device对象中共享
-		 *	@return		YUVTexture_Packed* Texture对象的指针，失败为NULL，当参数不合法或者显卡资源不足时将导致失败
-		 */
-		IRawFrameTexture* createTexture(PIXFormat pixFmt, int width, int height,
-			unsigned char* initData = NULL, int initDataLen = 0, bool isShared = false);
-
-		IRawFrameTexture * createTexture(PIXFormat pixfmt, int width, int height, TEXTURE_USAGE usage, bool bShared, unsigned char * initData, int dataLen, int pitch);
-
-		IRawFrameTexture* openSharedTexture(IRawFrameTexture* sharedTexture);
-
-		void releaseTexture(IRawFrameTexture** rawFrameTexture);
 
 		int createTextureResource(TextureResource** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char* initData = NULL, int dataLen = 0, int pitch = 0);
 		
