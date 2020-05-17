@@ -16,23 +16,21 @@ namespace zRender
 	class ElementDrawingContext
 	{
 	public:
-		ElementDrawingContext(int width, int height);
+//		const XMFLOAT4X4& getWorldTransformMatrix() const { return m_WorldTransformMat; }
+//		void setWorldTransformMatrix(const XMFLOAT4X4& worldMat);
+//
+//// 		const XMFLOAT4X4& getViewTransformMatrix() const { return m_viewTransform; }
+//// 		void setViewTransformMatrix(const XMFLOAT4X4& viewMat);
+//
+////		const XMFLOAT4X4& getProjectionTransformMatrix() const { return m_projTransform; }
+////		void setProjectionTransformMatrix(const XMFLOAT4X4& projectionMat);
+//
+//		const Material& getMaterial() const;
+//		void setMaterial(const Material& material);
+		virtual ~ElementDrawingContext() = 0 {}
 
-
-		const XMFLOAT4X4& getWorldTransformMatrix() const { return m_WorldTransformMat; }
-		void setWorldTransformMatrix(const XMFLOAT4X4& worldMat);
-
-// 		const XMFLOAT4X4& getViewTransformMatrix() const { return m_viewTransform; }
-// 		void setViewTransformMatrix(const XMFLOAT4X4& viewMat);
-
-//		const XMFLOAT4X4& getProjectionTransformMatrix() const { return m_projTransform; }
-//		void setProjectionTransformMatrix(const XMFLOAT4X4& projectionMat);
-
-		const Material& getMaterial() const;
-		void setMaterial(const Material& material);
-
-		int apply(DxRender* render, ITextureResource* textures[], int textureCount,
-			ID3D11Buffer* vtBuf, ID3D11Buffer* indexBuffer, ElementMetaData* metadata);
+		virtual int apply(DxRender* render, ITextureResource* textures[], int textureCount,
+			ID3D11Buffer* vtBuf, ID3D11Buffer* indexBuffer, ElementMetaData* metadata) = 0;
 
 
 		/**
@@ -43,7 +41,7 @@ namespace zRender
 		 *	@param[in]	float zIndex 当前显示原始所在顶点的Z坐标偏移
 		 *	@return		int 0--成功 <0--失败	该参数不合法时失败
 		 **/
-		int setDisplayRegion(const RECT_f& displayReg, float zIndex);//处理移动，设置内容的显示位置
+		virtual int setDisplayRegion(const RECT_f& displayReg, float zIndex) = 0;//处理移动，设置内容的显示位置
 
 		/**
 		 *	@name		setZIndex
@@ -52,9 +50,9 @@ namespace zRender
 		 *	@param[in]	float zIndex 当前显示原始所在顶点的Z坐标偏移
 		 *	@return		int 0--成功 <0--失败	该参数不合法时失败
 		**/
-		int setZIndex(float zIndex);
+		virtual int setZIndex(float zIndex) = 0;
 
-		float getZIndex() const;
+		virtual float getZIndex() const = 0;
 
 		/**
 		 *	@name		setDsplModel
@@ -62,33 +60,23 @@ namespace zRender
 		 *	@param[in]	ElemDsplModel<BasicEffect> * dsplModel ElemDsplModel对象
 		 *	@return		void
 		 **/
-		void setDsplModel(ElemDsplModel<BasicEffect>* dsplModel) { m_dsplModel = dsplModel; }
+		virtual void setDsplModel(ElemDsplModel<BasicEffect>* dsplModel) = 0;
 
-		void enableTransparent(bool enable) { m_isEnableTransparent = enable; }
-		bool isEnableTransparent() const { return m_isEnableTransparent; }
+		virtual void enableTransparent(bool enable) = 0;
+		virtual bool isEnableTransparent() const = 0;
 
 		/**
 		 *	@name			setAlpha
 		 *	@brief			设置显示内容透明度，有效范围（1.0f -- 0.0f）
 		 *	@param[in]		float alpha 透明度，1.0f为不透明， 0.0f为全透明
 		 **/
-		void setAlpha(float alpha);
+		virtual void setAlpha(float alpha) = 0;
 		/**
 		 *	@name			getAlpha
 		 *	@brief			获取当前设置的透明度
 		 *	@return			float
 		 **/
-		float getAlpha() const;
-	private:
-
-		XMFLOAT4X4			m_WorldTransformMat;
-		XMFLOAT4X4			m_worldBaseTransform;
-		XMFLOAT4X4			m_viewTransform;
-		XMFLOAT4X4			m_projTransform;
-		ElemDsplModel<BasicEffect>* m_dsplModel;
-		float m_aspectRatio;
-		float				m_alpha;
-		bool				m_isEnableTransparent;
+		virtual float getAlpha() const = 0;
 	};
 
 }

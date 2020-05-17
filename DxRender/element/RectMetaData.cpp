@@ -1,4 +1,5 @@
-#include "ElementMetaData.h"
+#include "RectMetaData.h"
+//#include "ElementMetaData.h"
 #include "Vertex.h"
 #include "Effects.h"
 #include "ConstDefine.h"
@@ -6,20 +7,20 @@
 
 using namespace zRender;
 
-zRender::ElementMetaData::ElementMetaData()
+zRender::RectMetaData::RectMetaData()
 	: m_vertexVector(nullptr)
 	, m_textureDataSource(nullptr)
 	, m_dsplModel(nullptr)
 {
-	
+
 }
 
-zRender::ElementMetaData::~ElementMetaData()
+zRender::RectMetaData::~RectMetaData()
 {
 	deinit();
 }
 
-int zRender::ElementMetaData::init(DxRender* render, const TCHAR* shaderFileName)
+int zRender::RectMetaData::init(DxRender* render, const TCHAR* shaderFileName)
 {
 	m_vertexVector = new VertexVector(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	zRender::Vertex ver[4];
@@ -40,7 +41,7 @@ int zRender::ElementMetaData::init(DxRender* render, const TCHAR* shaderFileName
 	return 0;
 }
 
-void zRender::ElementMetaData::deinit()
+void zRender::RectMetaData::deinit()
 {
 	delete m_dsplModel;
 	m_dsplModel = nullptr;
@@ -49,29 +50,29 @@ void zRender::ElementMetaData::deinit()
 	m_vertexVector = nullptr;
 }
 
-bool zRender::ElementMetaData::isValid() const
+bool zRender::RectMetaData::isValid() const
 {
 	return m_vertexVector != NULL && m_dsplModel != nullptr;
 }
 
-zRender::VertexVector* zRender::ElementMetaData::getVertexData()
+zRender::VertexVector* zRender::RectMetaData::getVertexData()
 {
 	return m_vertexVector;
 }
 
-bool zRender::ElementMetaData::isTextureNeedUpdate(int& identify)
+bool zRender::RectMetaData::isTextureNeedUpdate(int& identify)
 {
-	if(m_textureDataSource==nullptr)
+	if (m_textureDataSource == nullptr)
 		return false;
 	return m_textureDataSource->isUpdated(identify);
 }
 
-int zRender::ElementMetaData::update()
+int zRender::RectMetaData::update()
 {
 	return -1;
 }
 
-int zRender::ElementMetaData::createDisplayModel(DxRender* render, const TCHAR* shaderFileName)
+int zRender::RectMetaData::createDisplayModel(DxRender* render, const TCHAR* shaderFileName)
 {
 	zRender::ElemDsplModel<zRender::BasicEffect>* pDsplModel = NULL;
 	if (0 != zRender::CreateDsplModel<zRender::BasicEffect>(shaderFileName, render, &pDsplModel) || NULL == pDsplModel)

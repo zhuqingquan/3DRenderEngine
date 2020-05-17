@@ -397,55 +397,6 @@ RECT_f DxRender_D3D11::getVisibleRegion() const
 	return m_visibleReg;
 }
 
-// fixme DxRender* dxRender 是不需要的，此处是临时为通过编译而这样的
-DisplayElement* DxRender_D3D11::createDisplayElement(const RECT_f& displayReg, int zIndex, DxRender* dxRender)
-{
-	if(m_device==NULL)
-	{
-		log_e(LOG_TAG, _T("DxRender_D3D11 Object have not be inited yet.\n"));
-		return NULL;
-	}
-
-	if(!displayReg.isIntersect(m_visibleReg))
-	{
-		TCHAR errmsg[1024] = {0};
-		swprintf_s(errmsg, 1024, L"Failed To Create DisplayElement[L-%f, T-%f, R-%f, B-%f], out of DxRender Visible region[L-%f, T-%f, R-%f, B-%f].\n",
-				displayReg.left, displayReg.top, displayReg.right, displayReg.bottom,
-				m_visibleReg.left, m_visibleReg.top, m_visibleReg.right, m_visibleReg.bottom);
-		log_e(LOG_TAG, errmsg);
-		return NULL;
-	}
-
-	DisplayElement* de = new DisplayElement(dxRender, m_device, m_context);
-	assert(de);
-	int ret = de->setDisplayRegion(displayReg, (float)zIndex);
-	assert(0==ret);
-	if(0!=ret)
-	{
-		TCHAR errmsg[512] = {0};
-		swprintf_s(errmsg, 512, L"Failed to setDisplayRegion of display elem.");
-		log_e(LOG_TAG, errmsg);
-	}
-	return de;
-}
-
-int DxRender_D3D11::releaseDisplayElement(DisplayElement** displayElement)
-{
-	if(NULL==displayElement)
-		return -1;
-	if(*displayElement!=NULL)
-	{
-		DisplayElement* pelem = *displayElement;
-		int ret = pelem->releaseRenderResource();
-		if(0!=ret)
-			return ret;
-		//delete *displayElement;
-		delete pelem;
-		*displayElement = NULL;
-	}
-	return 0;
-}
-
 ID3D11Buffer* DxRender_D3D11::createBuffer(int byteCount, const unsigned char* initData, int initDataLen,
 									D3D11_USAGE usage, UINT bindFlag)
 {

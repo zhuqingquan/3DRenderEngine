@@ -43,17 +43,15 @@ namespace zRender
 		/**
 		 *	@name		DisplayElement
 		 *	@brief		构造函数，构造对象，不创建任何资源
-		 *	@param[in]	DxRender_D3D11* dxRender DxRender对象指针
-		 *	@param[in]	ID3D11Device* d3dDevice D3DDevice对象指针
-		 *	@param[in]	ID3D11DeviceContext* contex 与d3dDevice参数对应的设备上下文
+		 *	@param[in]	DxRender* dxRender DxRender对象指针
 		 **/
-		DisplayElement(DxRender* dxRender, ID3D11Device* d3dDevice, ID3D11DeviceContext* contex);
+		DisplayElement(DxRender* dxRender);
 
 		/**
 		 *	@name		~DisplayElement
 		 *	@brief		析构函数，对象中管理的相关资源将被释放
 		 **/
-		~DisplayElement();
+		virtual ~DisplayElement() = 0;
 
 		/**
 		 *	@name		setDisplayRegion
@@ -63,7 +61,7 @@ namespace zRender
 		 *	@param[in]	float zIndex 当前显示原始所在顶点的Z坐标偏移
 		 *	@return		int 0--成功 <0--失败	该参数不合法时失败
 		 **/
-		int setDisplayRegion(const RECT_f& displayReg, float zIndex);//处理移动，设置内容的显示位置
+		int move(const RECT_f& displayReg, float zIndex);//处理移动，设置内容的显示位置
 
 		/**
 		 *	@name		setDisplayZIndex
@@ -82,10 +80,9 @@ namespace zRender
 		 *				在draw时如果该对象已设置，则从该对象中拷贝纹理数据到D3D11的Texture显存中
 		 *	@param[in]	TextureDataSource* dataSrc 数据来源，来源的改变不会导致资源重新创建
 		 *				dataSrc为NULL时，则清楚Texture的数据源，Texture不会更新，此时参数textureReg无意义，不检查，不保存
-		 *	@param[in]	const RECT_f& textureReg dataSrc中的区域，该DisplayElement对象只显示该区域中的数据。相对坐标。取值范围[0~1]
 		 *	@return		int 0--成功 <0--失败	该参数不合法时失败
 		 **/
-		int setTextureDataSource(TextureDataSource* dataSrc, const RECT_f& textureReg);
+		int setTextureDataSource(TextureDataSource* dataSrc);
 
 		/**
 		 *	@name		createRenderResource
@@ -103,7 +100,7 @@ namespace zRender
 		 *	@brief		释放已经创建的资源
 		 *	@return		int	 0--成功  <0--失败
 		 **/
-		int releaseRenderResource();
+		void releaseRenderResource();
 
 		DxRender* getParentDxRender() const { return m_dxRender; }
 		ID3D11Buffer* getVertexBuffer() const { return m_VertexBuf; }
@@ -123,7 +120,7 @@ namespace zRender
 		 *	@brief		判断该显示对象是否提供了正确显示所需的资源与信息
 		 *	@return		bool true--可以显示  false--不可显示
 		 **/
-		bool isValid() const;
+		virtual bool isValid() const;
 
 		/**
 		 *	@name			setAlpha
@@ -143,6 +140,34 @@ namespace zRender
 		int draw();
 
 		ElementMetaData* getMetaData() const { return m_MetaData; }
+
+	protected:
+
+		/**
+		 *	@name		init
+		 *	@brief		初始化，完成MetaData、DrawingContext的初始化
+						构造函数中将直接调用这个方法进行环境初始化
+		 *	@return		int 0--成功  其他--失败
+		 **/
+		virtual int init(DxRender* dxRender) = 0;
+
+		/**
+		 *	@name		deinit
+		 *	@brief		释放init调用中创建的资源
+		 *	@return		int 0--成功  其他--失败
+		 **/
+		virtual void deinit() = 0;
+
+		RectangleDataCtxInitializer* m_DataCtxInitializer;
+		ElementDrawingContext* m_DrawingContext;
+		ElementMetaData* m_MetaData;
+
+		DxRender* m_dxRender;
+		ID3D11Device* m_device;
+		ID3D11DeviceContext* m_context;
+
+		bool m_isVertexInfoUpdated;
+		bool m_isTextureUpdated;
 	private:
 		DisplayElement(const DisplayElement& rObj);
 		DisplayElement& operator=(const DisplayElement& robj);
@@ -156,18 +181,6 @@ namespace zRender
 		int createIndexBuffer();
 		int releaseIndexBuffer();
 		void setupApplyingTextureList();
-
-		DxRender* m_dxRender;
-		ID3D11Device*	m_device;
-		ID3D11DeviceContext* m_context;
-
-		bool m_isVertexInfoUpdated;
-		PIXFormat m_TexFmt;
-		int	m_TexWidth;
-		int m_TexHeight;
-		TextureDataSource* m_TexDataSrc;
-		RECT_f	m_TexEffectiveReg;
-		bool m_isTextureUpdated;
 
 		struct TextureResContext
 		{
@@ -192,12 +205,8 @@ namespace zRender
 
 		std::vector<ITextureResource*> m_applyingTexture;
 		std::vector<TextureResContext> m_textureRes;
-		ID3D11Buffer*		m_VertexBuf;//std::shared_ptr<ID3D11Buffer*>
-		ID3D11Buffer*		m_IndexBuf;//std::shared_ptr<ID3D11Buffer*>
-
-		RectangleDataCtxInitializer* m_DataCtxInitializer;
-		ElementDrawingContext* m_DrawingContext;
-		ElementMetaData* m_MetaData;
+		ID3D11Buffer*		m_VertexBuf;
+		ID3D11Buffer*		m_IndexBuf;
 	};
 }
 #pragma warning(pop)

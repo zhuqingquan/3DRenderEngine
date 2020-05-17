@@ -16,6 +16,9 @@
     <Filter Include="FX">
       <UniqueIdentifier>{b16c4245-1a8f-4530-b5c8-393d4b43a78c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="element">
+      <UniqueIdentifier>{032d4c6d-d8e9-40ac-be5e-9996415b3a74}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AdapterOutputHelper.cpp">
@@ -87,15 +90,6 @@
     <ClCompile Include="BackbufferRT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RectangleDataCtxInitializer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ElementMetaData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ElementDrawingContext.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TextureResourceFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -104,6 +98,18 @@
     </ClCompile>
     <ClCompile Include="TextureFasterCopyHelper.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="element\RectangleDataCtxInitializer.cpp">
+      <Filter>element</Filter>
+    </ClCompile>
+    <ClCompile Include="element\RectDrawingContext.cpp">
+      <Filter>element</Filter>
+    </ClCompile>
+    <ClCompile Include="element\RectMetaData.cpp">
+      <Filter>element</Filter>
+    </ClCompile>
+    <ClCompile Include="element\zRect.cpp">
+      <Filter>element</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -203,9 +209,6 @@
     <ClInclude Include="ElementDataCtxInitializer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RectangleDataCtxInitializer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TextureResourceFactory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -217,6 +220,18 @@
     </ClInclude>
     <ClInclude Include="inc\ITextureResource.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="element\RectangleDataCtxInitializer.h">
+      <Filter>element</Filter>
+    </ClInclude>
+    <ClInclude Include="element\RectDrawingContext.h">
+      <Filter>element</Filter>
+    </ClInclude>
+    <ClInclude Include="element\RectMetaData.h">
+      <Filter>element</Filter>
+    </ClInclude>
+    <ClInclude Include="element\zRect.h">
+      <Filter>element</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

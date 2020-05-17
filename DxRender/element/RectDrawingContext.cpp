@@ -1,16 +1,16 @@
-#include "ElementDrawingContext.h"
-#include "DXLogger.h"
-#include "ConstDefine.h"
+#include "RectDrawingContext.h"
+#include <DXLogger.h>
+#include <ConstDefine.h>
+#include "inc/TextureResource.h"
 #include "Vertex.h"
 #include "ElementMetaData.h"
 #include "DxRenderCommon.h"
-#include "inc/TextureResource.h"
 
 using namespace zRender;
 
 #define LOG_TAG _T("ElementDrawingContext")
 
-int ElementDrawingContext::setDisplayRegion(const RECT_f& displayReg, float zIndex)
+int RectDrawingContext::setDisplayRegion(const RECT_f& displayReg, float zIndex)
 {
 	// 此处假设MetaData中提供的矩形区域是正方形
 	// 而如果用户需要将这个区域显示在特定位置或者特定形状，则需要使用此变化矩阵对正方形顶点进行转换
@@ -41,7 +41,7 @@ int ElementDrawingContext::setDisplayRegion(const RECT_f& displayReg, float zInd
 	return 0;
 }
 
-zRender::ElementDrawingContext::ElementDrawingContext(int width, int height)
+zRender::RectDrawingContext::RectDrawingContext(int width, int height)
 	: m_aspectRatio(1.0)
 	, m_isEnableTransparent(false), m_alpha(1.0f)
 {
@@ -56,7 +56,7 @@ zRender::ElementDrawingContext::ElementDrawingContext(int width, int height)
 	m_aspectRatio = aspectRatio;
 }
 
-int zRender::ElementDrawingContext::apply(DxRender* render, ITextureResource* textures[], int textureCount, ID3D11Buffer* vtBuf, ID3D11Buffer* indexBuffer, ElementMetaData* metadata)
+int zRender::RectDrawingContext::apply(DxRender* render, ITextureResource* textures[], int textureCount, ID3D11Buffer* vtBuf, ID3D11Buffer* indexBuffer, ElementMetaData* metadata)
 {
 	if (nullptr == m_dsplModel)
 	{
@@ -196,7 +196,7 @@ int zRender::ElementDrawingContext::apply(DxRender* render, ITextureResource* te
 	}
 }
 
-void zRender::ElementDrawingContext::setAlpha(float alpha)
+void zRender::RectDrawingContext::setAlpha(float alpha)
 {
 	m_alpha = alpha;
 	if (m_alpha != 1.0f)
@@ -208,11 +208,11 @@ void zRender::ElementDrawingContext::setAlpha(float alpha)
 	}
 }
 
-float zRender::ElementDrawingContext::getAlpha() const
+float zRender::RectDrawingContext::getAlpha() const
 {
 	return m_alpha;
 }
-int ElementDrawingContext::setZIndex(float zIndex)
+int RectDrawingContext::setZIndex(float zIndex)
 {
 	float fZIndex = zIndex > RANGE_OF_ZINDEX_MAX ? RANGE_OF_ZINDEX_MAX : zIndex;
 	fZIndex = zIndex < RANGE_OF_ZINDEX_MIN ? RANGE_OF_ZINDEX_MIN : zIndex;
@@ -220,7 +220,7 @@ int ElementDrawingContext::setZIndex(float zIndex)
 	return 0;
 }
 
-float zRender::ElementDrawingContext::getZIndex() const
+float zRender::RectDrawingContext::getZIndex() const
 {
 	return m_WorldTransformMat._43;
 }

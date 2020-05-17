@@ -107,26 +107,6 @@ namespace zRender
 		 */
 		void deinit();
 
-		/**
-		 *	@name		createDisplayElement
-		 *	@brief		创建DisplayElement对象，代表一个显示的内容
-		 *				创建时，与DisplayElement对应的资源还未创建，资源在调用DisplayElement的接口时创建
-		 *				DxRender对象正确初始化之后才能调用创建接口创建各种资源对象
-		 *	@param[in]	const RECT_f& displayReg 该显示的内容在坐标系中的位置
-		 *	@param[in]	int zIndex 当前显示原始所在顶点的Z坐标偏移
-		 *	@return		DisplayElement* 对象指针，失败时为NULL，但参数displayReg表示的位置不在本Render的可视区域内时创建失败
-		 */
-		DisplayElement* createDisplayElement(const RECT_f& displayReg, int zIndex, DxRender* dxRender);
-		
-		/**
-		 *	@name		releaseDisplayElement
-		 *	@brief		释放DisplayElement对象
-		 *				释放DisplayElement对象中的资源，并删除对象
-		 *	@param[in]	DisplayElement** displayElement 指向DisplayElement对象指针的指针，DisplayElement对象释放成功的则该指针被置NULL
-		 *	@return		int 0--成功   <0--失败
-		 */
-		int releaseDisplayElement(DisplayElement** displayElement);
-
 		int createTextureResource(TextureResource** ppOutTexRes, int width, int height, DXGI_FORMAT dxgiFmt, TEXTURE_USAGE usage, bool bShared, const char* initData= NULL, int dataLen = 0, int pitch = 0);
 		int createTextureResource(const TextureSourceDesc& srcDesc, TextureResource** ppOutTexRes);
 

@@ -6,6 +6,7 @@
 #include <tchar.h>
 #include "inc/TextureResource.h"
 #include "ElemDsplModel.h"
+#include "element/zRect.h"
 
 using namespace SOA::Mirror::Render;
 using namespace zRender;
@@ -93,7 +94,8 @@ int RenderDrawing::addBigViewportPartition(BigViewportPartition* viewportPartiti
 		return -3;
 	if(0!=viewportPartition->attachDisplayElement(de))
 	{
-		m_render->releaseDisplayElement(&de);
+		//m_render->releaseDisplayElement(&de);
+		ZRect::release((ZRect**)&de);
 		return -4;
 	}
 	addViewportPartition(viewportPartition);
@@ -105,7 +107,12 @@ zRender::DisplayElement* RenderDrawing::createDisplayElement(BigViewportPartitio
 	assert(vpPartition);
 	RECT_f regOfBigScreen = vpPartition->getRegOfBigScreen();
 	int zIndex = vpPartition->getZIndex();	
-	return m_render->createDisplayElement(regOfBigScreen, zIndex);
+
+	ZRect* de = ZRect::create(m_render, regOfBigScreen, zIndex);//new ZRect(m_render);
+	assert(de);
+	return de;
+
+	//return m_render->createDisplayElement(regOfBigScreen, zIndex);
 }
 
 void RenderDrawing::addViewportPartition(BigViewportPartition* vpPartition)
@@ -223,7 +230,8 @@ int RenderDrawing::doRenderWork()
 				{
 					*iter = NULL;
 					de = vpp->getAttachedDisplayElement();
-					m_render->releaseDisplayElement(&de);
+					//m_render->releaseDisplayElement(&de);
+					ZRect::release((ZRect**)&de);
 					delete vpp;
 				}
 				continue;

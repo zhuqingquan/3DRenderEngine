@@ -5,6 +5,7 @@
 #include "DxRender_D3D11.h"
 #include "BackgroundDisplayComponent.h"
 #include <assert.h>
+#include "element/zRect.h"
 
 using namespace zRender;
 
@@ -52,16 +53,6 @@ void DxRender::deinit()
 	m_renderImp->deinit();
 }
 
-DisplayElement* DxRender::createDisplayElement(const RECT_f& displayReg, int zIndex)
-{
-	return m_renderImp->createDisplayElement(displayReg, zIndex, this);
-}
-
-int DxRender::releaseDisplayElement(DisplayElement** displayElement)
-{
-	return m_renderImp->releaseDisplayElement(displayElement);
-}
-
 int DxRender::draw(DisplayElement* displayElem)
 {
 	return m_renderImp->draw(displayElem);
@@ -103,7 +94,8 @@ int DxRender::setupBackground(IDisplayContentProvider* contentProvider, const RE
 		return -4;
 	}
 
-	DisplayElement* de = m_renderImp->createDisplayElement(displayReg, (int)(RANGE_OF_ZINDEX_MAX-180), this);
+	//DisplayElement* de = m_renderImp->createDisplayElement(displayReg, (int)(RANGE_OF_ZINDEX_MAX-180), this);
+	ZRect* de = ZRect::create(this, displayReg, (int)(RANGE_OF_ZINDEX_MAX - 180));
 	assert(de);
 	if(NULL==de)
 	{
@@ -126,11 +118,12 @@ int DxRender::setupBackground(IDisplayContentProvider* contentProvider, const RE
 		int ret = texDataSrc->getTextureProfile(texEffectReg, dataLen, ypitch, upitch, vpitch, width, height, pixelFmt);
 		if(ret!=0 || dataLen==0 || pixelFmt==0 || width==0 || height==0)
 		{
-			m_renderImp->releaseDisplayElement(&de);
+			//m_renderImp->releaseDisplayElement(&de);
+			ZRect::release(&de);
 			printf("Error in DxRender::setupBackground : get texture's profile failed.\n");			
 			return -5;
 		}
-		de->setTextureDataSource(texDataSrc, texEffectReg);
+		de->setTextureDataSource(texDataSrc);
 		de->createRenderResource();
 		de->updateTexture();
 	}

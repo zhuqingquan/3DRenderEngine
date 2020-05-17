@@ -5,7 +5,6 @@
 #include "SharedFrameTexture.h"
 #include "ElemDsplModel.h"
 #include "ConstDefine.h"
-#include "RectangleDataCtxInitializer.h"
 #include "ElementDrawingContext.h"
 #include "ElementMetaData.h"
 #include "inc/TextureResource.h"
@@ -15,40 +14,24 @@
 using namespace zRender;
 #define LOG_TAG L"DxRender_DisplayElement"
 
-DisplayElement::DisplayElement(DxRender* dxRender, ID3D11Device* d3dDevice, ID3D11DeviceContext* context)
-	: m_dxRender(dxRender), m_device(d3dDevice), m_context(context)
+DisplayElement::DisplayElement(DxRender* dxRender)
+	: m_dxRender(dxRender)
 	, m_IndexBuf(NULL), m_VertexBuf(NULL)
 	, m_isTextureUpdated(false)
 	, m_isVertexInfoUpdated(false)
-	, m_TexFmt(PIXFMT_UNKNOW), m_TexWidth(0), m_TexHeight(0), m_TexDataSrc(NULL)
-	, m_DataCtxInitializer(new RectangleDataCtxInitializer())
+	, m_DataCtxInitializer(nullptr)
 	, m_DrawingContext(nullptr), m_MetaData(nullptr)
 {
-	if (0 != m_DataCtxInitializer->init(dxRender))
-	{
-		log_e(LOG_TAG, _T("Init Data context failed."));
-	}
-	else
-	{
-		m_DrawingContext = m_DataCtxInitializer->GetDrawingContext();
-		m_MetaData = m_DataCtxInitializer->GetMetaData();
-		m_isVertexInfoUpdated = true;
-	}
+
 }
 
 DisplayElement::~DisplayElement()
 {
-	if (m_DataCtxInitializer != nullptr)
-	{
-		m_DataCtxInitializer->deinit();
-		delete m_DataCtxInitializer;
-		m_DataCtxInitializer = nullptr;
-	}
 	releaseRenderResource();
 	m_applyingTexture.clear();
 }
 
-int DisplayElement::setDisplayRegion(const RECT_f& displayReg, float zIndex)
+int DisplayElement::move(const RECT_f& displayReg, float zIndex)
 {
 	if (m_DrawingContext != nullptr)
 	{
@@ -71,7 +54,7 @@ float zRender::DisplayElement::getZIndex() const
 	return m_DrawingContext->getZIndex();
 }
 
-int DisplayElement::setTextureDataSource(TextureDataSource* dataSrc, const RECT_f& textureReg)
+int DisplayElement::setTextureDataSource(TextureDataSource* dataSrc)
 {
 	if (m_MetaData == nullptr)
 		return DXRENDER_RESULT_NOT_INIT_YET;
@@ -116,12 +99,11 @@ int DisplayElement::createRenderResource()
 	return DXRENDER_RESULT_OK;
 }
 
-int DisplayElement::releaseRenderResource()
+void DisplayElement::releaseRenderResource()
 {
 	releaseVertexBuffer();
 	releaseIndexBuffer();
 	releaseTextureResource();
-	return 0;
 }
 
 int DisplayElement::createTextureResource()

@@ -68,7 +68,7 @@ int BigViewportPartition::disattachView()
 		m_attachedView->releaseAutorization(this);
 		m_attachedView = NULL;
 	}
-	m_attachedDE->setTextureDataSource(NULL, RECT_f());
+	m_attachedDE->setTextureDataSource(NULL);
 	return 0;
 }
 
@@ -147,7 +147,7 @@ void BigViewportPartition::updateTexture()
 		{
 			m_attachedDE->enableTransparent(true);
 		}
-		m_attachedDE->setTextureDataSource(tds, m_regOfBigViewport);
+		m_attachedDE->setTextureDataSource(tds/*, m_regOfBigViewport*/);
 		m_attachedDE->createRenderResource();
 		//m_attachedDE->updateTexture(m_curDrawedTextureIdentify);
 		m_attachedDE->updateTexture();
