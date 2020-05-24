@@ -175,6 +175,10 @@ int zRender::RectDrawingContext::apply(DxRender* render, ITextureResource* textu
 			effect->setTexture_V(srvList[2]);
 			break;
 		default:
+			if (texture)
+			{
+				texture->releaseSync(0);
+			}
 			return -6;
 			break;
 		}
