@@ -175,12 +175,8 @@ int zRender::RectDrawingContext::apply(DxRender* render, ITextureResource* textu
 			effect->setTexture_V(srvList[2]);
 			break;
 		default:
-			if (texture)
-			{
-				texture->releaseSync(0);
-			}
-			return -6;
-			break;
+			curTexRes->releaseSync(0);
+			return DXRENDER_RESULT_NOT_IMPLETE;
 		}
 		if (texPixfmt == PIXFMT_YUY2)
 		{

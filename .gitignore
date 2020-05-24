@@ -10,3 +10,12 @@
 /Effects11/Effects11_2008.vcxproj.user
 *.user
 /.vs
+depends
+DWIPCWrapper
+common
+build/*.htm
+StreamOutputer
+SharedTextureIPC
+SharedTextureDumper
+MemoryPool
+MediaEncoder
