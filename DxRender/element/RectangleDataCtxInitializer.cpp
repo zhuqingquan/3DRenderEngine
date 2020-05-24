@@ -24,7 +24,7 @@ int RectangleDataCtxInitializer::init(DxRender* render)
 {
 	if (render == nullptr)
 		return DXRENDER_RESULT_NOT_INIT_YET;
-	if (0 != m_metaData->init(render, _T("G:\\´úÂëºÚ¶´\\3DRenderEngine\\DxRender\\FX\\DefaultVideo.fxo")))
+	if (0 != m_metaData->init(render, _T("FX\\DefaultVideo.fxo")))
 	{
 		log_e(TAG, _T("Init meta data failed."));
 		return DXRENDER_RESULT_SUBCOMPONENT_INIT_FAILED;

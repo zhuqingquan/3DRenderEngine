@@ -249,12 +249,12 @@ int RenderDrawing::doRenderWork()
 			//snpRes->dumpToFile(_T("dx_render_snapshot.rgb"));
 			delete snpRes;
 		}
-		*/
+		
 		if(0== render->getSnapshot(pdstData, dstDataLen, dstWidth, dstHeight, dstPixfmt, dstPitch))
 		{
 			int len = dstPitch * dstHeight;
 			dstOuput.write((char*)pdstData, len);
-		}
+		}*/
 		Sleep(10);
 	}
 	free(pdstData);

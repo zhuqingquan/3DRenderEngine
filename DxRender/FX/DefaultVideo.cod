@@ -135,7 +135,7 @@ fxgroup
                 dcl_output o4.xyzw
                 dcl_temps 5
                 
-                #line 105 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 104 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[0].xyzw  // vout<4:NaN:Inf>
@@ -145,13 +145,13 @@ fxgroup
                 dp3 r2.y, v1.xyzx, cb0[5].xyzx  // vout<8:NaN:Inf>
                 dp3 r2.z, v1.xyzx, cb0[6].xyzx  // vout<9:NaN:Inf>
                 
-                #line 109
+                #line 108
                 dp4 r3.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r3.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 dp4 r3.w, r0.xyzw, cb0[11].xyzw  // vout<3:NaN:Inf>
                 
-                #line 112
+                #line 111
                 mov r0.xy, v2.xyxx
                 mov r0.zw, l(0,0,0,1.000000)
                 dp4 r4.x, r0.xyzw, cb0[12].xyzw  // vout<10:NaN:Inf>
@@ -262,27 +262,27 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 10
                 
-                #line 268 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 267 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 dp3 r0.x, v2.xyzx, v2.xyzx
                 rsq r0.x, r0.x
                 mul r0.xyz, r0.xxxx, v2.xyzx  // pin<7:NaN:Inf,8:NaN:Inf,9:NaN:Inf>
                 
-                #line 271
+                #line 270
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb1[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 274
+                #line 273
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 277
+                #line 276
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 288
+                #line 287
                 mov r2.xyzw, v4.xyzw  // texColor<0,1,2,3>
                 mul r0.w, r2.w, cb0[0].x  // texColor<3:Inf>
                 
-                #line 308
+                #line 307
                 nop 
                 mov r3.xyz, cb2[16].xyzx  // mat<0,1,2>
                 mov r4.xyz, cb2[17].xyzx  // mat<4,5,6>
@@ -325,22 +325,22 @@ fxgroup
                 movc r1.xyz, r2.wwww, r1.xyzx, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r0.xyz, r2.wwww, r0.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 308 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 307 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r3.xyz, r3.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r1.xyz, r1.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r0.xyz, r0.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 311
+                #line 310
                 add r3.xyz, r3.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf>
                 add r1.xyz, r1.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r0.xyz, r0.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 317
+                #line 316
                 add r1.xyz, r1.xyzx, r3.xyzx
                 mul r1.xyz, r1.xyzx, r2.xyzx
                 add r0.xyz, r0.xyzx, r1.xyzx  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 321
+                #line 320
                 mul r0.w, r0.w, cb2[17].w  // litColor<3:NaN:Inf>
                 mov o0.xyz, r0.xyzx  // PS_ARGB<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov o0.w, r0.w  // PS_ARGB<3:NaN:Inf>
@@ -426,7 +426,7 @@ fxgroup
                 dcl_output o4.xyzw
                 dcl_temps 5
                 
-                #line 105 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 104 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[0].xyzw  // vout<4:NaN:Inf>
@@ -436,13 +436,13 @@ fxgroup
                 dp3 r2.y, v1.xyzx, cb0[5].xyzx  // vout<8:NaN:Inf>
                 dp3 r2.z, v1.xyzx, cb0[6].xyzx  // vout<9:NaN:Inf>
                 
-                #line 109
+                #line 108
                 dp4 r3.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r3.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 dp4 r3.w, r0.xyzw, cb0[11].xyzw  // vout<3:NaN:Inf>
                 
-                #line 112
+                #line 111
                 mov r0.xy, v2.xyxx
                 mov r0.zw, l(0,0,0,1.000000)
                 dp4 r4.x, r0.xyzw, cb0[12].xyzw  // vout<10:NaN:Inf>
@@ -541,23 +541,23 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 12
                 
-                #line 122 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 121 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 dp3 r0.x, v2.xyzx, v2.xyzx
                 rsq r0.x, r0.x
                 mul r0.xyz, r0.xxxx, v2.xyzx  // pin<7:NaN:Inf,8:NaN:Inf,9:NaN:Inf>
                 
-                #line 125
+                #line 124
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb0[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 128
+                #line 127
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 131
+                #line 130
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r2.xyz, cb1[16].xyzx  // mat<0,1,2>
                 mov r3.xyz, cb1[17].xyzx  // mat<4,5,6>
@@ -600,17 +600,17 @@ fxgroup
                 movc r6.xyz, r1.wwww, r6.xyzx, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r7.xyz, r1.wwww, r7.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r5.xyz, r5.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r6.xyz, r6.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r7.xyz, r7.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r5.xyz, r5.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf>
                 add r6.xyz, r6.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r7.xyz, r7.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r8.xyz, cb0[4].xyzx  // L<0,1,2>
                 mov r9.xyz, cb0[5].xyzx  // L<4,5,6>
@@ -648,22 +648,22 @@ fxgroup
                 movc r0.xyz, r1.wwww, r0.yzwy, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r1.xyz, r1.wwww, r1.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r2.xyz, r2.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r0.xyz, r0.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r1.xyz, r1.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r2.xyz, r2.xyzx, r5.xyzx  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r0.xyz, r0.xyzx, r6.xyzx  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r1.xyz, r1.xyzx, r7.xyzx  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 196
+                #line 195
                 add r0.xyz, r0.xyzx, r2.xyzx
                 mul r0.xyz, r0.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
                 add r0.xyz, r1.xyzx, r0.xyzx  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 200
+                #line 199
                 mul r0.w, cb1[17].w, l(1.000000)  // litColor<3>
                 mov o0.xyz, r0.xyzx  // PS_YUYV<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov o0.w, r0.w  // PS_YUYV<3>
@@ -749,7 +749,7 @@ fxgroup
                 dcl_output o4.xyzw
                 dcl_temps 5
                 
-                #line 105 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 104 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[0].xyzw  // vout<4:NaN:Inf>
@@ -759,13 +759,13 @@ fxgroup
                 dp3 r2.y, v1.xyzx, cb0[5].xyzx  // vout<8:NaN:Inf>
                 dp3 r2.z, v1.xyzx, cb0[6].xyzx  // vout<9:NaN:Inf>
                 
-                #line 109
+                #line 108
                 dp4 r3.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r3.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 dp4 r3.w, r0.xyzw, cb0[11].xyzw  // vout<3:NaN:Inf>
                 
-                #line 112
+                #line 111
                 mov r0.xy, v2.xyxx
                 mov r0.zw, l(0,0,0,1.000000)
                 dp4 r4.x, r0.xyzw, cb0[12].xyzw  // vout<10:NaN:Inf>
@@ -864,23 +864,23 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 13
                 
-                #line 122 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 121 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 dp3 r0.x, v2.xyzx, v2.xyzx
                 rsq r0.x, r0.x
                 mul r0.xyz, r0.xxxx, v2.xyzx  // pin<7:NaN:Inf,8:NaN:Inf,9:NaN:Inf>
                 
-                #line 125
+                #line 124
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb0[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 128
+                #line 127
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 131
+                #line 130
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r2.xyz, cb1[16].xyzx  // mat<0,1,2>
                 mov r3.xyz, cb1[17].xyzx  // mat<4,5,6>
@@ -923,17 +923,17 @@ fxgroup
                 movc r6.xyz, r1.wwww, r6.xyzx, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r7.xyz, r1.wwww, r7.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r5.xyz, r5.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r6.xyz, r6.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r7.xyz, r7.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r5.xyz, r5.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf>
                 add r6.xyz, r6.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r7.xyz, r7.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r8.xyz, cb0[4].xyzx  // L<0,1,2>
                 mov r9.xyz, cb0[5].xyzx  // L<4,5,6>
@@ -971,17 +971,17 @@ fxgroup
                 movc r9.xyz, r1.wwww, r9.xyzx, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r10.xyz, r1.wwww, r10.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r8.xyz, r8.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r9.xyz, r9.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r10.xyz, r10.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r5.xyz, r5.xyzx, r8.xyzx  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r6.xyz, r6.xyzx, r9.xyzx  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r7.xyz, r7.xyzx, r10.xyzx  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r8.xyz, cb0[8].xyzx  // L<0,1,2>
                 mov r9.xyz, cb0[9].xyzx  // L<4,5,6>
@@ -1019,22 +1019,22 @@ fxgroup
                 movc r0.xyz, r1.wwww, r0.yzwy, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r1.xyz, r1.wwww, r1.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r2.xyz, r2.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r0.xyz, r0.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r1.xyz, r1.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r2.xyz, r2.xyzx, r5.xyzx  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r0.xyz, r0.xyzx, r6.xyzx  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r1.xyz, r1.xyzx, r7.xyzx  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 196
+                #line 195
                 add r0.xyz, r0.xyzx, r2.xyzx
                 mul r0.xyz, r0.xyzx, l(1.000000, 1.000000, 1.000000, 0.000000)
                 add r0.xyz, r1.xyzx, r0.xyzx  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 200
+                #line 199
                 mul r0.w, cb1[17].w, l(1.000000)  // litColor<3>
                 mov o0.xyz, r0.xyzx  // PS_YUYV<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov o0.w, r0.w  // PS_YUYV<3>
@@ -1120,7 +1120,7 @@ fxgroup
                 dcl_output o4.xyzw
                 dcl_temps 5
                 
-                #line 105 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 104 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[0].xyzw  // vout<4:NaN:Inf>
@@ -1130,13 +1130,13 @@ fxgroup
                 dp3 r2.y, v1.xyzx, cb0[5].xyzx  // vout<8:NaN:Inf>
                 dp3 r2.z, v1.xyzx, cb0[6].xyzx  // vout<9:NaN:Inf>
                 
-                #line 109
+                #line 108
                 dp4 r3.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r3.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 dp4 r3.w, r0.xyzw, cb0[11].xyzw  // vout<3:NaN:Inf>
                 
-                #line 112
+                #line 111
                 mov r0.xy, v2.xyxx
                 mov r0.zw, l(0,0,0,1.000000)
                 dp4 r4.x, r0.xyzw, cb0[12].xyzw  // vout<10:NaN:Inf>
@@ -1231,36 +1231,36 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 3
                 
-                #line 138 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 137 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 sample_indexable(texture2d)(float,float,float,float) r0.x, v3.xyxx, t0.xyzw, s0  // oneSample<0:Inf>
                 
-                #line 155
+                #line 154
                 sample_indexable(texture2d)(float,float,float,float) r1.x, v3.xyxx, t1.xyzw, s1  // parity<0:Inf>
                 lt r1.x, l(0.500000), r1.x
                 
-                #line 160
+                #line 159
                 mov r1.y, -cb0[0].y
                 add r2.x, r1.y, v3.x
                 mov r2.y, v3.y
                 sample_indexable(texture2d)(float,float,float,float) r0.y, r2.xyxx, t0.zyxw, s1  // u<0:Inf>
                 
-                #line 165
+                #line 164
                 add r2.x, v3.x, cb0[0].y
                 mov r2.y, v3.y
                 sample_indexable(texture2d)(float,float,float,float) r0.z, r2.xyxx, t0.zxyw, s1  // v<0:Inf>
                 
-                #line 157
+                #line 156
                 if_nz r1.x
                   sample_indexable(texture2d)(float,float,float,float) r0.z, v3.xyxx, t0.zxyw, s1  // v<0:Inf>
                 else 
                 
-                #line 164
+                #line 163
                   sample_indexable(texture2d)(float,float,float,float) r0.y, v3.xyxx, t0.zyxw, s1  // u<0:Inf>
                 
-                #line 157
+                #line 156
                 endif 
                 
-                #line 167
+                #line 166
                 mov r0.w, l(1.000000)
                 dp4 r1.x, l(1.164383, 0.000000, 1.596027, -0.874202), r0.xyzw  // texColor<0:NaN:Inf>
                 dp4 r1.y, l(1.164383, -0.391762, -0.812968, 0.531668), r0.xyzw  // texColor<1:NaN:Inf>
@@ -1268,10 +1268,10 @@ fxgroup
                 mov r0.w, cb0[0].x
                 dp4 r0.x, l(0.000000, 0.000000, 0.000000, 1.000000), r0.xyzw  // texColor<3:NaN:Inf>
                 
-                #line 174
+                #line 173
                 mov r1.xyz, r1.xyzx  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 200
+                #line 199
                 mul r0.x, r0.x, cb1[17].w  // litColor<3:NaN:Inf>
                 mov o0.xyz, r1.xyzx  // PS_YUYV<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov o0.w, r0.x  // PS_YUYV<3:NaN:Inf>
@@ -1357,7 +1357,7 @@ fxgroup
                 dcl_output o4.xyzw
                 dcl_temps 5
                 
-                #line 105 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 104 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[0].xyzw  // vout<4:NaN:Inf>
@@ -1367,13 +1367,13 @@ fxgroup
                 dp3 r2.y, v1.xyzx, cb0[5].xyzx  // vout<8:NaN:Inf>
                 dp3 r2.z, v1.xyzx, cb0[6].xyzx  // vout<9:NaN:Inf>
                 
-                #line 109
+                #line 108
                 dp4 r3.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r3.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 dp4 r3.w, r0.xyzw, cb0[11].xyzw  // vout<3:NaN:Inf>
                 
-                #line 112
+                #line 111
                 mov r0.xy, v2.xyxx
                 mov r0.zw, l(0,0,0,1.000000)
                 dp4 r4.x, r0.xyzw, cb0[12].xyzw  // vout<10:NaN:Inf>
@@ -1468,7 +1468,7 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 2
                 
-                #line 224 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 223 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 sample_indexable(texture2d)(float,float,float,float) r0.x, v3.xyxx, t0.xyzw, s0  // y<0:Inf>
                 sample_indexable(texture2d)(float,float,float,float) r0.y, v3.xyxx, t1.yxzw, s0  // u<0:Inf>
                 sample_indexable(texture2d)(float,float,float,float) r0.z, v3.xyxx, t2.yzxw, s0  // v<0:Inf>
@@ -1479,10 +1479,10 @@ fxgroup
                 mov r0.w, cb0[0].x
                 dp4 r0.x, l(0.000000, 0.000000, 0.000000, 1.000000), r0.xyzw  // texColor<3:NaN:Inf>
                 
-                #line 234
+                #line 233
                 mov r1.xyz, r1.xyzx  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 260
+                #line 259
                 mul r0.x, r0.x, cb1[17].w  // litColor<3:NaN:Inf>
                 mov o0.xyz, r1.xyzx  // PS_YUV420<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov o0.w, r0.x  // PS_YUV420<3:NaN:Inf>
@@ -1568,7 +1568,7 @@ fxgroup
                 dcl_output o4.xyzw
                 dcl_temps 5
                 
-                #line 105 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 104 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[0].xyzw  // vout<4:NaN:Inf>
@@ -1578,13 +1578,13 @@ fxgroup
                 dp3 r2.y, v1.xyzx, cb0[5].xyzx  // vout<8:NaN:Inf>
                 dp3 r2.z, v1.xyzx, cb0[6].xyzx  // vout<9:NaN:Inf>
                 
-                #line 109
+                #line 108
                 dp4 r3.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r3.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 dp4 r3.w, r0.xyzw, cb0[11].xyzw  // vout<3:NaN:Inf>
                 
-                #line 112
+                #line 111
                 mov r0.xy, v2.xyxx
                 mov r0.zw, l(0,0,0,1.000000)
                 dp4 r4.x, r0.xyzw, cb0[12].xyzw  // vout<10:NaN:Inf>
@@ -1675,16 +1675,16 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 1
                 
-                #line 284 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 283 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 sample_indexable(texture2d)(float,float,float,float) r0.xyzw, v3.xyxx, t0.xyzw, s0  // texColor<0:Inf,1:Inf,2:Inf,3:Inf>
                 
-                #line 290
+                #line 289
                 mul r0.w, r0.w, cb0[0].x  // texColor<3:NaN:Inf>
                 
-                #line 295
+                #line 294
                 mov r0.xyz, r0.xyzx  // litColor<0:Inf,1:Inf,2:Inf>
                 
-                #line 321
+                #line 320
                 mul r0.w, r0.w, cb1[17].w  // litColor<3:NaN:Inf>
                 mov o0.xyz, r0.xyzx  // PS_ARGB<0:Inf,1:Inf,2:Inf>
                 mov o0.w, r0.w  // PS_ARGB<3:NaN:Inf>
@@ -1770,7 +1770,7 @@ fxgroup
                 dcl_output o4.xyzw
                 dcl_temps 5
                 
-                #line 105 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 104 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[0].xyzw  // vout<4:NaN:Inf>
@@ -1780,13 +1780,13 @@ fxgroup
                 dp3 r2.y, v1.xyzx, cb0[5].xyzx  // vout<8:NaN:Inf>
                 dp3 r2.z, v1.xyzx, cb0[6].xyzx  // vout<9:NaN:Inf>
                 
-                #line 109
+                #line 108
                 dp4 r3.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r3.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 dp4 r3.w, r0.xyzw, cb0[11].xyzw  // vout<3:NaN:Inf>
                 
-                #line 112
+                #line 111
                 mov r0.xy, v2.xyxx
                 mov r0.zw, l(0,0,0,1.000000)
                 dp4 r4.x, r0.xyzw, cb0[12].xyzw  // vout<10:NaN:Inf>
@@ -1879,7 +1879,7 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 2
                 
-                #line 345 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 344 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 sample_indexable(texture2d)(float,float,float,float) r0.x, v3.xyxx, t0.xyzw, s0  // y<0:Inf>
                 sample_indexable(texture2d)(float,float,float,float) r1.xy, v3.xyxx, t1.xyzw, s0  // u<0:Inf>
                 mov r0.y, r1.x
@@ -1891,10 +1891,10 @@ fxgroup
                 mov r0.w, cb0[0].x
                 dp4 r0.x, l(0.000000, 0.000000, 0.000000, 1.000000), r0.xyzw  // texColor<3:NaN:Inf>
                 
-                #line 359
+                #line 358
                 mov r1.xyz, r1.xyzx  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 385
+                #line 384
                 mul r0.x, r0.x, cb1[17].w  // litColor<3:NaN:Inf>
                 mov o0.xyz, r1.xyzx  // PS_NV12<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov o0.w, r0.x  // PS_NV12<3:NaN:Inf>
@@ -1980,7 +1980,7 @@ fxgroup
                 dcl_output o4.xyzw
                 dcl_temps 5
                 
-                #line 105 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 104 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[0].xyzw  // vout<4:NaN:Inf>
@@ -1990,13 +1990,13 @@ fxgroup
                 dp3 r2.y, v1.xyzx, cb0[5].xyzx  // vout<8:NaN:Inf>
                 dp3 r2.z, v1.xyzx, cb0[6].xyzx  // vout<9:NaN:Inf>
                 
-                #line 109
+                #line 108
                 dp4 r3.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r3.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 dp4 r3.w, r0.xyzw, cb0[11].xyzw  // vout<3:NaN:Inf>
                 
-                #line 112
+                #line 111
                 mov r0.xy, v2.xyxx
                 mov r0.zw, l(0,0,0,1.000000)
                 dp4 r4.x, r0.xyzw, cb0[12].xyzw  // vout<10:NaN:Inf>
@@ -2115,52 +2115,52 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 10
                 
-                #line 122 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 121 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 dp3 r0.x, v2.xyzx, v2.xyzx
                 rsq r0.x, r0.x
                 mul r0.xyz, r0.xxxx, v2.xyzx  // pin<7:NaN:Inf,8:NaN:Inf,9:NaN:Inf>
                 
-                #line 125
+                #line 124
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb1[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 128
+                #line 127
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 131
+                #line 130
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 138
+                #line 137
                 sample_indexable(texture2d)(float,float,float,float) r2.x, v3.xyxx, t0.xyzw, s0  // oneSample<0:Inf>
                 
-                #line 155
+                #line 154
                 sample_indexable(texture2d)(float,float,float,float) r0.w, v3.xyxx, t1.yzwx, s1  // parity<0:Inf>
                 lt r0.w, l(0.500000), r0.w
                 
-                #line 160
+                #line 159
                 mov r1.w, -cb0[0].y
                 add r3.x, r1.w, v3.x
                 mov r3.y, v3.y
                 sample_indexable(texture2d)(float,float,float,float) r2.y, r3.xyxx, t0.zyxw, s1  // u<0:Inf>
                 
-                #line 165
+                #line 164
                 add r3.x, v3.x, cb0[0].y
                 mov r3.y, v3.y
                 sample_indexable(texture2d)(float,float,float,float) r2.z, r3.xyxx, t0.zxyw, s1  // v<0:Inf>
                 
-                #line 157
+                #line 156
                 if_nz r0.w
                   sample_indexable(texture2d)(float,float,float,float) r2.z, v3.xyxx, t0.zxyw, s1  // v<0:Inf>
                 else 
                 
-                #line 164
+                #line 163
                   sample_indexable(texture2d)(float,float,float,float) r2.y, v3.xyxx, t0.zyxw, s1  // u<0:Inf>
                 
-                #line 157
+                #line 156
                 endif 
                 
-                #line 167
+                #line 166
                 mov r2.w, l(1.000000)
                 dp4 r3.x, l(1.164383, 0.000000, 1.596027, -0.874202), r2.xyzw  // texColor<0:NaN:Inf>
                 dp4 r3.y, l(1.164383, -0.391762, -0.812968, 0.531668), r2.xyzw  // texColor<1:NaN:Inf>
@@ -2168,7 +2168,7 @@ fxgroup
                 mov r2.w, cb0[0].x
                 dp4 r0.w, l(0.000000, 0.000000, 0.000000, 1.000000), r2.xyzw  // texColor<3:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r2.xyz, cb2[16].xyzx  // mat<0,1,2>
                 mov r4.xyz, cb2[17].xyzx  // mat<4,5,6>
@@ -2211,22 +2211,22 @@ fxgroup
                 movc r1.xyz, r2.wwww, r1.xyzx, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r0.xyz, r2.wwww, r0.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r2.xyz, r2.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r1.xyz, r1.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r0.xyz, r0.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r2.xyz, r2.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf>
                 add r1.xyz, r1.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r0.xyz, r0.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 196
+                #line 195
                 add r1.xyz, r1.xyzx, r2.xyzx
                 mul r1.xyz, r1.xyzx, r3.xyzx
                 add r0.xyz, r0.xyzx, r1.xyzx  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 200
+                #line 199
                 mul r0.w, r0.w, cb2[17].w  // litColor<3:NaN:Inf>
                 mov o0.xyz, r0.xyzx  // PS_YUYV<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov o0.w, r0.w  // PS_YUYV<3:NaN:Inf>
@@ -2312,7 +2312,7 @@ fxgroup
                 dcl_output o4.xyzw
                 dcl_temps 5
                 
-                #line 105 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 104 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[0].xyzw  // vout<4:NaN:Inf>
@@ -2322,13 +2322,13 @@ fxgroup
                 dp3 r2.y, v1.xyzx, cb0[5].xyzx  // vout<8:NaN:Inf>
                 dp3 r2.z, v1.xyzx, cb0[6].xyzx  // vout<9:NaN:Inf>
                 
-                #line 109
+                #line 108
                 dp4 r3.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r3.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 dp4 r3.w, r0.xyzw, cb0[11].xyzw  // vout<3:NaN:Inf>
                 
-                #line 112
+                #line 111
                 mov r0.xy, v2.xyxx
                 mov r0.zw, l(0,0,0,1.000000)
                 dp4 r4.x, r0.xyzw, cb0[12].xyzw  // vout<10:NaN:Inf>
@@ -2447,52 +2447,52 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 13
                 
-                #line 122 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 121 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 dp3 r0.x, v2.xyzx, v2.xyzx
                 rsq r0.x, r0.x
                 mul r0.xyz, r0.xxxx, v2.xyzx  // pin<7:NaN:Inf,8:NaN:Inf,9:NaN:Inf>
                 
-                #line 125
+                #line 124
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb1[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 128
+                #line 127
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 131
+                #line 130
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 138
+                #line 137
                 sample_indexable(texture2d)(float,float,float,float) r2.x, v3.xyxx, t0.xyzw, s0  // oneSample<0:Inf>
                 
-                #line 155
+                #line 154
                 sample_indexable(texture2d)(float,float,float,float) r0.w, v3.xyxx, t1.yzwx, s1  // parity<0:Inf>
                 lt r0.w, l(0.500000), r0.w
                 
-                #line 160
+                #line 159
                 mov r1.w, -cb0[0].y
                 add r3.x, r1.w, v3.x
                 mov r3.y, v3.y
                 sample_indexable(texture2d)(float,float,float,float) r2.y, r3.xyxx, t0.zyxw, s1  // u<0:Inf>
                 
-                #line 165
+                #line 164
                 add r3.x, v3.x, cb0[0].y
                 mov r3.y, v3.y
                 sample_indexable(texture2d)(float,float,float,float) r2.z, r3.xyxx, t0.zxyw, s1  // v<0:Inf>
                 
-                #line 157
+                #line 156
                 if_nz r0.w
                   sample_indexable(texture2d)(float,float,float,float) r2.z, v3.xyxx, t0.zxyw, s1  // v<0:Inf>
                 else 
                 
-                #line 164
+                #line 163
                   sample_indexable(texture2d)(float,float,float,float) r2.y, v3.xyxx, t0.zyxw, s1  // u<0:Inf>
                 
-                #line 157
+                #line 156
                 endif 
                 
-                #line 167
+                #line 166
                 mov r2.w, l(1.000000)
                 dp4 r3.x, l(1.164383, 0.000000, 1.596027, -0.874202), r2.xyzw  // texColor<0:NaN:Inf>
                 dp4 r3.y, l(1.164383, -0.391762, -0.812968, 0.531668), r2.xyzw  // texColor<1:NaN:Inf>
@@ -2500,7 +2500,7 @@ fxgroup
                 mov r2.w, cb0[0].x
                 dp4 r0.w, l(0.000000, 0.000000, 0.000000, 1.000000), r2.xyzw  // texColor<3:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r2.xyz, cb2[16].xyzx  // mat<0,1,2>
                 mov r4.xyz, cb2[17].xyzx  // mat<4,5,6>
@@ -2543,17 +2543,17 @@ fxgroup
                 movc r7.xyz, r2.wwww, r7.xyzx, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r8.xyz, r2.wwww, r8.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r6.xyz, r6.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r7.xyz, r7.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r8.xyz, r8.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r6.xyz, r6.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf>
                 add r7.xyz, r7.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r8.xyz, r8.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r9.xyz, cb1[4].xyzx  // L<0,1,2>
                 mov r10.xyz, cb1[5].xyzx  // L<4,5,6>
@@ -2591,22 +2591,22 @@ fxgroup
                 movc r1.xyz, r2.wwww, r1.xyzx, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r0.xyz, r2.wwww, r0.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r2.xyz, r2.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r1.xyz, r1.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r0.xyz, r0.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r2.xyz, r2.xyzx, r6.xyzx  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r1.xyz, r1.xyzx, r7.xyzx  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r0.xyz, r0.xyzx, r8.xyzx  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 196
+                #line 195
                 add r1.xyz, r1.xyzx, r2.xyzx
                 mul r1.xyz, r1.xyzx, r3.xyzx
                 add r0.xyz, r0.xyzx, r1.xyzx  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 200
+                #line 199
                 mul r0.w, r0.w, cb2[17].w  // litColor<3:NaN:Inf>
                 mov o0.xyz, r0.xyzx  // PS_YUYV<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov o0.w, r0.w  // PS_YUYV<3:NaN:Inf>
@@ -2692,7 +2692,7 @@ fxgroup
                 dcl_output o4.xyzw
                 dcl_temps 5
                 
-                #line 105 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 104 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r0.xyz, v0.xyzx
                 mov r0.w, l(1.000000)
                 dp4 r1.x, r0.xyzw, cb0[0].xyzw  // vout<4:NaN:Inf>
@@ -2702,13 +2702,13 @@ fxgroup
                 dp3 r2.y, v1.xyzx, cb0[5].xyzx  // vout<8:NaN:Inf>
                 dp3 r2.z, v1.xyzx, cb0[6].xyzx  // vout<9:NaN:Inf>
                 
-                #line 109
+                #line 108
                 dp4 r3.x, r0.xyzw, cb0[8].xyzw  // vout<0:NaN:Inf>
                 dp4 r3.y, r0.xyzw, cb0[9].xyzw  // vout<1:NaN:Inf>
                 dp4 r3.z, r0.xyzw, cb0[10].xyzw  // vout<2:NaN:Inf>
                 dp4 r3.w, r0.xyzw, cb0[11].xyzw  // vout<3:NaN:Inf>
                 
-                #line 112
+                #line 111
                 mov r0.xy, v2.xyxx
                 mov r0.zw, l(0,0,0,1.000000)
                 dp4 r4.x, r0.xyzw, cb0[12].xyzw  // vout<10:NaN:Inf>
@@ -2827,52 +2827,52 @@ fxgroup
                 dcl_output o0.xyzw
                 dcl_temps 14
                 
-                #line 122 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 121 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 dp3 r0.x, v2.xyzx, v2.xyzx
                 rsq r0.x, r0.x
                 mul r0.xyz, r0.xxxx, v2.xyzx  // pin<7:NaN:Inf,8:NaN:Inf,9:NaN:Inf>
                 
-                #line 125
+                #line 124
                 mov r1.xyz, -v1.xyzx
                 add r1.xyz, r1.xyzx, cb1[12].xyzx  // toEye<0:Inf,1:Inf,2:Inf>
                 
-                #line 128
+                #line 127
                 dp3 r0.w, r1.xyzx, r1.xyzx
                 sqrt r0.w, r0.w  // distToEye<0:NaN:Inf>
                 
-                #line 131
+                #line 130
                 div r1.xyz, r1.xyzx, r0.wwww  // toEye<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 138
+                #line 137
                 sample_indexable(texture2d)(float,float,float,float) r2.x, v3.xyxx, t0.xyzw, s0  // oneSample<0:Inf>
                 
-                #line 155
+                #line 154
                 sample_indexable(texture2d)(float,float,float,float) r0.w, v3.xyxx, t1.yzwx, s1  // parity<0:Inf>
                 lt r0.w, l(0.500000), r0.w
                 
-                #line 160
+                #line 159
                 mov r1.w, -cb0[0].y
                 add r3.x, r1.w, v3.x
                 mov r3.y, v3.y
                 sample_indexable(texture2d)(float,float,float,float) r2.y, r3.xyxx, t0.zyxw, s1  // u<0:Inf>
                 
-                #line 165
+                #line 164
                 add r3.x, v3.x, cb0[0].y
                 mov r3.y, v3.y
                 sample_indexable(texture2d)(float,float,float,float) r2.z, r3.xyxx, t0.zxyw, s1  // v<0:Inf>
                 
-                #line 157
+                #line 156
                 if_nz r0.w
                   sample_indexable(texture2d)(float,float,float,float) r2.z, v3.xyxx, t0.zxyw, s1  // v<0:Inf>
                 else 
                 
-                #line 164
+                #line 163
                   sample_indexable(texture2d)(float,float,float,float) r2.y, v3.xyxx, t0.zyxw, s1  // u<0:Inf>
                 
-                #line 157
+                #line 156
                 endif 
                 
-                #line 167
+                #line 166
                 mov r2.w, l(1.000000)
                 dp4 r3.x, l(1.164383, 0.000000, 1.596027, -0.874202), r2.xyzw  // texColor<0:NaN:Inf>
                 dp4 r3.y, l(1.164383, -0.391762, -0.812968, 0.531668), r2.xyzw  // texColor<1:NaN:Inf>
@@ -2880,7 +2880,7 @@ fxgroup
                 mov r2.w, cb0[0].x
                 dp4 r0.w, l(0.000000, 0.000000, 0.000000, 1.000000), r2.xyzw  // texColor<3:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r2.xyz, cb2[16].xyzx  // mat<0,1,2>
                 mov r4.xyz, cb2[17].xyzx  // mat<4,5,6>
@@ -2923,17 +2923,17 @@ fxgroup
                 movc r7.xyz, r2.wwww, r7.xyzx, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r8.xyz, r2.wwww, r8.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r6.xyz, r6.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r7.xyz, r7.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r8.xyz, r8.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r6.xyz, r6.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // ambient<0:Inf,1:Inf,2:Inf>
                 add r7.xyz, r7.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r8.xyz, r8.xyzx, l(0.000000, 0.000000, 0.000000, 0.000000)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r9.xyz, cb1[4].xyzx  // L<0,1,2>
                 mov r10.xyz, cb1[5].xyzx  // L<4,5,6>
@@ -2971,17 +2971,17 @@ fxgroup
                 movc r10.xyz, r2.wwww, r10.xyzx, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r11.xyz, r2.wwww, r11.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r9.xyz, r9.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r10.xyz, r10.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r11.xyz, r11.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r6.xyz, r6.xyzx, r9.xyzx  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r7.xyz, r7.xyzx, r10.xyzx  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r8.xyz, r8.xyzx, r11.xyzx  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187
+                #line 186
                 nop 
                 mov r9.xyz, cb1[8].xyzx  // L<0,1,2>
                 mov r10.xyz, cb1[9].xyzx  // L<4,5,6>
@@ -3019,22 +3019,22 @@ fxgroup
                 movc r1.xyz, r2.wwww, r1.xyzx, l(0,0,0,0)  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 movc r0.xyz, r2.wwww, r0.xyzx, l(0,0,0,0)  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 187 "d:\Projects\SVN\cloud_switcher\client_windows\branches\mshow_v2.1.0.3_fb\packages\DxRender\FX\DefaultVideo.fx"
+                #line 186 "D:\code\3DRenderEngine\DxRender\FX\DefaultVideo.fx"
                 mov r2.xyz, r2.xyzx  // A<0:Inf,1:Inf,2:Inf>
                 mov r1.xyz, r1.xyzx  // D<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov r0.xyz, r0.xyzx  // S<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 190
+                #line 189
                 add r2.xyz, r2.xyzx, r6.xyzx  // ambient<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r1.xyz, r1.xyzx, r7.xyzx  // diffuse<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 add r0.xyz, r0.xyzx, r8.xyzx  // spec<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 196
+                #line 195
                 add r1.xyz, r1.xyzx, r2.xyzx
                 mul r1.xyz, r1.xyzx, r3.xyzx
                 add r0.xyz, r0.xyzx, r1.xyzx  // litColor<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 
-                #line 200
+                #line 199
                 mul r0.w, r0.w, cb2[17].w  // litColor<3:NaN:Inf>
                 mov o0.xyz, r0.xyzx  // PS_YUYV<0:NaN:Inf,1:NaN:Inf,2:NaN:Inf>
                 mov o0.w, r0.w  // PS_YUYV<3:NaN:Inf>

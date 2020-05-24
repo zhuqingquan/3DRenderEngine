@@ -173,11 +173,11 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="FX\DefaultVideo.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">fxc compile for debug: %(InputPath)</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"../depends/directx-jun2010/bin/release/Utilities/bin/x86/fxc.exe" /Fc /Od /Zi /T fx_5_0 /Fo "%(RootDir)%(Directory)\%(Filename).fxo" "%(FullPath)"
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"../depends/directx-jun2010/bin/release/Utilities/bin/x86/fxc.exe" /Fc /Od /Zi /T fx_5_0 /Fo "%(DefiningProjectDirectory)\..\bin\release\%(RelativeDir)%(Filename).fxo" "%(FullPath)"
 </Command>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RootDir)%(Directory)\%(Filename).fxo;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(DefiningProjectDirectory)\..\bin\release\%(RelativeDir)%(Filename).fxo;%(Outputs)</Outputs>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

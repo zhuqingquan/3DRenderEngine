@@ -7,7 +7,6 @@
 #include "LightHelper.fx"
  
 float transparent = 1.0;
-
 //static float4x4 matYUV2RGB = {	1,  0.0,   1.370705, -0.685353,
 //								1,  -0.337633, -0.698001, 0.517817,
 //								1,  1.732446,  0.0, -0.866223,
